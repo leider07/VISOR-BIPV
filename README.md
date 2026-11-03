@@ -25,8 +25,7 @@ plataforma abre directamente en las gráficas.
 
 La pestaña **Explorar** muestra cualquier variable de la base (también las adicionales que declare
 cada instalación, como el fill factor) por módulo o por sensor: en el tiempo, a lo largo del día o
-contra otra variable, y permite descargar los datos en CSV. Usa promedios por hora sin el filtro de
-limpieza; solo descarta valores fuera del rango posible de cada variable.
+contra otra variable, y permite descargar los datos en CSV.
 
 ## Usarla en el computador
 
@@ -55,22 +54,23 @@ En `formato/` está todo lo necesario:
 `procesamiento/validar_bd.py` revisa una base y lista los errores en lenguaje claro antes de
 procesarla.
 
-## Metodología
+## La plataforma es un visor
 
-Los parámetros están en `procesamiento/metodologia.py` y son los mismos para cualquier instalación;
-lo propio de cada una (potencia STC, área, sensores, límites de cada variable) viene de su base.
+La plataforma **no filtra datos**: muestra lo que trae la base tal como se cargó. Cada instalación
+depura sus datos antes de cargarlos (Sumicol, por ejemplo, aplica su propio filtro, ventana horaria
+y días válidos en su script de preparación, fuera de este repositorio).
 
-| Paso | Detalle |
+`procesamiento/procesar.py` solo resume los datos para que las páginas carguen rápido
+(parámetros en `procesamiento/parametros.py`):
+
+| Resumen | Detalle |
 |---|---|
-| Ventana horaria | Solo datos de 5:00 a 19:00. |
+| Promedios por hora | Potencia, irradiancia, temperaturas, humedad, viento y todas las variables de Explorar. |
 | Irradiancia de cada módulo | La del sensor de irradiancia de su superficie, en el mismo minuto. |
-| Filtro de módulos | Etapa 1: límites frente a la potencia STC (potencia fantasma / módulo muerto). Etapa 2: tubo estadístico Q20–Q80 por bins de 10 W/m², suavizado y ampliado. En superficies sin sensor de irradiancia solo se aplican límites de potencia. |
-| Días válidos (energía) | Un día de un módulo cuenta si tiene ≥ 470 mediciones limpias. |
 | Energía | La de la tabla `energia_diaria` si la base la trae; si no, integrando la potencia. |
-| Eficiencia | `P / (G × área)`, solo con G ≥ 100 W/m². |
-| Horas de sol pico | Suma horaria de la irradiancia / 1000, por superficie; día válido con ≥ 80 % de los minutos habituales. |
-| Temperaturas | Entre −5 y 90 °C y dentro de los límites de cada variable. |
-| Viento | Se descartan lecturas ≤ 0 y las que superan el máximo de la variable. |
+| Eficiencia | `P / (G × área)`, solo con G ≥ 100 W/m² (con poca luz el cociente no tiene sentido). |
+| Horas de sol pico | Suma de los promedios horarios de irradiancia / 1000, por día y superficie. |
+| Dispersión potencia–irradiancia | Promedios de 10 minutos, desde 20 W/m². |
 
 ## Estructura
 
@@ -86,7 +86,7 @@ lo propio de cada una (potencia STC, área, sensores, límites de cada variable)
 ├── procesamiento/         # de la base de carga a la base de la plataforma
 │   ├── validar_bd.py
 │   ├── procesar.py
-│   └── metodologia.py
+│   └── parametros.py
 ├── formato/               # guía, esquema y plantilla del formato de carga
 ├── data/visor.db          # base de la plataforma (Sumicol)
 └── assets/                # css/, fonts/ (con sus licencias OFL), img/ (logos, iconos, sumicol)

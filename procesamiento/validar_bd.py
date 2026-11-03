@@ -408,7 +408,7 @@ class Validador:
             if cond:
                 n = self.uno(f"SELECT COUNT(*) FROM {q(tabla)} WHERE {q(c)} IS NOT NULL AND ({' OR '.join(cond)})")
                 if n:
-                    self.r.aviso(f"`{tabla}.{c}`: {n:,} valor(es) fuera de {mn}–{mx}; la plataforma los descartará")
+                    self.r.aviso(f"`{tabla}.{c}`: {n:,} valor(es) fuera de {mn}–{mx}; revísalos (la plataforma los mostrará tal cual)")
 
     def paginas(self):
         hay = set(self.vars)

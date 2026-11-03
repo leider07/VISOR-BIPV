@@ -42,7 +42,6 @@ CONFIG = {
     "toImageButtonOptions": {"format": "png", "scale": 2, "filename": "visor_bipv"},
 }
 
-HORAS = list(range(C.HORA_INICIO, C.HORA_FIN))
 
 
 def color_modulo(posicion):
@@ -107,9 +106,12 @@ def _base(fig, y_titulo, x_titulo, alto=380, leyenda=True):
 
 
 def _eje_horas(fig):
-    fig.update_xaxes(tickmode="array", tickvals=list(range(6, 19, 2)),
-                     ticktext=[f"{h}:00" for h in range(6, 19, 2)],
-                     range=[C.HORA_INICIO - 0.5, C.HORA_FIN - 0.5])
+    """Eje de horas del día según las horas que tienen datos en la base."""
+    m = D.metadatos()
+    h0, h1 = int(m.get("hora_min", 0)), int(m.get("hora_max", 23))
+    marcas = [h for h in range(h0, h1 + 1) if h % 2 == 0]
+    fig.update_xaxes(tickmode="array", tickvals=marcas, ticktext=[f"{h}:00" for h in marcas],
+                     range=[h0 - 0.5, h1 + 0.5])
     return fig
 
 
@@ -409,10 +411,8 @@ def explorar_perfil(series, nombre, unidad, dec=2):
     for et, d, col in series:
         if d.empty:
             continue
-        g = d.groupby("hora").valor
-        st = pd.DataFrame({"m": g.mean(), "q1": g.quantile(0.25), "q3": g.quantile(0.75)}).reset_index()
-        _banda(fig, st.hora, st.q1, st.q3, col, et, et)
-        fig.add_trace(go.Scatter(x=st.hora, y=st.m, mode="lines+markers", name=et, legendgroup=et,
+        st = d.groupby("hora").valor.mean().rename("m").reset_index()
+        fig.add_trace(go.Scatter(x=st.hora, y=st.m, mode="lines+markers", name=et,
                                  line=dict(color=col, width=3), marker=dict(size=5),
                                  hovertemplate=f"%{{y:.{dec}f}}{u}<extra>%{{fullData.name}}</extra>"))
     _base(fig, _eje_y(nombre, unidad), "Hora del día", 440)

@@ -57,6 +57,9 @@ app.layout = layout
 
 
 # ------------------------------------------------------------------ navegación
+def NOTA_FILTROS():
+    """Los datos de Sumicol se prepararon con una ventana de 5:00 a 19:00; las demás bases se muestran tal cual."""
+    return "Datos filtrados de 5:00 a 19:00" if D.es_resumen_fijo() else ""
 def _ruta(ruta):
     rutas = [r for r, _ in paginas()]
     return ruta if ruta in rutas else rutas[0]
@@ -75,9 +78,9 @@ def navegacion(ruta):
         return clases, {"display": "none"}, "", "", "", "grupo-filtro", "grupo-filtro"
     tit, sub = P.titulos(ruta)
     if ruta == "/explorar":   # Explorar tiene sus propios selectores; de la barra solo quedan las fechas
-        return clases, {}, tit, sub, "Datos de 5:00 a 19:00", "grupo-filtro oculto", "grupo-filtro oculto"
+        return clases, {}, tit, sub, NOTA_FILTROS(), "grupo-filtro oculto", "grupo-filtro oculto"
     cara_cls = "grupo-filtro atenuado" if ruta == "/clima" else "grupo-filtro"
-    return clases, {}, tit, sub, "Datos filtrados de 5:00 a 19:00", cara_cls, "grupo-filtro"
+    return clases, {}, tit, sub, NOTA_FILTROS(), cara_cls, "grupo-filtro"
 
 
 @app.callback(
@@ -147,7 +150,6 @@ def explorar_eje(eje):
 
 
 @app.callback(Output("exp-grafica", "figure"), Output("exp-titulo", "children"), Output("exp-subtitulo", "children"),
-              Output("exp-nota", "children"),
               Input("exp-entidades", "value"), Input("exp-eje", "value"), Input("exp-xvariable", "value"),
               Input("fechas", "data"), State("exp-variable", "value"))
 def explorar_grafica(entidades, eje, xvariable, fechas, variable):

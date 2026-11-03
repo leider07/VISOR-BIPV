@@ -386,7 +386,6 @@ def explorar(f):
                 html.Button("Descargar datos", id="btn-descargar-exp", n_clicks=0, className="btn btn-sec btn-peq")]),
             dcc.Loading(type="dot", color="#1b554f", children=dcc.Graph(id="exp-grafica", config=G.CONFIG,
                                                                          className="grafica")),
-            html.P(id="exp-nota", className="nota"),
         ]),
     ])
 
@@ -410,30 +409,25 @@ def datos_explorar(variable, entidades, eje, xvariable, ini, fin):
 
 
 def figura_explorar(variable, entidades, eje, xvariable, ini, fin):
-    """(figura, título, subtítulo, nota)."""
+    """(figura, título, subtítulo)."""
     if variable not in D.variables_explorar().index:
-        return G.vacia(), "", "", ""
+        return G.vacia(), "", ""
     series, _ = datos_explorar(variable, entidades, eje, xvariable, ini, fin)
     nom, uni = nombre_variable(variable), unidad_variable(variable)
     if not series:
-        return G.vacia("Elige al menos un lugar en «Dónde»."), nom, "", ""
+        return G.vacia("Elige al menos un lugar en «Dónde»."), nom, ""
     if eje == "tiempo":
         fig = G.explorar_tiempo(series, nom, uni)
         sub = "Promedio de cada hora · usa la barra inferior para acercarte"
     elif eje == "hora":
         fig = G.explorar_perfil(series, nom, uni)
-        sub = "Línea = promedio por hora · franja = rango donde cae la mitad de los días"
+        sub = "Promedio por hora"
     else:
         xn, xu = nombre_variable(xvariable), unidad_variable(xvariable)
         fig = G.explorar_dispersion(series, xn, xu, nom, uni)
         nom = f"{nom} según {xn[0].lower() + xn[1:]}"
         sub = "Cada punto es el promedio de una hora · la otra variable se toma del mismo lugar o del sitio"
-    fija = bool(D.variables_explorar().loc[variable, "es_fija"])
-    nota = ("Datos de las 5:00 a las 19:00, sin el filtro de limpieza de las pestañas Energía y Desempeño: "
-            "solo se descartan valores fuera del rango posible de cada variable.")
-    if not fija:
-        nota = "Variable adicional de la instalación. " + nota
-    return fig, nom, sub, nota
+    return fig, nom, sub
 
 
 def csv_explorar(variable, entidades, eje, xvariable, ini, fin):

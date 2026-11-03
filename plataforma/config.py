@@ -7,13 +7,12 @@ Aquí solo quedan rutas y opciones de la aplicación.
 """
 from pathlib import Path
 
-from procesamiento import metodologia as M
+from procesamiento import parametros as M
 
 RAIZ = Path(__file__).resolve().parent.parent          # carpeta del repositorio
 DB_VISOR = RAIZ / "data" / "visor.db"
 
-# Ventana horaria y muestreo de la dispersión (los mismos del procesamiento)
-HORA_INICIO, HORA_FIN = M.HORA_INICIO, M.HORA_FIN
+# Muestreo de la dispersión potencia vs irradiancia (el mismo del procesamiento)
 DISPERSION_MINUTOS = M.DISPERSION_MINUTOS
 
 # Instalación que tiene la pestaña Resumen propia (textos y fotos fijos, plataforma/resumen_sumicol.py).

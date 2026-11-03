@@ -84,7 +84,7 @@ def matriz_irradiancia(ini, fin, superficie):
 
 
 def hsp_dia(ini, fin):
-    return _q("SELECT superficie_id, fecha, hsp FROM hsp_dia WHERE valido = 1 AND fecha BETWEEN ? AND ? "
+    return _q("SELECT superficie_id, fecha, hsp FROM hsp_dia WHERE fecha BETWEEN ? AND ? "
               "ORDER BY fecha", (ini, fin))
 
 
