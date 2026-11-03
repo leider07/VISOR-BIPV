@@ -95,21 +95,23 @@ def revisar(d):
             e.append(f"Módulos, fila {i}: elige una tecnología de la tabla Tecnologías.")
 
     adic = _filas(d.get("adicionales"))
-    reservados = set(ELECTRICAS_OPCIONALES + AMBIENTALES_FIJAS + ["potencia_max_w", "fecha_hora", "modulo_id"])
+    reservados = set(AMBIENTALES_FIJAS + ["potencia_max_w", "fecha_hora", "modulo_id"])
     ids_adic = set()
     for i, f in enumerate(adic, 1):
         c = _txt(f.get("variable_id"))
         if not c or not CODIGO.match(c):
-            e.append(f"Variables adicionales, fila {i}: el código solo puede tener letras sin tilde, números y _.")
+            e.append(f"Otras variables, fila {i}: el código solo puede tener letras sin tilde, números y _.")
         elif c in reservados or c in ids_adic:
-            e.append(f"Variables adicionales, fila {i}: el código «{c}» ya existe.")
+            e.append(f"Otras variables, fila {i}: el código «{c}» ya existe.")
         ids_adic.add(c)
         if not _txt(f.get("nombre")):
-            e.append(f"Variables adicionales, fila {i}: falta el nombre.")
+            e.append(f"Otras variables, fila {i}: falta el nombre.")
         if _txt(f.get("tipo")) not in ("electrica", "ambiental"):
-            e.append(f"Variables adicionales, fila {i}: elige si es eléctrica o ambiental.")
+            e.append(f"Otras variables, fila {i}: elige si es eléctrica o ambiental.")
+        elif c in ELECTRICAS_OPCIONALES and _txt(f.get("tipo")) != "electrica":
+            e.append(f"Otras variables, fila {i}: «{c}» es una variable eléctrica.")
         if _txt(f.get("agregacion")) not in AGREGACIONES:
-            e.append(f"Variables adicionales, fila {i}: elige cómo se resume (promedio, suma, mínimo o máximo).")
+            e.append(f"Otras variables, fila {i}: elige cómo se resume (promedio, suma, mínimo o máximo).")
     amb_adic = {_txt(f.get("variable_id")) for f in adic if _txt(f.get("tipo")) == "ambiental"}
 
     sen = _filas(d.get("sensores"))
@@ -174,15 +176,22 @@ def crear(d, destino):
         # Variables: se dejan solo las que se van a entregar
         sen = _filas(d.get("sensores"))
         usadas_amb = {_txt(f["variable_id"]) for f in sen}
-        electricas = set(d.get("electricas") or [])
+        adic = _filas(d.get("adicionales"))
+        electricas = {_txt(f["variable_id"]) for f in adic if _txt(f.get("tipo")) == "electrica"}
         quitar = [v for v in ELECTRICAS_OPCIONALES if v not in electricas] + \
                  [v for v in AMBIENTALES_FIJAS if v not in usadas_amb]
         con.executemany("DELETE FROM variables WHERE variable_id = ?", [(v,) for v in quitar])
         for v in ELECTRICAS_OPCIONALES:
             if v not in electricas:
                 con.execute(f"ALTER TABLE mediciones_electricas DROP COLUMN {v}")
-        for f in _filas(d.get("adicionales")):
+        for f in adic:
             vid = _txt(f["variable_id"])
+            if vid in ELECTRICAS_OPCIONALES:     # códigos conocidos (voc_v, isc_a…): se usan los datos escritos
+                if _txt(f["tipo"]) != "electrica":
+                    raise sqlite3.IntegrityError(f"«{vid}» debe ser una variable eléctrica")
+                con.execute("UPDATE variables SET nombre = ?, unidad = ?, agregacion = ? WHERE variable_id = ?",
+                            [_txt(f["nombre"]), _txt(f.get("unidad")) or None, _txt(f["agregacion"]), vid])
+                continue
             con.execute("INSERT INTO variables (variable_id, nombre, unidad, tipo, agregacion) VALUES (?, ?, ?, ?, ?)",
                         [vid, _txt(f["nombre"]), _txt(f.get("unidad")) or None, _txt(f["tipo"]), _txt(f["agregacion"])])
             if _txt(f["tipo"]) == "electrica":

@@ -251,7 +251,7 @@ def llenar_ejemplo(n):
               Input("btn-generar", "n_clicks"),
               State("form-nombre", "value"), State("form-descripcion", "value"), State("form-responsable", "value"),
               State("form-ciudad", "value"), State("form-pais", "value"), State("form-tecnologias", "data"),
-              State("form-superficies", "data"), State("form-modulos", "data"), State("form-electricas", "value"),
+              State("form-superficies", "data"), State("form-modulos", "data"),
               State("form-adicionales", "data"), State("form-sensores", "data"), prevent_initial_call=True)
 def generar_plantilla(n, *campos):
     if not n:

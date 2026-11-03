@@ -25,5 +25,5 @@ INSTALACION_CON_RESUMEN = "Prototipo BIPV Sumicol"
 CARPETA_CARGAS = Path(tempfile.gettempdir()) / "visor_cargas"
 HORAS_CONSERVAR_CARGAS = 24
 # Tamaño máximo de archivo que se acepta (MB)
-MAX_MB_BASE_CARGA = 20       # base en formato de carga 1.1: se procesa en el servidor
+MAX_MB_BASE_CARGA = 15       # base en formato de carga 1.1: se procesa en el servidor (512 MB de RAM en Render)
 MAX_MB_BASE_PROCESADA = 40   # base ya procesada en el computador con procesar.py

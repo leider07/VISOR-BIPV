@@ -35,7 +35,7 @@ La pestaña **Tus datos** tiene dos partes:
    módulos, variables y sensores). Genera un `.db` en formato 1.1 con las tablas de información ya
    llenas y las de mediciones vacías, con exactamente las columnas declaradas.
 2. **Carga tu base:** se acepta
-   - la base en formato de carga (hasta 20 MB): se valida y se procesa en el servidor;
+   - la base en formato de carga (hasta 15 MB): se valida y se procesa en el servidor;
    - o, si es más grande, la base ya procesada en el computador con `procesamiento/procesar.py`
      (hasta 40 MB).
 

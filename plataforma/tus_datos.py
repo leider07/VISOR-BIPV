@@ -21,8 +21,6 @@ NOMBRES_AMBIENTALES = {
     "temperatura_modulo": "Temperatura de módulo (°C)", "humedad_relativa": "Humedad relativa (%)",
     "velocidad_viento": "Velocidad del viento (m/s)",
 }
-ELECTRICAS = [("voc_v", "VOC · voltaje de circuito abierto (V)"), ("isc_a", "ISC · corriente de cortocircuito (A)"),
-              ("vmpp_v", "VMPP · voltaje en máxima potencia (V)"), ("impp_a", "IMPP · corriente en máxima potencia (A)")]
 
 TABLAS = {
     "tecnologias": [("tecnologia_id", "Código *", "text"), ("nombre", "Nombre *", "text"), ("tipo", "Tipo *", "lista"),
@@ -44,13 +42,15 @@ AYUDAS = {
     "tecnologias": "Cada tipo de módulo. La potencia STC y el área se usan para calcular la eficiencia.",
     "superficies": "Caras, fachadas o cubiertas donde están los módulos. Inclinación: 0° horizontal, 90° vertical.",
     "modulos": "Cada módulo con medición eléctrica: en qué superficie está y de qué tecnología es.",
-    "adicionales": "Opcional: variables que no están en la lista fija (fill factor, lluvia, dirección del viento…). "
-                   "Se verán en la pestaña Explorar.",
+    "adicionales": "La potencia máxima es obligatoria y ya viene incluida. Agrega aquí las demás variables que vas a "
+                   "entregar: eléctricas (voltaje de circuito abierto, corriente de cortocircuito, fill factor…) o "
+                   "ambientales que no estén en la lista de sensores (lluvia, dirección del viento…). "
+                   "Se ven en la pestaña Explorar.",
     "sensores": "Cada columna de la tabla de mediciones ambientales. La irradiancia lleva su superficie; "
                 "la temperatura de módulo, su módulo.",
 }
 TITULOS = {"tecnologias": "Tecnologías", "superficies": "Superficies", "modulos": "Módulos",
-           "adicionales": "Variables adicionales", "sensores": "Sensores ambientales"}
+           "adicionales": "Otras variables", "sensores": "Sensores ambientales"}
 
 EJEMPLO = {
     "instalacion": {"nombre": "Techo solar de ejemplo", "descripcion": "Dos tecnologías en un techo y una fachada",
@@ -65,8 +65,11 @@ EJEMPLO = {
     "modulos": [{"modulo_id": "M1", "superficie_id": "techo", "tecnologia_id": "MONO"},
                 {"modulo_id": "C1", "superficie_id": "techo", "tecnologia_id": "CIGS"},
                 {"modulo_id": "F1", "superficie_id": "fachada", "tecnologia_id": "MONO"}],
-    "electricas": ["voc_v", "isc_a"],
-    "adicionales": [{"variable_id": "ff", "nombre": "Fill factor", "unidad": "", "tipo": "electrica",
+    "adicionales": [{"variable_id": "voc_v", "nombre": "Voltaje de circuito abierto", "unidad": "V",
+                     "tipo": "electrica", "agregacion": "promedio"},
+                    {"variable_id": "isc_a", "nombre": "Corriente de cortocircuito", "unidad": "A",
+                     "tipo": "electrica", "agregacion": "promedio"},
+                    {"variable_id": "ff", "nombre": "Fill factor", "unidad": "", "tipo": "electrica",
                      "agregacion": "promedio"}],
     "sensores": [{"sensor_id": "G_techo", "variable_id": "irradiancia", "superficie_id": "techo", "modelo": "SMP10"},
                  {"sensor_id": "T_amb", "variable_id": "temperatura_ambiente"},
@@ -164,13 +167,6 @@ def formulario(d=None):
         _bloque_tabla("tecnologias", d.get("tecnologias")),
         _bloque_tabla("superficies", d.get("superficies")),
         _bloque_tabla("modulos", d.get("modulos")),
-        html.Div(className="form-bloque", children=[
-            html.Div(className="form-bloque-cab", children=[
-                html.H4("Variables eléctricas"),
-                html.P("La potencia máxima es obligatoria. Marca las demás que vas a entregar.", className="nota")]),
-            dcc.Checklist(id="form-electricas", options=[{"label": n, "value": v} for v, n in ELECTRICAS],
-                          value=d.get("electricas", []), inline=True, className="chips",
-                          inputClassName="chip-input", labelClassName="chip chip-claro")]),
         _bloque_tabla("adicionales", d.get("adicionales")),
         _bloque_tabla("sensores", d.get("sensores")),
     ])
@@ -209,9 +205,7 @@ def pagina(token):
             html.Div(className="tarjeta paso", children=[
                 html.Div(className="paso-tit", children=[html.Span(n, className="paso-num"), t]), html.P(txt)])
             for n, t, txt in pasos]),
-        html.P(["La plataforma muestra los datos tal como se cargan: depúralos antes (lecturas erróneas, días "
-                "incompletos, horas que no te interesan). ",
-                html.Button("Descargar la guía del formato", id="btn-guia", n_clicks=0, className="enlace-btn"),
+        html.P([html.Button("Descargar la guía del formato", id="btn-guia", n_clicks=0, className="enlace-btn"),
                 " · ",
                 html.Button("Descargar la plantilla vacía", id="btn-plantilla-vacia", n_clicks=0, className="enlace-btn")],
                className="nota"),
@@ -245,11 +239,10 @@ def pagina(token):
 
 
 # ------------------------------------------------------------------ acciones
-def datos_formulario(nombre, descripcion, responsable, ciudad, pais, tec, sup, mod, electricas, adic, sen):
+def datos_formulario(nombre, descripcion, responsable, ciudad, pais, tec, sup, mod, adic, sen):
     return {"instalacion": {"nombre": nombre, "descripcion": descripcion, "responsable": responsable,
                             "ciudad": ciudad, "pais": pais},
-            "tecnologias": tec, "superficies": sup, "modulos": mod, "electricas": electricas or [],
-            "adicionales": adic, "sensores": sen}
+            "tecnologias": tec, "superficies": sup, "modulos": mod, "adicionales": adic, "sensores": sen}
 
 
 def lista_errores(titulo, errores, clase="aviso-errores"):
