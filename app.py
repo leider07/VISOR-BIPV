@@ -1,5 +1,7 @@
 """
-Visor BIPV Sumicol · Proyecto Integra
+Plataforma de monitoreo fotovoltaico · Proyecto Integra
+
+Muestra la base data/visor.db (generada con procesamiento/procesar.py).
 
 Ejecutar en el computador:
     python app.py            ->  abrir http://127.0.0.1:8050
@@ -12,19 +14,21 @@ import os
 import dash
 from dash import ALL, Input, Output, State, ctx, dcc, html, no_update
 
-import datos as D
-import paginas as P
-from componentes import (PAGINAS, barra_filtros, encabezado, meses_disponibles, pie,
-                         rango_texto, rangos_rapidos)
+from plataforma import datos as D
+from plataforma import paginas as P
+from plataforma import resumen_sumicol
+from plataforma.componentes import (barra_filtros, encabezado, meses_disponibles, filtro_modulos, paginas, pie,
+                                    rango_texto, rangos_rapidos)
 
+_META = D.metadatos()
 app = dash.Dash(
     __name__,
-    title="Visor BIPV · Proyecto Integra",
+    title="Visor BIPV · Proyecto Integra" if D.es_resumen_fijo() else f"{_META['instalacion']} · Proyecto Integra",
     update_title=None,
     suppress_callback_exceptions=True,
     compress=True,   # comprime las respuestas (flask-compress): la página carga más rápido
     meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"},
-               {"name": "description", "content": "Datos históricos del prototipo BIPV de Sumicol · Proyecto Integra"}],
+               {"name": "description", "content": f"Datos históricos · {_META['instalacion']} · Proyecto Integra"}],
 )
 server = app.server
 
@@ -52,40 +56,55 @@ app.layout = layout
 
 
 # ------------------------------------------------------------------ navegación
+def _ruta(ruta):
+    rutas = [r for r, _ in paginas()]
+    return ruta if ruta in rutas else rutas[0]
+
+
 @app.callback(
-    [Output(f"nav-{i}", "className") for i in range(len(PAGINAS))]
-    + [Output("banda", "style"), Output("titulo", "children"), Output("subtitulo", "children"),
-       Output("nota-filtros", "children"), Output("grupo-cara", "className")],
+    Output({"type": "nav", "index": ALL}, "className"),
+    Output("banda", "style"), Output("titulo", "children"), Output("subtitulo", "children"),
+    Output("nota-filtros", "children"), Output("grupo-cara", "className"),
     Input("url", "pathname"),
 )
 def navegacion(ruta):
-    ruta = ruta if ruta in dict(PAGINAS) else "/"
-    clases = ["nav-link activo" if r == ruta else "nav-link" for r, _ in PAGINAS]
+    ruta = _ruta(ruta)
+    clases = ["nav-link activo" if r == ruta else "nav-link" for r, _ in paginas()]
     if ruta == "/":
-        return clases + [{"display": "none"}, "", "", "", "grupo-filtro"]
-    tit, sub = P.TITULOS[ruta]
-    if ruta == "/clima":
-        nota, cara_cls = "Datos filtrados de 5:00 a 19:00", "grupo-filtro atenuado"
-    else:
-        nota, cara_cls = "Datos filtrados de 5:00 a 19:00", "grupo-filtro"
-    return clases + [{}, tit, sub, nota, cara_cls]
+        return clases, {"display": "none"}, "", "", "", "grupo-filtro"
+    tit, sub = P.titulos(ruta)
+    cara_cls = "grupo-filtro atenuado" if ruta == "/clima" else "grupo-filtro"
+    return clases, {}, tit, sub, "Datos filtrados de 5:00 a 19:00", cara_cls
+
+
+@app.callback(
+    Output("caja-modulos", "children"),
+    Input("filtro-cara", "value"), State("filtro-vidrios", "value"), prevent_initial_call=True,
+)
+def modulos_de_la_superficie(sup, elegidos):
+    """Al cambiar de superficie se conservan las mismas tecnologías elegidas (si no hay, todas)."""
+    tec = D.tecnologias_de(elegidos or [])
+    nuevos = D.modulos_de(sup)
+    valor = list(nuevos[nuevos.tecnologia_id.isin(tec)].modulo_id) if tec else []
+    # Se regenera el filtro completo: Dash 4 falla si se cambian por callback opciones con componentes
+    return filtro_modulos(sup, valor or list(nuevos.modulo_id))
 
 
 @app.callback(
     Output("contenido", "children"),
-    Input("url", "pathname"), Input("fechas", "data"),
-    Input("filtro-cara", "value"), Input("filtro-vidrios", "value"),
+    Input("url", "pathname"), Input("fechas", "data"), Input("filtro-vidrios", "value"),
+    State("filtro-cara", "value"),
 )
-def contenido(ruta, fechas, cara, vidrios):
-    f = {"ini": fechas["ini"], "fin": fechas["fin"], "cara": cara or "superior",
-         "vidrios": sorted(vidrios or [])}
+def contenido(ruta, fechas, modulos, cara):
+    ruta = _ruta(ruta)
+    f = {"ini": fechas["ini"], "fin": fechas["fin"], "cara": cara, "modulos": list(modulos or [])}
     if ruta == "/clima":
         return P.clima(f)
     if ruta == "/energia":
         return P.energia(f)
     if ruta == "/desempeno":
         return P.desempeno(f)
-    return P.resumen()
+    return resumen_sumicol.resumen()
 
 
 # ------------------------------------------------------------------ matriz de irradiancia (Clima)

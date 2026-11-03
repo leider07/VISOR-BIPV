@@ -26,6 +26,10 @@ TUBO_VENTANA = 15
 TUBO_EXPANSION = 0.5
 TUBO_MARGEN_MIN = 4.0
 
+# Módulos en superficies SIN sensor de irradiancia: no se puede aplicar el filtro híbrido; solo se
+# descartan potencias negativas o mayores que esta fracción de la potencia STC
+P_MAX_SIN_IRR = 1.3
+
 # Un día de un módulo es válido para energía con al menos este número de mediciones limpias
 UMBRAL_REGISTROS_DIA = 470
 

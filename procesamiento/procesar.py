@@ -159,6 +159,13 @@ def procesar_electricas(b, irr):
         f = filtrar_modulo(d, r.potencia_stc_w, r.area_m2, ghost_pct(r.transmitancia_pct))
         partes.append(f)
         log(f"  {mid}: {len(d):,} -> {len(f):,} mediciones limpias")
+    # Superficies sin ningún sensor de irradiancia: solo límites físicos de potencia (sin filtro híbrido)
+    sin_sensor = set(b.info["superficies"].superficie_id) - set(b.sensores_de("irradiancia").superficie_id.dropna())
+    for mid, d in iv[iv.superficie.isin(sin_sensor)].dropna(subset=["p"]).groupby("modulo_id"):
+        stc = b.modulos.loc[mid].potencia_stc_w
+        f = d[(d.p >= 0) & (d.p <= stc * M.P_MAX_SIN_IRR)]
+        partes.append(f)
+        log(f"  {mid}: {len(d):,} -> {len(f):,} mediciones (superficie sin irradiancia: solo límites de potencia)")
     limpio = pd.concat(partes, ignore_index=True) if partes else iv.iloc[:0]
     # Días-módulo sin ninguna irradiancia (p. ej. periodo sin sensor): se validan solo por número de lecturas
     iv["fecha"] = iv.ts.dt.strftime("%Y-%m-%d")
@@ -272,17 +279,44 @@ def tablas_meteo(b):
 
 
 def tabla_cronograma(b, fecha_fin):
-    """Cronograma en columnas por superficie (una fila por periodo), para la tabla del resumen."""
+    """Periodos de orientación por superficie (el último periodo abierto llega hasta el fin de los datos)."""
     cr = b.info.get("cronograma_orientaciones")
     if cr is None or cr.empty:
-        return pd.DataFrame(columns=["desde", "hasta"])
+        return pd.DataFrame(columns=["superficie_id", "desde", "hasta", "orientacion"])
     cr = cr.copy()
     cr["desde"] = cr.desde.str[:10]
     cr["hasta"] = cr.hasta.fillna(fecha_fin + " 00:00:00").str[:10]
-    out = cr.pivot_table(index=["desde", "hasta"], columns="superficie_id", values="orientacion",
-                         aggfunc="first").reset_index()
-    out.columns.name = None
-    return out.sort_values("desde")
+    return cr[["superficie_id", "desde", "hasta", "orientacion"]].sort_values(["superficie_id", "desde"])
+
+
+def tablas_catalogo(b):
+    """Superficies y módulos con el orden, las etiquetas y el color que usa el visor."""
+    tec = b.info["tecnologias"].copy()
+    tec["_t"] = tec.transmitancia_pct.fillna(1000)
+    tec = tec.sort_values(["_t", "nombre"]).reset_index(drop=True)
+    orden_tec = {t: i for i, t in enumerate(tec.tecnologia_id)}
+
+    irr = set(b.sensores_de("irradiancia").superficie_id.dropna())
+    sup = b.info["superficies"].copy().sort_values(["inclinacion_deg", "nombre"]).reset_index(drop=True)
+    sup["orden"] = range(len(sup))
+    sup["tiene_irradiancia"] = sup.superficie_id.isin(irr).astype(int)
+    sup = sup[["superficie_id", "nombre", "inclinacion_deg", "orientacion", "orden", "tiene_irradiancia"]]
+
+    con_temp = set(b.sensores_de("temperatura_modulo").modulo_id.dropna())
+    mod = b.modulos.reset_index()
+    mod["orden_tec"] = mod.tecnologia_id.map(orden_tec)
+    mod["orden_sup"] = mod.superficie_id.map(dict(zip(sup.superficie_id, sup.orden)))
+    mod = mod.sort_values(["orden_sup", "orden_tec", "modulo_id"]).reset_index(drop=True)
+    base = mod.nombre.where(mod.nombre.notna() & (mod.nombre.astype(str).str.strip() != ""), mod.nombre_tec)
+    repetido = mod.duplicated(["superficie_id", "tecnologia_id"], keep=False) & mod.nombre.isna()
+    mod["etiqueta"] = np.where(repetido, base + " · " + mod.modulo_id, base)
+    mod["color"] = mod.groupby("superficie_id").cumcount()      # posición dentro de su superficie
+    mod["orden"] = range(len(mod))
+    mod["tiene_temp"] = mod.modulo_id.isin(con_temp).astype(int)
+    mod = mod.rename(columns={"nombre_tec": "tecnologia"})
+    mod = mod[["modulo_id", "superficie_id", "tecnologia_id", "tecnologia", "etiqueta", "orden", "color",
+               "area_m2", "potencia_stc_w", "transmitancia_pct", "tiene_temp"]]
+    return sup, mod, tec.drop(columns="_t")
 
 
 # --------------------------------------------------------------------------------------------
@@ -295,9 +329,9 @@ def escribir(tablas, destino):
     con = sqlite3.connect(tmp)
     for nombre, df in tablas.items():
         df.to_sql(nombre, con, index=False)
-    idx = {"iv_hora": "fecha, panel_id", "dispersion": "ts, panel_id", "energia_dia": "fecha, panel_id",
-           "irr_hora": "fecha, cara", "hsp_dia": "fecha, cara", "meteo_hora": "fecha",
-           "temp_vidrio_hora": "fecha, panel_id", "dias_panel": "fecha, panel_id"}
+    idx = {"iv_hora": "fecha, modulo_id", "dispersion": "ts, modulo_id", "energia_dia": "fecha, modulo_id",
+           "irr_hora": "fecha, superficie_id", "hsp_dia": "fecha, superficie_id", "meteo_hora": "fecha",
+           "temp_modulo_hora": "fecha, modulo_id", "dias_modulo": "fecha, modulo_id"}
     for t, cols in idx.items():
         con.execute(f"CREATE INDEX ix_{t} ON {t} ({cols})")
     con.commit()
@@ -332,31 +366,31 @@ def main():
     fechas = pd.concat([iv_hora.fecha, irr_hora.fecha, energia.fecha])
     fecha_fin = fechas.max()
     crono = tabla_cronograma(b, fecha_fin)
+    superficies, modulos, tecnologias = tablas_catalogo(b)
     b.con.close()
 
-    mod = b.modulos.reset_index()
-    sens_t = b.sensores_de("temperatura_modulo").reset_index().set_index("modulo_id").sensor_id
-    paneles = pd.DataFrame({"panel_id": mod.modulo_id, "cara": mod.superficie_id,
-                            "vidrio": mod.transmitancia_pct.round().astype("Int64"),
-                            "sensor_temp": mod.modulo_id.map(sens_t)})
+    inst = b.info["instalacion"].iloc[0]
+    solo_vidrio = (tecnologias.tipo == "vidrio semitransparente").all()
+    todas_caras = superficies.nombre.str.lower().str.startswith("cara").all()
+    disponibles = [v for v in ["irradiancia", "temperatura_ambiente", "temperatura_modulo",
+                               "humedad_relativa", "velocidad_viento"] if not b.sensores_de(v).empty]
     meta = {"fecha_inicio": fechas.min(), "fecha_fin": fecha_fin,
-            "generado": datetime.now().strftime("%Y-%m-%d %H:%M"), "origen": a.origen.name,
-            "instalacion": b.info["instalacion"].nombre.iloc[0], "formato": "1.1"}
-    ren = {"modulo_id": "panel_id", "superficie": "cara"}
+            "generado": datetime.now().strftime("%Y-%m-%d %H:%M"), "origen": a.origen.name, "formato": "1.1",
+            "instalacion": inst.nombre, "descripcion": inst.get("descripcion"),
+            "responsable": inst.get("responsable"), "ciudad": inst.get("ciudad"), "pais": inst.get("pais"),
+            "modulo_palabra": "vidrio" if solo_vidrio else "módulo",
+            "superficie_palabra": "cara" if todas_caras else "superficie",
+            "variables": ",".join(disponibles)}
+    meta = {k: ("" if v is None or (isinstance(v, float) and pd.isna(v)) else str(v)) for k, v in meta.items()}
     tablas = {
-        "paneles": paneles,
-        "dias_panel": dias.rename(columns=ren),
-        "iv_hora": iv_hora.rename(columns=ren),
-        "dispersion": disp.rename(columns=ren),
-        "energia_dia": energia.rename(columns=ren),
-        "irr_hora": irr_hora.rename(columns=ren),
-        "hsp_dia": hsp_dia.rename(columns=ren),
-        "meteo_hora": meteo,
-        "temp_vidrio_hora": tmod.rename(columns=ren),
-        "cronograma": crono,
+        "superficies": superficies, "modulos": modulos, "tecnologias": tecnologias,
+        "dias_modulo": dias, "iv_hora": iv_hora, "dispersion": disp, "energia_dia": energia,
+        "irr_hora": irr_hora.rename(columns={"superficie": "superficie_id"}),
+        "hsp_dia": hsp_dia.rename(columns={"superficie": "superficie_id"}),
+        "meteo_hora": meteo, "temp_modulo_hora": tmod, "cronograma": crono,
+        "variables": b.info["variables"], "sensores": b.info["sensores"],
         "metadatos": pd.DataFrame(list(meta.items()), columns=["clave", "valor"]),
     }
-    tablas.update({f"info_{t}": df for t, df in b.info.items()})
     log("Escribiendo base de la plataforma...")
     escribir(tablas, a.destino)
     log(f"Listo: {a.destino} ({a.destino.stat().st_size / 1e6:.1f} MB) · datos del "
