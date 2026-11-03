@@ -3,6 +3,16 @@
 Plataforma web (Dash + Plotly) con los datos históricos del prototipo BIPV instalado en Sumicol:
 12 vidrios fotovoltaicos semitransparentes (10, 30, 40 y 80 % de transmitancia) en tres caras (0°, 60° y 90°).
 
+> **Rama `plataforma` (en construcción):** la base de la plataforma ya no se genera desde la base
+> original de Sumicol sino desde una base en el **formato de carga 1.1** (ver `formato/`):
+>
+> ```bash
+> python procesamiento/validar_bd.py mi_instalacion.db          # revisa la base y lista errores
+> python procesamiento/procesar.py  mi_instalacion.db           # genera data/visor.db
+> ```
+>
+> `preparar_datos.py` queda como referencia del flujo anterior y se retirará en la fase 5.
+
 ## Usarla en el computador (3 pasos)
 
 Abre una terminal en esta carpeta (`Visor_BIPV`) y ejecuta:
