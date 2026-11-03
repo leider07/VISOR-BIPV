@@ -63,7 +63,9 @@ En `formato/` está todo lo necesario:
 
 | Archivo | Para qué |
 |---|---|
-| `guia_formato.md` | Guía del formato de carga 1.1: las 10 tablas, sus columnas y reglas |
+| `guia_formato.pdf` | Guía visual y práctica para quien carga datos (la descarga la pestaña Tus datos) |
+| `guia_formato.md` | La misma guía en texto, de referencia técnica |
+| `guia/` | Fuente de la guía en PDF (`guia.html`) y el script que la genera (`generar_pdf.py`) |
 | `plantilla_v1.1.db` | Base vacía con las tablas creadas y las variables fijas escritas |
 | `esquema.sql` | Las mismas tablas en SQL |
 

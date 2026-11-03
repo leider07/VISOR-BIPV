@@ -224,6 +224,11 @@ def desplegables_modulos(sup, tec):
     return T.desplegables_modulos(sup, tec)
 
 
+@app.callback(Output("form-cronograma", "dropdown"), Input("form-superficies", "data"))
+def desplegables_cronograma(sup):
+    return T.desplegables_cronograma(sup)
+
+
 @app.callback(Output("form-sensores", "dropdown"), Input("form-superficies", "data"), Input("form-modulos", "data"),
               Input("form-adicionales", "data"))
 def desplegables_sensores(sup, mod, adic):
@@ -251,7 +256,7 @@ def llenar_ejemplo(n):
               Input("btn-generar", "n_clicks"),
               State("form-nombre", "value"), State("form-descripcion", "value"), State("form-responsable", "value"),
               State("form-ciudad", "value"), State("form-pais", "value"), State("form-tecnologias", "data"),
-              State("form-superficies", "data"), State("form-modulos", "data"),
+              State("form-superficies", "data"), State("form-cronograma", "data"), State("form-modulos", "data"),
               State("form-adicionales", "data"), State("form-sensores", "data"), prevent_initial_call=True)
 def generar_plantilla(n, *campos):
     if not n:
@@ -269,7 +274,7 @@ def generar_plantilla(n, *campos):
 def descargar_formato(_g, _p):
     if not ctx.triggered or not ctx.triggered[0]["value"]:
         return no_update
-    nombre = "guia_formato.md" if ctx.triggered_id == "btn-guia" else "plantilla_v1.1.db"
+    nombre = "guia_formato.pdf" if ctx.triggered_id == "btn-guia" else "plantilla_v1.1.db"
     return dcc.send_file(str(T.C.RAIZ / "formato" / nombre))
 
 

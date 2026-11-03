@@ -19,6 +19,16 @@ ELECTRICAS_OPCIONALES = ["voc_v", "isc_a", "vmpp_v", "impp_a"]
 AMBIENTALES_FIJAS = ["irradiancia", "temperatura_ambiente", "temperatura_modulo", "humedad_relativa",
                      "velocidad_viento"]
 CODIGO = re.compile(r"^[A-Za-z0-9_]+$")
+FECHA_HORA = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$")
+FECHA = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def fecha_hora(v):
+    """Acepta AAAA-MM-DD HH:MM:SS o AAAA-MM-DD (se completa con 00:00:00). None si está vacía o mal escrita."""
+    t = _txt(v)
+    if FECHA.match(t):
+        t += " 00:00:00"
+    return t if FECHA_HORA.match(t) else None
 
 
 def _txt(v):
@@ -85,6 +95,32 @@ def revisar(d):
         o = _txt(f.get("orientacion"))
         if o and o not in ORIENTACIONES:
             e.append(f"Superficies, fila {i}: elige la orientación de la lista.")
+
+    cron = _filas(d.get("cronograma"))
+    periodos = {}
+    for i, f in enumerate(cron, 1):
+        s = _txt(f.get("superficie_id"))
+        if s not in ids_sup:
+            e.append(f"Cronograma, fila {i}: elige una superficie de la tabla Superficies.")
+        ini, fin = fecha_hora(f.get("desde")), fecha_hora(f.get("hasta"))
+        if not ini:
+            e.append(f"Cronograma, fila {i}: «Desde» debe escribirse AAAA-MM-DD o AAAA-MM-DD HH:MM:SS.")
+        if _txt(f.get("hasta")) and not fin:
+            e.append(f"Cronograma, fila {i}: «Hasta» debe escribirse AAAA-MM-DD o AAAA-MM-DD HH:MM:SS.")
+        if ini and fin and fin <= ini:
+            e.append(f"Cronograma, fila {i}: «Hasta» debe ser posterior a «Desde».")
+        if _txt(f.get("orientacion")) not in ORIENTACIONES:
+            e.append(f"Cronograma, fila {i}: elige la orientación de la lista.")
+        incl = f.get("inclinacion_deg")
+        if _txt(incl) and (_num(incl) is None or not 0 <= _num(incl) <= 90):
+            e.append(f"Cronograma, fila {i}: la inclinación debe ser un número entre 0 y 90.")
+        if s and ini:
+            periodos.setdefault(s, []).append((ini, fin))
+    for s, ps in periodos.items():
+        ps.sort()
+        for (a1, b1), (a2, _b2) in zip(ps, ps[1:]):
+            if b1 is None or a2 < b1:
+                e.append(f"Cronograma: en «{s}» hay periodos que se cruzan (el que empieza {a1} y el que empieza {a2}).")
 
     mod = _filas(d.get("modulos"))
     ids_mod = codigos("Módulos", mod, "modulo_id", "un módulo")
@@ -168,6 +204,11 @@ def crear(d, destino):
             con.execute("INSERT INTO superficies VALUES (?, ?, ?, ?, ?)",
                         [_txt(f["superficie_id"]), _txt(f["nombre"]), _num(f["inclinacion_deg"]),
                          _txt(f.get("orientacion")) or None, _txt(f.get("descripcion")) or None])
+        for f in _filas(d.get("cronograma")):
+            con.execute("INSERT INTO cronograma_orientaciones VALUES (?, ?, ?, ?, ?)",
+                        [_txt(f["superficie_id"]), fecha_hora(f["desde"]), fecha_hora(f.get("hasta")),
+                         _txt(f["orientacion"]),
+                         _num(f.get("inclinacion_deg")) if _txt(f.get("inclinacion_deg")) else None])
         for f in _filas(d.get("modulos")):
             con.execute("INSERT INTO modulos VALUES (?, ?, ?, ?)",
                         [_txt(f["modulo_id"]), _txt(f["superficie_id"]), _txt(f["tecnologia_id"]),

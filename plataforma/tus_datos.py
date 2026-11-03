@@ -30,6 +30,9 @@ TABLAS = {
     "superficies": [("superficie_id", "Código *", "text"), ("nombre", "Nombre *", "text"),
                     ("inclinacion_deg", "Inclinación (°) *", "numeric"), ("orientacion", "Orientación", "lista"),
                     ("descripcion", "Descripción", "text")],
+    "cronograma": [("superficie_id", "Superficie *", "lista"), ("desde", "Desde *", "text"),
+                   ("hasta", "Hasta", "text"), ("orientacion", "Orientación *", "lista"),
+                   ("inclinacion_deg", "Inclinación (°)", "numeric")],
     "modulos": [("modulo_id", "Código *", "text"), ("superficie_id", "Superficie *", "lista"),
                 ("tecnologia_id", "Tecnología *", "lista"), ("nombre", "Nombre para mostrar", "text")],
     "adicionales": [("variable_id", "Código *", "text"), ("nombre", "Nombre *", "text"), ("unidad", "Unidad", "text"),
@@ -42,6 +45,9 @@ AYUDAS = {
     "tecnologias": "Cada tipo de módulo. La potencia STC y el área se usan para calcular la eficiencia.",
     "superficies": "Caras, fachadas o cubiertas donde están los módulos. Inclinación: 0° horizontal, 90° vertical.",
     "modulos": "Cada módulo con medición eléctrica: en qué superficie está y de qué tecnología es.",
+    "cronograma": "Solo si alguna superficie se giró o cambió de inclinación: una fila por superficie y periodo. "
+                  "Fechas AAAA-MM-DD (o AAAA-MM-DD HH:MM:SS); deja «Hasta» vacío si siguió así hasta el final. "
+                  "Si ninguna superficie se movió, deja esta tabla vacía.",
     "adicionales": "La potencia máxima es obligatoria y ya viene incluida. Agrega aquí las demás variables que vas a "
                    "entregar: eléctricas (voltaje de circuito abierto, corriente de cortocircuito, fill factor…) o "
                    "ambientales que no estén en la lista de sensores (lluvia, dirección del viento…). "
@@ -50,7 +56,8 @@ AYUDAS = {
                 "la temperatura de módulo, su módulo.",
 }
 TITULOS = {"tecnologias": "Tecnologías", "superficies": "Superficies", "modulos": "Módulos",
-           "adicionales": "Otras variables", "sensores": "Sensores ambientales"}
+           "adicionales": "Otras variables", "sensores": "Sensores ambientales",
+           "cronograma": "Cronograma de orientaciones (opcional)"}
 
 EJEMPLO = {
     "instalacion": {"nombre": "Techo solar de ejemplo", "descripcion": "Dos tecnologías en un techo y una fachada",
@@ -110,6 +117,8 @@ def desplegables_fijos(tabla):
         return {"tipo": {"options": _opciones(PL.TIPOS_TECNOLOGIA)}}
     if tabla == "superficies":
         return {"orientacion": {"options": _opciones(PL.ORIENTACIONES)}}
+    if tabla == "cronograma":
+        return {"orientacion": {"options": _opciones(PL.ORIENTACIONES)}}
     if tabla == "adicionales":
         return {"tipo": {"options": _opciones(["electrica", "ambiental"], {"electrica": "Eléctrica",
                                                                            "ambiental": "Ambiental"})},
@@ -121,6 +130,11 @@ def desplegables_modulos(superficies, tecnologias):
     sup = [f.get("superficie_id") for f in superficies or [] if f.get("superficie_id")]
     tec = [f.get("tecnologia_id") for f in tecnologias or [] if f.get("tecnologia_id")]
     return {"superficie_id": {"options": _opciones(sup)}, "tecnologia_id": {"options": _opciones(tec)}}
+
+
+def desplegables_cronograma(superficies):
+    sup = [f.get("superficie_id") for f in superficies or [] if f.get("superficie_id")]
+    return {"superficie_id": {"options": _opciones(sup)}, "orientacion": {"options": _opciones(PL.ORIENTACIONES)}}
 
 
 def desplegables_sensores(superficies, modulos, adicionales):
@@ -166,6 +180,7 @@ def formulario(d=None):
                 _campo("form-pais", "País", inst.get("pais", ""))])]),
         _bloque_tabla("tecnologias", d.get("tecnologias")),
         _bloque_tabla("superficies", d.get("superficies")),
+        _bloque_tabla("cronograma", d.get("cronograma")),
         _bloque_tabla("modulos", d.get("modulos")),
         _bloque_tabla("adicionales", d.get("adicionales")),
         _bloque_tabla("sensores", d.get("sensores")),
@@ -205,7 +220,7 @@ def pagina(token):
             html.Div(className="tarjeta paso", children=[
                 html.Div(className="paso-tit", children=[html.Span(n, className="paso-num"), t]), html.P(txt)])
             for n, t, txt in pasos]),
-        html.P([html.Button("Descargar la guía del formato", id="btn-guia", n_clicks=0, className="enlace-btn"),
+        html.P([html.Button("Descargar la guía (PDF)", id="btn-guia", n_clicks=0, className="enlace-btn"),
                 " · ",
                 html.Button("Descargar la plantilla vacía", id="btn-plantilla-vacia", n_clicks=0, className="enlace-btn")],
                className="nota"),
@@ -239,10 +254,11 @@ def pagina(token):
 
 
 # ------------------------------------------------------------------ acciones
-def datos_formulario(nombre, descripcion, responsable, ciudad, pais, tec, sup, mod, adic, sen):
+def datos_formulario(nombre, descripcion, responsable, ciudad, pais, tec, sup, cron, mod, adic, sen):
     return {"instalacion": {"nombre": nombre, "descripcion": descripcion, "responsable": responsable,
                             "ciudad": ciudad, "pais": pais},
-            "tecnologias": tec, "superficies": sup, "modulos": mod, "adicionales": adic, "sensores": sen}
+            "tecnologias": tec, "superficies": sup, "cronograma": cron, "modulos": mod, "adicionales": adic,
+            "sensores": sen}
 
 
 def lista_errores(titulo, errores, clase="aviso-errores"):
