@@ -122,3 +122,106 @@ def dispersion(ini, fin, ids, max_por_modulo=4000):
             f"WHERE substr(ts, 1, 10) BETWEEN ? AND ? AND modulo_id IN ({_in(ids)})", (ini, fin, *ids))
     partes = [d.sample(min(len(d), max_por_modulo), random_state=1) for _, d in df.groupby("modulo_id")]
     return pd.concat(partes) if partes else df
+
+
+# ---------------------------- explorar ----------------------------
+@lru_cache(maxsize=1)
+def variables_explorar():
+    """Variables con datos: variable_id, nombre, unidad, tipo, es_fija (en el orden de la plataforma)."""
+    v = _q("SELECT variable_id, nombre, unidad, tipo FROM variables")
+    cols_e = set(_q("SELECT * FROM elec_hora LIMIT 0").columns)
+    sens = sensores()
+    v = v[((v.tipo == "electrica") & v.variable_id.isin(cols_e)) |
+          ((v.tipo == "ambiental") & v.variable_id.isin(sens.variable_id))].copy()
+    fijas = ["potencia_max_w", "voc_v", "isc_a", "vmpp_v", "impp_a", "irradiancia", "temperatura_ambiente",
+             "temperatura_modulo", "humedad_relativa", "velocidad_viento"]
+    v["es_fija"] = v.variable_id.isin(fijas)
+    v["orden"] = [(0 if t == "electrica" else 1, fijas.index(i) if i in fijas else 99, i)
+                  for t, i in zip(v.tipo, v.variable_id)]
+    return v.sort_values("orden").drop(columns="orden").set_index("variable_id")
+
+
+@lru_cache(maxsize=1)
+def sensores():
+    return _q("SELECT sensor_id, variable_id, superficie_id, modulo_id FROM sensores")
+
+
+def _nombre_sup(sid):
+    s = superficies()
+    return s[s.superficie_id == sid].nombre.iloc[0]
+
+
+def entidades(variable):
+    """Dónde se midió una variable: lista de (id, etiqueta) de módulos o sensores, en orden."""
+    v = variables_explorar()
+    if variable not in v.index:
+        return []
+    varias_sup = superficies().superficie_id.nunique() > 1
+    if v.loc[variable, "tipo"] == "electrica":
+        return [(r.modulo_id, f"{_nombre_sup(r.superficie_id)} · {r.etiqueta}" if varias_sup else r.etiqueta)
+                for r in modulos().itertuples()]
+    s = sensores()
+    s = s[s.variable_id == variable].copy()
+    m = modulos().set_index("modulo_id")
+    so = dict(zip(superficies().superficie_id, superficies().orden))
+    s["_o"] = [(m.loc[mo, "orden"] if isinstance(mo, str) else so.get(su, -1) * 100) for mo, su in
+               zip(s.modulo_id, s.superficie_id)]
+    out = []
+    for r in s.sort_values("_o").itertuples():
+        if isinstance(r.modulo_id, str):
+            mod = m.loc[r.modulo_id]
+            et = f"{_nombre_sup(mod.superficie_id)} · {mod.etiqueta}" if varias_sup else mod.etiqueta
+        elif isinstance(r.superficie_id, str):
+            et = _nombre_sup(r.superficie_id)
+        else:
+            et = "Sitio"
+        out.append((r.sensor_id, et))
+    vistos = [e for _, e in out]
+    return [(i, f"{e} · {i}" if vistos.count(e) > 1 else e) for i, e in out]
+
+
+def superficie_de(entidad):
+    """Superficie (y módulo) de un módulo o sensor, para emparejar variables."""
+    m = modulos().set_index("modulo_id")
+    if entidad in m.index:
+        return m.loc[entidad, "superficie_id"], entidad
+    s = sensores().set_index("sensor_id")
+    if entidad in s.index:
+        r = s.loc[entidad]
+        if isinstance(r.modulo_id, str):
+            return m.loc[r.modulo_id, "superficie_id"], r.modulo_id
+        return (r.superficie_id if isinstance(r.superficie_id, str) else None), None
+    return None, None
+
+
+def pareja(variable, entidad):
+    """Módulo o sensor de `variable` que corresponde a `entidad` (mismo módulo, misma superficie o sitio)."""
+    v = variables_explorar()
+    sup, mod = superficie_de(entidad)
+    if v.loc[variable, "tipo"] == "electrica":
+        return mod
+    s = sensores()
+    s = s[s.variable_id == variable]
+    for cond in [s.modulo_id == mod, s.superficie_id == sup, s.modulo_id.isna() & s.superficie_id.isna()]:
+        c = s[cond.fillna(False)]
+        if len(c):
+            return c.sensor_id.iloc[0]
+    return s.sensor_id.iloc[0] if len(s) else None
+
+
+def serie(variable, entidad, ini, fin):
+    """Valores por hora (fecha, hora, valor) de una variable en un módulo o sensor."""
+    if variable not in variables_explorar().index or entidad is None:
+        return pd.DataFrame(columns=["fecha", "hora", "valor"])
+    if variables_explorar().loc[variable, "tipo"] == "electrica":
+        if entidad not in set(modulos().modulo_id):
+            return pd.DataFrame(columns=["fecha", "hora", "valor"])
+        col = '"' + variable.replace('"', '""') + '"'
+        df = _q(f"SELECT fecha, hora, {col} AS valor FROM elec_hora WHERE modulo_id = ? AND fecha BETWEEN ? AND ?",
+                (entidad, ini, fin))
+    else:
+        if entidad not in set(sensores().sensor_id):
+            return pd.DataFrame(columns=["fecha", "hora", "valor"])
+        col = '"' + entidad.replace('"', '""') + '"'
+        df = _q(f"SELECT fecha, hora, {col} AS valor FROM amb_hora WHERE fecha BETWEEN ? AND ?", (ini, fin))
+    return df.dropna(subset=["valor"])

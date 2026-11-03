@@ -369,3 +369,71 @@ def perfil_eficiencia(df):
                                  hovertemplate="%{y:.1f} %<extra>%{fullData.name}</extra>"))
     _base(fig, "Eficiencia (%)", "Hora del día", 360)
     return _eje_horas(fig)
+
+
+# ============================== EXPLORAR ==============================
+PALETA_EXPLORAR = PALETA_MODULO
+
+
+def _color_i(i):
+    return PALETA_EXPLORAR[i % len(PALETA_EXPLORAR)]
+
+
+def _eje_y(nombre, unidad):
+    return f"{nombre} ({unidad})" if unidad else nombre
+
+
+def explorar_tiempo(series, nombre, unidad, dec=2):
+    """series: [(etiqueta, df fecha/hora/valor, color)]."""
+    if not any(len(d) for _, d, _c in series):
+        return vacia()
+    fig = go.Figure()
+    u = f" {unidad}" if unidad else ""
+    for et, d, col in series:
+        if d.empty:
+            continue
+        s = _horaria(d.fecha, d.hora, d.valor, dec)
+        fig.add_trace(go.Scatter(x=s.index, y=s.values, mode="lines", name=et, connectgaps=False,
+                                 line=dict(color=col, width=1.6),
+                                 hovertemplate=f"%{{y:.{dec}f}}{u}<extra>%{{fullData.name}}</extra>"))
+    _base(fig, _eje_y(nombre, unidad), "Fecha", 480)
+    fig.update_yaxes(rangemode="normal")
+    return _eje_tiempo(fig)
+
+
+def explorar_perfil(series, nombre, unidad, dec=2):
+    if not any(len(d) for _, d, _c in series):
+        return vacia()
+    fig = go.Figure()
+    u = f" {unidad}" if unidad else ""
+    for et, d, col in series:
+        if d.empty:
+            continue
+        g = d.groupby("hora").valor
+        st = pd.DataFrame({"m": g.mean(), "q1": g.quantile(0.25), "q3": g.quantile(0.75)}).reset_index()
+        _banda(fig, st.hora, st.q1, st.q3, col, et, et)
+        fig.add_trace(go.Scatter(x=st.hora, y=st.m, mode="lines+markers", name=et, legendgroup=et,
+                                 line=dict(color=col, width=3), marker=dict(size=5),
+                                 hovertemplate=f"%{{y:.{dec}f}}{u}<extra>%{{fullData.name}}</extra>"))
+    _base(fig, _eje_y(nombre, unidad), "Hora del día", 440)
+    fig.update_yaxes(rangemode="normal")
+    return _eje_horas(fig)
+
+
+def explorar_dispersion(pares, xnombre, xunidad, ynombre, yunidad, dec=2):
+    """pares: [(etiqueta, df con x, y, color)]."""
+    if not any(len(d) for _, d, _c in pares):
+        return vacia("No hay datos de las dos variables en las mismas horas.")
+    fig = go.Figure()
+    xu, yu = (f" {xunidad}" if xunidad else ""), (f" {yunidad}" if yunidad else "")
+    for et, d, col in pares:
+        if d.empty:
+            continue
+        fig.add_trace(go.Scattergl(x=d.x, y=d.y, mode="markers", name=et,
+                                   marker=dict(color=col, size=5, opacity=0.55),
+                                   hovertemplate=f"%{{x:.{dec}f}}{xu} → %{{y:.{dec}f}}{yu}<extra>%{{fullData.name}}</extra>"))
+    _base(fig, _eje_y(ynombre, yunidad), _eje_y(xnombre, xunidad), 480)
+    fig.update_layout(hovermode="closest", legend=dict(itemsizing="constant"))
+    fig.update_xaxes(showgrid=True, gridcolor=REJILLA)
+    fig.update_yaxes(rangemode="normal")
+    return fig

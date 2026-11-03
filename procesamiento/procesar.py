@@ -278,6 +278,38 @@ def tablas_meteo(b):
     return meteo, tmod
 
 
+AGREGACION = {"promedio": "mean", "suma": "sum", "minimo": "min", "maximo": "max"}
+
+
+def _resumen_horario(df, claves, columnas, variable_de, b):
+    """Resume por hora cada columna con la agregación y los límites de su variable."""
+    df = df[en_ventana(df.ts)].copy()
+    df["fecha"] = df.ts.dt.strftime("%Y-%m-%d")
+    df["hora"] = df.ts.dt.hour
+    funcs = {}
+    for c in columnas:
+        v = variable_de(c)
+        df[c] = dentro(pd.to_numeric(df[c], errors="coerce"), *b.limites(v))
+        funcs[c] = AGREGACION.get(b.variables.loc[v, "agregacion"], "mean")
+    out = df.groupby(claves + ["fecha", "hora"]).agg(funcs).reset_index()
+    return out.dropna(subset=columnas, how="all")
+
+
+def tablas_explorar(b):
+    """Promedios por hora de TODAS las variables, sin filtro híbrido (solo límites de cada variable)."""
+    cols_e = [r[1] for r in b.con.execute("PRAGMA table_info(mediciones_electricas)")]
+    elec = [c for c in cols_e if c in b.variables.index and b.variables.loc[c, "tipo"] == "electrica"]
+    e = pd.read_sql(f"SELECT fecha_hora, modulo_id, {', '.join(q(c) for c in elec)} FROM mediciones_electricas", b.con)
+    e["ts"] = pd.to_datetime(e.fecha_hora, format=FMT)
+    e = _resumen_horario(e.drop(columns="fecha_hora"), ["modulo_id"], elec, lambda c: c, b)
+    sens = list(b.sensores.index)
+    a = b.ambientales(sens) if sens else pd.DataFrame(columns=["ts"])
+    a = _resumen_horario(a, [], sens, lambda c: b.sensores.loc[c, "variable_id"], b) if sens else a
+    log(f"  Explorar: {len(elec)} variable(s) eléctrica(s) en {len(e):,} horas-módulo; "
+        f"{len(sens)} sensor(es) en {len(a):,} horas")
+    return e, a
+
+
 def tabla_cronograma(b, fecha_fin):
     """Periodos de orientación por superficie (el último periodo abierto llega hasta el fin de los datos)."""
     cr = b.info.get("cronograma_orientaciones")
@@ -331,7 +363,8 @@ def escribir(tablas, destino):
         df.to_sql(nombre, con, index=False)
     idx = {"iv_hora": "fecha, modulo_id", "dispersion": "ts, modulo_id", "energia_dia": "fecha, modulo_id",
            "irr_hora": "fecha, superficie_id", "hsp_dia": "fecha, superficie_id", "meteo_hora": "fecha",
-           "temp_modulo_hora": "fecha, modulo_id", "dias_modulo": "fecha, modulo_id"}
+           "temp_modulo_hora": "fecha, modulo_id", "dias_modulo": "fecha, modulo_id",
+           "elec_hora": "fecha, modulo_id", "amb_hora": "fecha"}
     for t, cols in idx.items():
         con.execute(f"CREATE INDEX ix_{t} ON {t} ({cols})")
     con.commit()
@@ -362,6 +395,8 @@ def main():
     log("Calculando irradiancia y horas de sol pico por superficie...")
     irr_hora, hsp_dia = tablas_irradiancia(irr)
     meteo, tmod = tablas_meteo(b)
+    log("Calculando promedios por hora para Explorar...")
+    elec_hora, amb_hora = tablas_explorar(b)
 
     fechas = pd.concat([iv_hora.fecha, irr_hora.fecha, energia.fecha])
     fecha_fin = fechas.max()
@@ -388,6 +423,7 @@ def main():
         "irr_hora": irr_hora.rename(columns={"superficie": "superficie_id"}),
         "hsp_dia": hsp_dia.rename(columns={"superficie": "superficie_id"}),
         "meteo_hora": meteo, "temp_modulo_hora": tmod, "cronograma": crono,
+        "elec_hora": elec_hora, "amb_hora": amb_hora,
         "variables": b.info["variables"], "sensores": b.info["sensores"],
         "metadatos": pd.DataFrame(list(meta.items()), columns=["clave", "valor"]),
     }

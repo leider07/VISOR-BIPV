@@ -24,6 +24,9 @@ def titulos(ruta):
     t = {
         "/clima": ("Clima y recurso solar", (clima[:1].upper() + clima[1:] + ".") if clima else ""),
         "/energia": ("Energía generada", f"Energía de cada {p['n']} seleccionado en la {p['s']} elegida."),
+        "/explorar": ("Explorar los datos",
+                      f"Elige cualquier variable medida y compárala entre {p['np']} o sensores: en el tiempo, "
+                      "a lo largo del día o contra otra variable."),
         "/desempeno": ("Desempeño: potencia y eficiencia",
                        f"Cómo responde cada {p['n']} al sol a lo largo del día. La eficiencia es el porcentaje de "
                        f"la energía solar que llega al {p['n']} y se convierte en electricidad."),
@@ -298,3 +301,151 @@ def desempeno(f):
     if not con_irr:
         hijos.append(aviso(f"Esta {p['s']} no tiene sensor de irradiancia: no se puede calcular la eficiencia."))
     return html.Div(className="contenedor pila", children=hijos)
+
+
+# =================================================================== EXPLORAR
+EJES = [("tiempo", "En el tiempo"), ("hora", "A lo largo del día"), ("variable", "Contra otra variable")]
+MAX_PRESELECCION = 4
+
+
+def nombre_variable(vid):
+    """Nombre para mostrar: en las variables fijas, 'módulo' se cambia por la palabra de la instalación."""
+    v = D.variables_explorar().loc[vid]
+    n = v.nombre
+    if v.es_fija:
+        n = n.replace("módulo", palabras()["n"])
+    return n
+
+
+def unidad_variable(vid):
+    u = D.variables_explorar().loc[vid].unidad
+    return u if isinstance(u, str) else ""
+
+
+def _etiqueta_variable(vid):
+    u = unidad_variable(vid)
+    return f"{nombre_variable(vid)} ({u})" if u else nombre_variable(vid)
+
+
+def variable_inicial():
+    v = D.variables_explorar()
+    elec = [i for i in v.index if v.loc[i, "tipo"] == "electrica" and i != "potencia_max_w"]
+    return elec[0] if elec else v.index[0]
+
+
+def seleccion_inicial(variable):
+    ent = [i for i, _ in D.entidades(variable)]
+    if D.variables_explorar().loc[variable, "tipo"] == "electrica":
+        primera = D.superficies().superficie_id.iloc[0]
+        return list(D.modulos_de(primera).modulo_id)
+    return ent[:MAX_PRESELECCION] if len(ent) > MAX_PRESELECCION else ent
+
+
+def filtro_entidades(variable, valor=None):
+    opciones = [{"label": html.Span([html.Span(className="punto", style={"background": G._color_i(i)}), et]),
+                 "value": eid} for i, (eid, et) in enumerate(D.entidades(variable))]
+    validos = {o["value"] for o in opciones}
+    valor = [x for x in (valor or []) if x in validos] or seleccion_inicial(variable)
+    return dcc.Checklist(id="exp-entidades", options=opciones, value=valor, inline=True, className="chips",
+                         inputClassName="chip-input", labelClassName="chip chip-claro")
+
+
+def _chips(id_, opciones, valor):
+    return dcc.RadioItems(id=id_, options=opciones, value=valor, inline=True, className="chips",
+                          inputClassName="chip-input", labelClassName="chip")
+
+
+def explorar(f):
+    v = D.variables_explorar()
+    var0 = variable_inicial()
+    grupos = []
+    for tipo, titulo in [("electrica", "Variables eléctricas"), ("ambiental", "Variables ambientales")]:
+        ids = [i for i in v.index if v.loc[i, "tipo"] == tipo]
+        if ids:
+            grupos.append((titulo, [{"label": _etiqueta_variable(i), "value": i} for i in ids]))
+    opciones_var = [o for _, ops in grupos for o in ops]
+    xvar0 = "irradiancia" if "irradiancia" in v.index else v.index[0]
+    return html.Div(className="contenedor pila", children=[
+        html.Section(className="tarjeta explorar-controles", children=[
+            html.Div(className="grupo-filtro", children=[
+                html.Span("Variable", className="filtro-titulo"),
+                _chips("exp-variable", opciones_var, var0)]),
+            html.Div(className="grupo-filtro", children=[
+                html.Span("Dónde", className="filtro-titulo"),
+                html.Div(id="exp-caja-entidades", children=filtro_entidades(var0))]),
+            html.Div(className="grupo-filtro", children=[
+                html.Span("Cómo verla", className="filtro-titulo"),
+                _chips("exp-eje", [{"label": t, "value": k} for k, t in EJES], "tiempo")]),
+            html.Div(id="exp-grupo-x", className="grupo-filtro", style={"display": "none"}, children=[
+                html.Span("Variable del eje horizontal", className="filtro-titulo"),
+                _chips("exp-xvariable", opciones_var, xvar0)]),
+        ]),
+        html.Section(className="tarjeta tarjeta-grafica", children=[
+            html.Div(className="tarjeta-cab explorar-cab", children=[
+                html.Div([html.H3(id="exp-titulo"), html.P(id="exp-subtitulo")]),
+                html.Button("Descargar datos", id="btn-descargar-exp", n_clicks=0, className="btn btn-sec btn-peq")]),
+            dcc.Loading(type="dot", color="#1b554f", children=dcc.Graph(id="exp-grafica", config=G.CONFIG,
+                                                                         className="grafica")),
+            html.P(id="exp-nota", className="nota"),
+        ]),
+    ])
+
+
+def datos_explorar(variable, entidades, eje, xvariable, ini, fin):
+    """Series de la vista Explorar: (lista de (etiqueta, df, color), etiquetas por id).
+    El color es el mismo del punto en el botón del lugar."""
+    lista = D.entidades(variable)
+    nombres = dict(lista)
+    color = {eid: G._color_i(i) for i, (eid, _) in enumerate(lista)}
+    ids = [eid for eid, _ in lista if eid in set(entidades or [])]
+    if eje != "variable":
+        return [(nombres[e], D.serie(variable, e, ini, fin), color[e]) for e in ids], nombres
+    pares = []
+    for e in ids:
+        y = D.serie(variable, e, ini, fin)
+        x = D.serie(xvariable, D.pareja(xvariable, e), ini, fin)
+        d = y.merge(x, on=["fecha", "hora"], suffixes=("_y", "_x")).rename(columns={"valor_y": "y", "valor_x": "x"})
+        pares.append((nombres[e], d, color[e]))
+    return pares, nombres
+
+
+def figura_explorar(variable, entidades, eje, xvariable, ini, fin):
+    """(figura, título, subtítulo, nota)."""
+    if variable not in D.variables_explorar().index:
+        return G.vacia(), "", "", ""
+    series, _ = datos_explorar(variable, entidades, eje, xvariable, ini, fin)
+    nom, uni = nombre_variable(variable), unidad_variable(variable)
+    if not series:
+        return G.vacia("Elige al menos un lugar en «Dónde»."), nom, "", ""
+    if eje == "tiempo":
+        fig = G.explorar_tiempo(series, nom, uni)
+        sub = "Promedio de cada hora · usa la barra inferior para acercarte"
+    elif eje == "hora":
+        fig = G.explorar_perfil(series, nom, uni)
+        sub = "Línea = promedio por hora · franja = rango donde cae la mitad de los días"
+    else:
+        xn, xu = nombre_variable(xvariable), unidad_variable(xvariable)
+        fig = G.explorar_dispersion(series, xn, xu, nom, uni)
+        nom = f"{nom} según {xn[0].lower() + xn[1:]}"
+        sub = "Cada punto es el promedio de una hora · la otra variable se toma del mismo lugar o del sitio"
+    fija = bool(D.variables_explorar().loc[variable, "es_fija"])
+    nota = ("Datos de las 5:00 a las 19:00, sin el filtro de limpieza de las pestañas Energía y Desempeño: "
+            "solo se descartan valores fuera del rango posible de cada variable.")
+    if not fija:
+        nota = "Variable adicional de la instalación. " + nota
+    return fig, nom, sub, nota
+
+
+def csv_explorar(variable, entidades, eje, xvariable, ini, fin):
+    series, _ = datos_explorar(variable, entidades, eje, xvariable, ini, fin)
+    import pandas as pd
+    partes = [d.assign(lugar=et) for et, d, _c in series if len(d)]
+    if not partes:
+        return None
+    df = pd.concat(partes)
+    if eje == "variable":
+        df = df.rename(columns={"x": nombre_variable(xvariable), "y": nombre_variable(variable)})
+    else:
+        df = df.rename(columns={"valor": nombre_variable(variable)})
+    cols = ["lugar", "fecha", "hora"] + [c for c in df.columns if c not in ("lugar", "fecha", "hora")]
+    return "﻿" + df[cols].round(4).to_csv(sep=";", decimal=",", index=False)

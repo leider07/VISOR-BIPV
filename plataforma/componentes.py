@@ -21,7 +21,7 @@ def paginas():
         p.append(("/", "Resumen"))
     if D.variables() & AMBIENTALES:
         p.append(("/clima", "Clima"))
-    p += [("/energia", "Energía"), ("/desempeno", "Desempeño")]
+    p += [("/energia", "Energía"), ("/desempeno", "Desempeño"), ("/explorar", "Explorar")]
     return p
 
 
@@ -157,7 +157,7 @@ def barra_filtros(meta):
             dcc.RadioItems(id="filtro-cara", options=opciones_sup, value=primera, inline=True,
                            className="chips", inputClassName="chip-input", labelClassName="chip"),
         ]),
-        html.Div(className="grupo-filtro", children=[
+        html.Div(id="grupo-modulos", className="grupo-filtro", children=[
             html.Span(titulo_modulos(), className="filtro-titulo"),
             html.Div(id="caja-modulos", children=filtro_modulos(primera)),
         ]),

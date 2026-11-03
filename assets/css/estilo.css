@@ -259,3 +259,8 @@ h1, h2, h3 { font-family: var(--display); color: var(--tinta); margin: 0; }
 .equipo p, .metodo p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--tinta-3); }
 .metodo { padding: 20px; display: flex; flex-direction: column; gap: 8px; border-top: 4px solid var(--turquesa); }
 .metodo h3 { font-size: 17px; }
+
+/* Explorar */
+.grupo-filtro.oculto { display: none; }
+.explorar-controles { display: flex; flex-direction: column; gap: 18px; padding: 20px 24px; }
+.explorar-cab { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }

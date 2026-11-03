@@ -41,6 +41,7 @@ def layout():
         dcc.Store(id="fechas", data=todo, storage_type="session"),
         dcc.Store(id="borrador", data=todo),
         dcc.Download(id="descarga"),
+        dcc.Download(id="descarga-exp"),
         encabezado(meta),
         html.Div(id="banda", className="banda", children=html.Div(className="contenedor banda-int", children=[
             html.Div([html.H1(id="titulo"), html.P(id="subtitulo")]),
@@ -64,17 +65,19 @@ def _ruta(ruta):
 @app.callback(
     Output({"type": "nav", "index": ALL}, "className"),
     Output("banda", "style"), Output("titulo", "children"), Output("subtitulo", "children"),
-    Output("nota-filtros", "children"), Output("grupo-cara", "className"),
+    Output("nota-filtros", "children"), Output("grupo-cara", "className"), Output("grupo-modulos", "className"),
     Input("url", "pathname"),
 )
 def navegacion(ruta):
     ruta = _ruta(ruta)
     clases = ["nav-link activo" if r == ruta else "nav-link" for r, _ in paginas()]
     if ruta == "/":
-        return clases, {"display": "none"}, "", "", "", "grupo-filtro"
+        return clases, {"display": "none"}, "", "", "", "grupo-filtro", "grupo-filtro"
     tit, sub = P.titulos(ruta)
+    if ruta == "/explorar":   # Explorar tiene sus propios selectores; de la barra solo quedan las fechas
+        return clases, {}, tit, sub, "Datos de 5:00 a 19:00", "grupo-filtro oculto", "grupo-filtro oculto"
     cara_cls = "grupo-filtro atenuado" if ruta == "/clima" else "grupo-filtro"
-    return clases, {}, tit, sub, "Datos filtrados de 5:00 a 19:00", cara_cls
+    return clases, {}, tit, sub, "Datos filtrados de 5:00 a 19:00", cara_cls, "grupo-filtro"
 
 
 @app.callback(
@@ -104,6 +107,8 @@ def contenido(ruta, fechas, modulos, cara):
         return P.energia(f)
     if ruta == "/desempeno":
         return P.desempeno(f)
+    if ruta == "/explorar":
+        return P.explorar(f)
     return resumen_sumicol.resumen()
 
 
@@ -126,6 +131,39 @@ def descargar_matriz(n, cara, fechas):
     if texto is None:
         return no_update
     return dcc.send_string(texto, f"irradiancia_{cara}_{fechas['ini']}_a_{fechas['fin']}.csv")
+
+
+# ------------------------------------------------------------------ Explorar
+@app.callback(Output("exp-caja-entidades", "children"),
+              Input("exp-variable", "value"), State("exp-entidades", "value"), prevent_initial_call=True)
+def explorar_donde(variable, elegidos):
+    # Se conserva la selección si la nueva variable se midió en los mismos lugares
+    return P.filtro_entidades(variable, elegidos)
+
+
+@app.callback(Output("exp-grupo-x", "style"), Input("exp-eje", "value"))
+def explorar_eje(eje):
+    return {} if eje == "variable" else {"display": "none"}
+
+
+@app.callback(Output("exp-grafica", "figure"), Output("exp-titulo", "children"), Output("exp-subtitulo", "children"),
+              Output("exp-nota", "children"),
+              Input("exp-entidades", "value"), Input("exp-eje", "value"), Input("exp-xvariable", "value"),
+              Input("fechas", "data"), State("exp-variable", "value"))
+def explorar_grafica(entidades, eje, xvariable, fechas, variable):
+    return P.figura_explorar(variable, entidades, eje, xvariable, fechas["ini"], fechas["fin"])
+
+
+@app.callback(Output("descarga-exp", "data"), Input("btn-descargar-exp", "n_clicks"),
+              State("exp-variable", "value"), State("exp-entidades", "value"), State("exp-eje", "value"),
+              State("exp-xvariable", "value"), State("fechas", "data"), prevent_initial_call=True)
+def explorar_descargar(n, variable, entidades, eje, xvariable, fechas):
+    if not n:
+        return no_update
+    texto = P.csv_explorar(variable, entidades, eje, xvariable, fechas["ini"], fechas["fin"])
+    if texto is None:
+        return no_update
+    return dcc.send_string(texto, f"explorar_{variable}_{fechas['ini']}_a_{fechas['fin']}.csv")
 
 
 # ------------------------------------------------------------------ selector de fechas

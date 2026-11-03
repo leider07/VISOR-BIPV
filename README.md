@@ -23,6 +23,11 @@ Cada gráfica aparece solo si hay datos para ella (por ejemplo, sin sensor de vi
 gráficas de viento). La pestaña **Resumen** es propia de Sumicol; para otras instalaciones la
 plataforma abre directamente en las gráficas.
 
+La pestaña **Explorar** muestra cualquier variable de la base (también las adicionales que declare
+cada instalación, como el fill factor) por módulo o por sensor: en el tiempo, a lo largo del día o
+contra otra variable, y permite descargar los datos en CSV. Usa promedios por hora sin el filtro de
+limpieza; solo descarta valores fuera del rango posible de cada variable.
+
 ## Usarla en el computador
 
 Abre una terminal en esta carpeta y ejecuta:
@@ -76,7 +81,7 @@ lo propio de cada una (potencia STC, área, sensores, límites de cada variable)
 │   ├── datos.py           # consultas a data/visor.db
 │   ├── graficas.py        # gráficas Plotly con el estilo de la plataforma
 │   ├── componentes.py     # encabezado, pie, filtros, tarjetas
-│   ├── paginas.py         # Clima, Energía y Desempeño
+│   ├── paginas.py         # Clima, Energía, Desempeño y Explorar
 │   └── resumen_sumicol.py # pestaña Resumen del prototipo Sumicol
 ├── procesamiento/         # de la base de carga a la base de la plataforma
 │   ├── validar_bd.py
