@@ -264,3 +264,32 @@ h1, h2, h3 { font-family: var(--display); color: var(--tinta); margin: 0; }
 .grupo-filtro.oculto { display: none; }
 .explorar-controles { display: flex; flex-direction: column; gap: 18px; padding: 20px 24px; }
 .explorar-cab { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+
+/* Tus datos */
+.franja-base { background: #fdf6d8; border-bottom: 1px solid #efe1a3; }
+.franja-base-int { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  padding-top: 6px; padding-bottom: 6px; font-size: 14px; color: var(--tinta); }
+.base-activa { padding: 24px 28px; display: flex; justify-content: space-between; align-items: center; gap: 24px;
+  flex-wrap: wrap; border-left: 6px solid var(--sol); }
+.base-activa h3 { margin: 10px 0 6px; }
+.pila-form { display: flex; flex-direction: column; gap: 28px; padding: 8px 0 4px; }
+.form-bloque { display: flex; flex-direction: column; gap: 10px; }
+.form-bloque-cab h4 { font-family: var(--display); font-size: 15px; margin: 0 0 2px; color: var(--verde); }
+.form-bloque-cab .nota { margin: 0; }
+.rejilla-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 16px; }
+.campo { display: flex; flex-direction: column; gap: 4px; }
+.campo label { font-family: var(--display); font-size: 12px; font-weight: 700; color: var(--tinta-2); }
+.input-texto { min-height: 42px; padding: 0 12px; border: 1px solid var(--borde-2); border-radius: 10px;
+  font-family: var(--texto); font-size: 15px; color: var(--tinta); background: #fff; }
+.input-texto:focus { outline: 3px solid var(--sol); outline-offset: 1px; }
+.form-acciones { display: flex; justify-content: flex-end; padding: 8px 0 4px; }
+.zona-carga { border: 2px dashed var(--borde-2); border-radius: 14px; padding: 36px 16px; text-align: center;
+  background: var(--menta); color: var(--tinta-2); cursor: pointer; margin: 8px 0 12px; }
+.zona-carga:hover { border-color: var(--verde); }
+.zona-carga strong { font-family: var(--display); color: var(--verde); }
+.aviso-errores, .aviso-avisos, .aviso-ok { padding: 16px 20px; margin-top: 12px; font-size: 15px; }
+.aviso-errores { border-left: 6px solid #c0504d; }
+.aviso-avisos { border-left: 6px solid var(--sol); }
+.aviso-ok { border-left: 6px solid var(--turquesa); }
+.aviso-errores ul, .aviso-avisos ul { margin: 8px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner td.dropdown { overflow: visible; }

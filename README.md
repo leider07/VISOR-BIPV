@@ -27,6 +27,22 @@ La pestaña **Explorar** muestra cualquier variable de la base (también las adi
 cada instalación, como el fill factor) por módulo o por sensor: en el tiempo, a lo largo del día o
 contra otra variable, y permite descargar los datos en CSV.
 
+## Tus datos: cada visitante puede ver su propia instalación
+
+La pestaña **Tus datos** tiene dos partes:
+
+1. **Crea tu plantilla:** un formulario con tablas editables (instalación, tecnologías, superficies,
+   módulos, variables y sensores). Genera un `.db` en formato 1.1 con las tablas de información ya
+   llenas y las de mediciones vacías, con exactamente las columnas declaradas.
+2. **Carga tu base:** se acepta
+   - la base en formato de carga (hasta 20 MB): se valida y se procesa en el servidor;
+   - o, si es más grande, la base ya procesada en el computador con `procesamiento/procesar.py`
+     (hasta 40 MB).
+
+La base cargada **solo la ve quien la subió**, en esa pestaña del navegador; se guarda en una carpeta
+temporal del servidor y se borra a las 24 horas (en el plan gratuito de Render, también al
+reiniciarse el servidor). Los límites están en `plataforma/config.py`.
+
 ## Usarla en el computador
 
 Abre una terminal en esta carpeta y ejecuta:
@@ -82,10 +98,12 @@ y días válidos en su script de preparación, fuera de este repositorio).
 │   ├── graficas.py        # gráficas Plotly con el estilo de la plataforma
 │   ├── componentes.py     # encabezado, pie, filtros, tarjetas
 │   ├── paginas.py         # Clima, Energía, Desempeño y Explorar
-│   └── resumen_sumicol.py # pestaña Resumen del prototipo Sumicol
+│   ├── resumen_sumicol.py # pestaña Resumen del prototipo Sumicol
+│   └── tus_datos.py       # pestaña Tus datos: formulario de plantilla y carga de bases
 ├── procesamiento/         # de la base de carga a la base de la plataforma
 │   ├── validar_bd.py
 │   ├── procesar.py
+│   ├── plantilla.py       # crea plantillas desde el formulario
 │   └── parametros.py
 ├── formato/               # guía, esquema y plantilla del formato de carga
 ├── data/visor.db          # base de la plataforma (Sumicol)

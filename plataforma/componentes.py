@@ -21,7 +21,7 @@ def paginas():
         p.append(("/", "Resumen"))
     if D.variables() & AMBIENTALES:
         p.append(("/clima", "Clima"))
-    p += [("/energia", "Energía"), ("/desempeno", "Desempeño"), ("/explorar", "Explorar")]
+    p += [("/energia", "Energía"), ("/desempeno", "Desempeño"), ("/explorar", "Explorar"), ("/datos", "Tus datos")]
     return p
 
 
@@ -150,7 +150,7 @@ def barra_filtros(meta):
     sup = D.superficies()
     primera = sup.superficie_id.iloc[0]
     opciones_sup = [{"label": etiqueta_superficie(r, corta=True), "value": r.superficie_id} for r in sup.itertuples()]
-    return html.Div(className="barra-filtros", children=[
+    return html.Div(id="barra-filtros", className="barra-filtros", children=[
         selector_fechas(meta),
         html.Div(id="grupo-cara", className="grupo-filtro", children=[
             html.Span(f"{palabras()['s'].capitalize()} (elige una)", className="filtro-titulo"),
@@ -194,6 +194,15 @@ def encabezado(meta):
                 for ruta, nombre in paginas()]),
         ]),
     ])
+
+
+def aviso_base_propia(meta):
+    """Franja que recuerda que se está viendo una base cargada por el visitante."""
+    return html.Div(className="franja-base", children=html.Div(className="contenedor franja-base-int", children=[
+        html.Span(["Estás viendo tu base ", html.B(f"«{meta['instalacion']}»"),
+                   ". Solo tú la ves en esta pestaña del navegador."]),
+        html.Button("Volver a la plataforma de Sumicol", id={"type": "volver", "index": "franja"}, n_clicks=0,
+                    className="enlace-btn")]))
 
 
 def pie():

@@ -1,17 +1,56 @@
-"""Consultas a la base de la plataforma (data/visor.db)."""
+"""
+Consultas a la base de la plataforma.
+
+Por defecto se lee data/visor.db (Sumicol). Si el visitante cargó su propia base en «Tus datos»,
+cada callback activa esa base con usar(token) y todas las consultas de esa petición la leen a ella.
+"""
+import contextvars
+import re
 import sqlite3
-from functools import lru_cache
+from functools import lru_cache, wraps
 
 import pandas as pd
 
 from . import config as C
 
+_BASE = contextvars.ContextVar("base_visor", default=None)
+
+
+def ruta_carga(token):
+    """Archivo de la base procesada de un visitante (None si el código no es válido)."""
+    if not token or not re.fullmatch(r"[0-9a-f]{32}", str(token)):
+        return None
+    return C.CARPETA_CARGAS / f"{token}.db"
+
+
+def usar(token):
+    """Activa la base del visitante (o la de Sumicol si no hay o ya no existe). Devuelve True si es propia."""
+    r = ruta_carga(token)
+    propia = r is not None and r.exists()
+    _BASE.set(r if propia else None)
+    return propia
+
+
+def ruta():
+    return _BASE.get() or C.DB_VISOR
+
+
+def por_base(f):
+    """lru_cache separado para cada base (cada archivo cargado tiene un nombre único)."""
+    cache = lru_cache(maxsize=32)(lambda _ruta, *a: f(*a))
+
+    @wraps(f)
+    def envoltura(*a):
+        return cache(str(ruta()), *a)
+    return envoltura
+
 
 def _q(sql, params=()):
-    if not C.DB_VISOR.exists():
+    r = ruta()
+    if not r.exists():
         raise FileNotFoundError(
-            f"No existe {C.DB_VISOR}. Ejecuta primero:  python procesamiento/procesar.py mi_instalacion.db")
-    con = sqlite3.connect(C.DB_VISOR.resolve().as_uri() + "?mode=ro", uri=True, check_same_thread=False)
+            f"No existe {r}. Ejecuta primero:  python procesamiento/procesar.py mi_instalacion.db")
+    con = sqlite3.connect(r.resolve().as_uri() + "?mode=ro", uri=True, check_same_thread=False)
     try:
         return pd.read_sql(sql, con, params=params)
     finally:
@@ -23,23 +62,23 @@ def _in(lista):
 
 
 # ---------------------------- catálogo de la instalación ----------------------------
-@lru_cache(maxsize=1)
+@por_base
 def metadatos():
     df = _q("SELECT clave, valor FROM metadatos")
     return dict(zip(df.clave, df.valor))
 
 
-@lru_cache(maxsize=1)
+@por_base
 def superficies():
     return _q("SELECT * FROM superficies ORDER BY orden")
 
 
-@lru_cache(maxsize=1)
+@por_base
 def modulos():
     return _q("SELECT * FROM modulos ORDER BY orden")
 
 
-@lru_cache(maxsize=1)
+@por_base
 def cronograma():
     return _q("SELECT superficie_id, desde, hasta, orientacion FROM cronograma ORDER BY desde")
 
@@ -125,7 +164,7 @@ def dispersion(ini, fin, ids, max_por_modulo=4000):
 
 
 # ---------------------------- explorar ----------------------------
-@lru_cache(maxsize=1)
+@por_base
 def variables_explorar():
     """Variables con datos: variable_id, nombre, unidad, tipo, es_fija (en el orden de la plataforma)."""
     v = _q("SELECT variable_id, nombre, unidad, tipo FROM variables")
@@ -141,7 +180,7 @@ def variables_explorar():
     return v.sort_values("orden").drop(columns="orden").set_index("variable_id")
 
 
-@lru_cache(maxsize=1)
+@por_base
 def sensores():
     return _q("SELECT sensor_id, variable_id, superficie_id, modulo_id FROM sensores")
 
