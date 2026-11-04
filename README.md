@@ -1,4 +1,4 @@
-# VISOR-BIPV · Plataforma de monitoreo fotovoltaico
+<img width="693" height="703" alt="imagen" src="https://github.com/user-attachments/assets/f3c3d5fa-75dc-48d9-b9ca-58efc69058cb" /># VISOR-BIPV · Plataforma de monitoreo fotovoltaico
 
 Plataforma web para visualizar los datos históricos de instalaciones fotovoltaicas: el recurso
 solar y las condiciones del sitio, la energía generada por cada módulo y su desempeño (potencia y
@@ -214,12 +214,12 @@ la aplicación no los usa.
 ## Autoría, licencia y cita
 
 **Autor:** Leider Fabián Castro García · fabianleider0707@gmail.com
+**Coautor:** Santiago Restrepo Muñoz
 
 Grupo de Investigación en Manejo Eficiente de la Energía (**GIMEL**) y Centro de Investigación,
 Innovación y Desarrollo de Materiales (**CIDEMAT**), Universidad de Antioquia.
 
-**Agradecimientos:** al Proyecto Integra, en el que se desarrolló el prototipo BIPV de Sumicol y esta
-plataforma.
+**Agradecimientos:** Este trabajo contó con el apoyo de los proyectos como «Desarrollo de capacidades para la generación de energía eléctrica para atender los retos de diversificación, descentralización y demanda en entornos urbanos y rurales de Antioquia, Risaralda, Caldas y Quindío», con código BPIN 2023000100025; «Plataforma de Hardware in the Loop para la Gestión Energética» (código 2024-76942), financiado por la convocatoria 2023-2024 de la Universidad de Antioquia, «Desarrollo de una plataforma de agricultura inteligente energéticamente autónoma para el monitoreo continuo de variables relevantes, orientada a mejorar la productividad y mitigar el impacto ambiental en cultivos hortícolas de Antioquia y Quindío», con código BPIN 2022000100012, al Sistema General de Regalías, Sumicol (Organización Corona) por facilitar sus instalaciones y espacios para la implementación, operación y validación del montaje experimental.
 
 **Licencia:**
 
