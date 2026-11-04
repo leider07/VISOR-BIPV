@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Manual de uso · Plataforma de monitoreo fotovoltaico</title>
+<style>
+@font-face { font-family: 'Montserrat'; font-weight: 600; src: url('../assets/fonts/montserrat-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-weight: 700; src: url('../assets/fonts/montserrat-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-weight: 800; src: url('../assets/fonts/montserrat-latin-800-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-weight: 400; src: url('../assets/fonts/source-sans-3-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-weight: 600; src: url('../assets/fonts/source-sans-3-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-weight: 700; src: url('../assets/fonts/source-sans-3-latin-700-normal.woff2') format('woff2'); }
+@page { size: Letter; margin: 0; }
+:root { --verde: #1b554f; --verde-osc: #123c37; --turq: #2f978d; --sol: #edcf3e; --sol-bg: #fdf6d8; --tinta: #16302d;
+  --tinta-2: #35504c; --tinta-3: #5a716d; --fondo: #f5f9f8; --menta: #eef6f3; --borde: #d6e4e1; --rojo: #b5483f; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: 'Source Sans 3', sans-serif; font-size: 10.5pt; line-height: 1.45; color: var(--tinta);
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.pagina { width: 8.5in; height: 11in; padding: 0.6in 0.7in 0.55in; position: relative; overflow: hidden;
+  page-break-after: always; display: flex; flex-direction: column; gap: 12px; }
+.pagina:last-child { page-break-after: auto; }
+.pagina > * { flex-shrink: 0; }
+.compacta th { font-size: 6.4pt; padding: 5px 5px; letter-spacing: 0; }
+.compacta td { padding: 4px 5px; }
+.compacta td.d { font-size: 7.4pt; }
+.check-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 22px; }
+.pie { position: absolute; left: 0.7in; right: 0.7in; bottom: 0.28in; display: flex; justify-content: space-between;
+  font-size: 8pt; color: var(--tinta-3); border-top: 1px solid var(--borde); padding-top: 6px; }
+h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; margin: 0; color: var(--tinta); }
+h2 { font-size: 19pt; font-weight: 800; color: var(--verde); letter-spacing: -0.2px; }
+h3 { font-size: 11.5pt; font-weight: 700; }
+h4 { font-size: 9.5pt; font-weight: 700; color: var(--verde); }
+p { margin: 0; }
+.solo-ceja { margin-bottom: 4px; }
+.figura-diagrama { border: 1px solid #d5e4e0; border-radius: 10px; padding: 14px; background: #fff; text-align: center; margin: 4px 0 12px; }
+.figura-diagrama img { width: 74%; height: auto; image-rendering: auto; }
+.ceja { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 8pt; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--turq); }
+.lead { font-size: 11.5pt; color: var(--tinta-2); max-width: 6.4in; }
+code, .mono { font-family: 'DejaVu Sans Mono', Consolas, monospace; font-size: 8.6pt; }
+code { background: var(--menta); border-radius: 3px; padding: 0 3px; color: var(--verde-osc); }
+.caja { border: 1px solid var(--borde); border-radius: 10px; padding: 12px 14px; background: #fff; }
+.nota { background: var(--sol-bg); border-radius: 8px; padding: 9px 12px; font-size: 9.8pt; }
+.nota b { color: var(--tinta); }
+.rejilla-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.rejilla-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 8.8pt; }
+th { text-align: left; font-family: 'Montserrat', sans-serif; font-size: 7.4pt; font-weight: 700; letter-spacing: 0.3px;
+  text-transform: uppercase; color: var(--tinta-2); background: var(--menta); padding: 5px 7px; border-bottom: 1px solid var(--borde); }
+td { padding: 4.5px 7px; border-bottom: 1px solid #e8f0ee; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+.tabla { border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; }
+.tabla-nombre { font-family: 'DejaVu Sans Mono', monospace; font-size: 8.6pt; font-weight: 700; color: #fff;
+  background: var(--verde); padding: 4px 8px; display: flex; justify-content: space-between; align-items: center; }
+.tabla-nombre span { font-family: 'Source Sans 3', sans-serif; font-weight: 400; font-size: 8pt; opacity: 0.85; }
+td.k { font-family: 'DejaVu Sans Mono', monospace; font-size: 8.2pt; color: var(--verde-osc); font-weight: 700; white-space: nowrap; }
+td.d { font-family: 'DejaVu Sans Mono', monospace; font-size: 8.2pt; white-space: nowrap; }
+.si { color: var(--verde); font-weight: 700; } .no { color: #9aaea9; }
+.badge { font-family: 'Montserrat', sans-serif; font-size: 6.8pt; font-weight: 700; letter-spacing: 0.5px;
+  text-transform: uppercase; padding: 2px 7px; border-radius: 99px; background: #e2f2ef; color: var(--verde); }
+.badge.op { background: #eef1f0; color: #6b7f7b; }
+/* portada */
+.portada { padding: 0; }
+.portada-top { background: var(--verde); color: #fff; padding: 0.75in 0.7in 0.55in; display: flex; flex-direction: column; gap: 14px; }
+.portada-top h1 { color: #fff; font-size: 28pt; font-weight: 800; line-height: 1.12; max-width: 6.3in; }
+.portada-top .ceja { color: var(--sol); }
+.portada-top p { color: #d9ebe7; font-size: 12pt; max-width: 6in; }
+.portada-cuerpo { padding: 0.35in 0.7in; display: flex; flex-direction: column; gap: 12px; }
+.indice td { padding: 3px 6px; }
+.paso { border: 1px solid var(--borde); border-radius: 12px; padding: 14px; background: #fff; display: flex; flex-direction: column; gap: 6px; }
+.paso-num { width: 28px; height: 28px; border-radius: 50%; background: var(--sol); font-family: 'Montserrat', sans-serif;
+  font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 11pt; }
+.paso h3 { font-size: 11pt; }
+.paso p { font-size: 9.8pt; color: var(--tinta-2); }
+.lista { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 3px; }
+.check { list-style: none; padding-left: 0; }
+.check li { padding-left: 22px; position: relative; }
+.check li::before { content: ""; position: absolute; left: 0; top: 2px; width: 12px; height: 12px; border: 1.6px solid var(--verde); border-radius: 3px; }
+.codigo { background: #0f2a27; color: #dcefe9; border-radius: 8px; padding: 10px 12px; font-family: 'DejaVu Sans Mono', monospace;
+  font-size: 8.1pt; line-height: 1.5; white-space: pre; }
+.codigo .c { color: #8fb8b0; }
+.pasos-dbb { counter-reset: n; list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; }
+.pasos-dbb li { counter-increment: n; padding-left: 26px; position: relative; font-size: 9.8pt; }
+.pasos-dbb li::before { content: counter(n); position: absolute; left: 0; top: 0; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--verde); color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 8pt;
+  display: flex; align-items: center; justify-content: center; }
+.err td:first-child { color: var(--rojo); }
+.tit-sec { display: flex; flex-direction: column; gap: 4px; }
+svg .tx, svg text.tx { font-family: 'Source Sans 3', sans-serif; }
+svg .mono-svg text { font-family: 'DejaVu Sans Mono', monospace; }
+svg .mono-svg text.tx { font-family: 'Source Sans 3', sans-serif; }
+svg text.mt { font-family: 'Montserrat', sans-serif; }
+/* texto justificado */
+body { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+.paso p, .portada-cuerpo .rejilla-2 li { text-align: left; }
+th, td.k, td.d, .codigo, code, .tabla-nombre, .paso-num, h1, h2, h3, h4, .ceja { text-align: left; hyphens: manual; }
+.t-cab { display: flex; align-items: baseline; gap: 10px; margin-top: 2px; }
+.t-cab h3 { font-family: 'DejaVu Sans Mono', monospace; font-size: 11pt; color: var(--verde-osc); }
+.t-desc { font-size: 9.8pt; color: var(--tinta-2); margin: 2px 0 5px; }
+.bloque-tabla { display: flex; flex-direction: column; }
+.parrafo { font-size: 10pt; color: var(--tinta-2); }
+td.o { text-align: center; width: 22px; }
+
+/* manual */
+.fig { border: 1px solid var(--borde); border-radius: 10px; overflow: hidden; background: #fff; }
+.fig img { width: 100%; display: block; }
+.fig-centro { text-align: center; }
+.fig-centro .fig { display: inline-block; }
+.pie-fig { font-size: 8.6pt; color: var(--tinta-3); margin-top: 4px; text-align: left; }
+.col { display: flex; flex-direction: column; gap: 6px; }
+.dos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+.lista li { font-size: 10pt; }
+.parrafo b { color: var(--tinta); }
+.autor { font-size: 9.6pt; color: var(--tinta-2); line-height: 1.55; }
+.autor b { color: var(--tinta); }
+</style>
+</head>
+<body>
+<section class="pagina portada">
+  <div class="portada-top">
+    <div class="ceja">Plataforma de monitoreo fotovoltaico · Proyecto Integra</div>
+    <h1>Manual de uso</h1>
+    <p>Consulta de los datos de la plataforma: navegación, filtros, contenido de cada pestaña, exploración de variables y carga de los datos de una instalación propia.</p>
+  </div>
+  <div class="portada-cuerpo">
+    <div class="caja">
+      <h4>Contenido</h4>
+      <table class="indice" style="margin-top:6px; font-size:9.8pt">
+        <tr><td style="width:46px">2</td><td>La plataforma y sus pestañas</td></tr>
+        <tr><td>3</td><td>Filtros e interacción con las gráficas</td></tr>
+        <tr><td>4</td><td>Resumen</td></tr>
+        <tr><td>5–6</td><td>Clima</td></tr>
+        <tr><td>7</td><td>Energía</td></tr>
+        <tr><td>8</td><td>Desempeño</td></tr>
+        <tr><td>9–10</td><td>Explorar</td></tr>
+        <tr><td>11–12</td><td>Tus datos</td></tr>
+        <tr><td>13</td><td>Descargas y preguntas frecuentes</td></tr>
+      </table>
+    </div>
+    <div class="rejilla-2">
+      <div class="caja">
+        <h4>A quién está dirigido</h4>
+        <p class="parrafo" style="margin-top:6px">A cualquier persona interesada en los datos de una instalación fotovoltaica, con nociones básicas sobre energía solar. No se requieren conocimientos de programación para consultar la plataforma.</p>
+      </div>
+      <div class="caja">
+        <h4>Documentos relacionados</h4>
+        <p class="parrafo" style="margin-top:6px">La preparación de una base de datos propia se describe en detalle en la <b>Guía para cargar datos</b>, que se descarga desde la pestaña Tus datos.</p>
+      </div>
+    </div>
+    <div class="caja autor">
+      <h4>Autoría</h4>
+      <p style="margin-top:6px"><b>Leider Fabián Castro García</b><br>
+      Grupo de Investigación en Manejo Eficiente de la Energía (GIMEL) y Centro de Investigación, Innovación y Desarrollo de Materiales (CIDEMAT), Universidad de Antioquia<br>
+      Con el apoyo del Proyecto Integra · Contacto: fabianleider0707@gmail.com</p>
+    </div>
+  </div>
+  <div class="pie" style="color:var(--tinta-3)"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>1</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Introducción</div><h2>La plataforma y sus pestañas</h2></div>
+<div class="col"><div class="fig"><img src="img/encabezado.png" alt=""></div><p class="pie-fig">Encabezado de la plataforma: nombre de la instalación, pestañas y periodo de datos disponible.</p></div><p class="parrafo">La plataforma presenta los datos históricos de una instalación fotovoltaica: el recurso solar y las condiciones del sitio, la energía generada por cada módulo y su desempeño. Se organiza en pestañas, que se recorren desde el menú superior. La franja verde superior indica la instalación que se está consultando y el periodo con datos.</p><div class="tabla"><table>
+<tr><th style="width:22%">Pestaña</th><th>Contenido</th></tr>
+<tr><td><b>Resumen</b></td><td>Presentación del prototipo BIPV de Sumicol: montaje, equipos de medición, metodología y cronograma de orientaciones. Solo aparece con los datos de Sumicol.</td></tr>
+<tr><td><b>Clima</b></td><td>Radiación solar, horas de sol pico, temperaturas, humedad y viento.</td></tr>
+<tr><td><b>Energía</b></td><td>Energía generada por cada módulo: por día, acumulada y en promedio.</td></tr>
+<tr><td><b>Desempeño</b></td><td>Potencia y eficiencia de cada módulo a lo largo del día y según la radiación solar.</td></tr>
+<tr><td><b>Explorar</b></td><td>Cualquier variable registrada, comparada entre módulos o sensores.</td></tr>
+<tr><td><b>Tus datos</b></td><td>Creación de una plantilla y carga de la base de datos de una instalación propia.</td></tr>
+</table></div><div class="caja"><h4>Aspectos generales</h4><ul class="lista" style="margin-top:6px">
+<li>La plataforma es un <b>visor</b>: presenta los datos tal como se cargaron, sin filtrarlos ni corregirlos. La depuración de los datos corresponde a quien los carga.</li>
+<li>Las pestañas y las gráficas se muestran según los datos disponibles. Por ejemplo, sin sensor de viento no aparecen las gráficas de viento.</li>
+<li>Los términos se adaptan a cada instalación: en Sumicol se habla de <b>vidrios</b> y <b>caras</b>; en otras instalaciones, de <b>módulos</b> y <b>superficies</b>.</li>
+</ul></div>
+<div class="pie"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>2</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Uso general</div><h2>Filtros e interacción con las gráficas</h2></div>
+<div class="col"><div class="fig"><img src="img/filtros.png" alt=""></div><p class="pie-fig">Barra de filtros de las pestañas Energía y Desempeño.</p></div><div class="dos"><div class="col"><div class="fig"><img src="img/fechas.png" alt=""></div><p class="pie-fig">Selector de fechas abierto.</p></div><div class="col"><ul class="lista">
+<li><b>Fechas:</b> define el periodo que se analiza. Los rangos rápidos (último día, últimos 7 días, último mes, años) se cuentan hacia atrás desde el último día con datos. En <i>Personalizado</i> se elige un rango de fechas o un mes; el cambio se confirma con <b>Aplicar</b>.</li>
+<li><b>Cara o superficie:</b> se elige una a la vez. En Clima se comparan todas, por lo que este filtro aparece desactivado.</li>
+<li><b>Vidrios o módulos:</b> se pueden activar o desactivar varios. Cada uno conserva su color en todas las gráficas.</li>
+<li>Los filtros se mantienen al cambiar de pestaña.</li>
+</ul></div></div><div class="caja"><h4>Interacción con las gráficas</h4><ul class="lista" style="margin-top:6px">
+<li>Al pasar el cursor sobre una gráfica se muestran los valores de cada punto.</li>
+<li>Un clic en un elemento de la leyenda lo oculta o lo muestra; un doble clic deja visible solo ese elemento.</li>
+<li>Arrastrar sobre la gráfica amplía la zona seleccionada; un doble clic restablece la vista.</li>
+<li>Las gráficas en el tiempo tienen una barra inferior para desplazarse y los botones <i>7 días</i>, <i>1 mes</i> y <i>Todo</i>.</li>
+<li>El ícono de cámara, en la esquina superior derecha de cada gráfica, descarga la imagen en formato PNG.</li>
+</ul></div>
+<div class="pie"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>3</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Pestañas</div><h2>Resumen</h2></div>
+<div class="col"><div class="fig"><img src="img/resumen.png" alt=""></div><p class="pie-fig">Inicio de la pestaña Resumen.</p></div><p class="parrafo">La pestaña Resumen presenta el prototipo de integración fotovoltaica en edificaciones (BIPV) instalado en Sumicol, en Medellín: doce módulos de vidrio semitransparente con cuatro niveles de transmitancia (10, 30, 40 y 80 %), montados en tres caras con inclinaciones de 0°, 60° y 90°.</p><div class="caja"><h4>Secciones</h4><ul class="lista" style="margin-top:6px">
+<li><b>Cifras principales</b> del montaje y del periodo de medición.</li>
+<li><b>El montaje:</b> descripción de las tres caras y fotografías del prototipo.</li>
+<li><b>Equipos de medición:</b> trazador de curvas I-V, piranómetros, sensores de temperatura y estación de viento.</li>
+<li><b>Metodología:</b> horario analizado, depuración de los datos y forma de calcular los promedios.</li>
+<li><b>Guía rápida:</b> pasos para usar la plataforma y enlace a este manual.</li>
+<li><b>Cronograma de orientaciones:</b> hacia dónde miraban la cara inclinada y la vertical en cada periodo, necesario para interpretar los datos de una fecha concreta.</li>
+</ul></div><div class="nota">El botón <b>Explorar los datos</b> lleva a la pestaña Clima. Cuando se consulta una base propia, la pestaña Resumen no aparece y la plataforma abre directamente en las gráficas.</div>
+<div class="pie"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>4</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Pestañas</div><h2>Clima</h2></div>
+<div class="col"><div class="fig"><img src="img/clima_kpis.png" alt=""></div><p class="pie-fig">Indicadores de la pestaña Clima para el periodo elegido.</p></div><p class="parrafo">La parte superior muestra las <b>horas de sol pico</b> promedio de cada cara y la temperatura ambiente promedio del periodo. Las horas de sol pico expresan la energía solar recibida en un día como el número de horas equivalentes a una irradiancia de 1000 W/m²; por ejemplo, 4,9 h/día equivalen a 4,9 kWh/m² por día.</p><div class="col"><div class="fig"><img src="img/clima_radiacion.png" alt=""></div><p class="pie-fig">Radiación solar a lo largo del día.</p></div><p class="parrafo">La gráfica de <b>radiación solar a lo largo del día</b> muestra, para cada cara, la irradiancia promedio de cada hora entre todos los días del periodo. La franja sombreada indica el rango en el que se encuentra la mitad de los días, lo que da una idea de la variación entre días soleados y nublados.</p><div class="col"><div class="fig"><img src="img/clima_hsp.png" alt=""></div><p class="pie-fig">Horas de sol pico por día.</p></div>
+<div class="pie"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>5</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec solo-ceja"><div class="ceja">Pestañas · Clima</div></div>
+<div class="col"><div class="fig"><img src="img/clima_matriz.png" alt=""></div><p class="pie-fig">Matriz de irradiancia por hora.</p></div><p class="parrafo">La <b>matriz de irradiancia</b> presenta la irradiancia promedio de cada hora (columnas) en cada día (filas), con un color más intenso a mayor irradiancia. La última columna, Σ Día, es la energía solar que llegó a la cara ese día. Por defecto se muestran los últimos siete días del rango elegido; el enlace <i>Ver todo el rango</i> muestra el periodo completo y <b>Descargar datos</b> entrega la tabla en formato CSV.</p><div class="dos"><div class="col"><div class="fig"><img src="img/clima_temperaturas.png" alt=""></div><p class="pie-fig">Temperatura de los vidrios y del ambiente.</p></div><div class="col"><p class="parrafo">La gráfica de <b>temperaturas</b> compara la temperatura de cada vidrio, medida con un sensor adherido a su superficie, con la temperatura ambiente (línea discontinua). Los vidrios que absorben más luz alcanzan temperaturas más altas.</p><p class="parrafo">Según los sensores disponibles, la pestaña incluye además la <b>velocidad del viento</b> y la <b>humedad relativa</b> por hora del día, y gráficas de temperaturas, viento y humedad <b>en el tiempo</b>, con el promedio de cada hora a lo largo de todo el periodo.</p></div></div>
+<div class="pie"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>6</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Pestañas</div><h2>Energía</h2></div>
+<div class="col"><div class="fig"><img src="img/energia_kpis.png" alt=""></div><p class="pie-fig">Energía total de cada vidrio en el periodo elegido.</p></div><p class="parrafo">Cada indicador muestra la <b>energía total</b> generada por un vidrio de la cara elegida, su promedio diario y el número de días con datos. La energía se toma de los datos diarios de la instalación o, si no existen, se calcula a partir de la potencia medida.</p><div class="col"><div class="fig"><img src="img/energia_diaria.png" alt=""></div><p class="pie-fig">Energía diaria por vidrio.</p></div><div class="dos"><div class="col"><div class="fig"><img src="img/energia_acumulada.png" alt=""></div><p class="pie-fig">Energía acumulada: suma día a día; una pendiente mayor indica mayor generación.</p></div><div class="col"><div class="fig"><img src="img/energia_promedio.png" alt=""></div><p class="pie-fig">Energía promedio por día de cada vidrio en el periodo elegido.</p></div></div>
+<div class="pie"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>7</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Pestañas</div><h2>Desempeño</h2><p class="lead">Potencia y eficiencia de cada vidrio de la cara elegida. Las gráficas que dependen de la radiación solar solo aparecen si la cara tiene sensor de irradiancia.</p></div>
+<div class="dos"><div class="col"><div class="fig"><img src="img/desempeno_potencia.png" alt=""></div><p class="pie-fig">Potencia a lo largo del día.</p></div><div class="col"><div class="fig"><img src="img/desempeno_dispersion.png" alt=""></div><p class="pie-fig">Potencia según la radiación solar.</p></div><div class="col"><div class="fig"><img src="img/desempeno_eficiencia.png" alt=""></div><p class="pie-fig">Eficiencia a lo largo del día.</p></div><div class="col"><div class="fig"><img src="img/desempeno_eficiencia_media.png" alt=""></div><p class="pie-fig">Eficiencia media por vidrio.</p></div></div><ul class="lista">
+<li><b>Potencia a lo largo del día:</b> potencia máxima promedio de cada hora para cada vidrio.</li>
+<li><b>Potencia según la radiación solar:</b> cada punto es el promedio de diez minutos de medición. Una relación casi lineal indica un funcionamiento regular; los puntos alejados pueden corresponder a sombras o a temperaturas altas.</li>
+<li><b>Eficiencia:</b> fracción de la energía solar incidente que se convierte en electricidad. Se calcula como la potencia dividida entre la irradiancia por el área del módulo, solo cuando la irradiancia es de al menos 100 W/m², ya que con poca luz el cociente pierde sentido.</li>
+<li><b>Eficiencia media por vidrio:</b> promedio del periodo elegido.</li>
+</ul>
+<div class="pie"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>8</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Pestañas</div><h2>Explorar</h2><p class="lead">Permite consultar cualquier variable de la base y compararla entre vidrios, módulos o sensores.</p></div>
+<div class="col"><div class="fig"><img src="img/explorar_controles.png" alt=""></div><p class="pie-fig">Controles de la pestaña Explorar.</p></div><ul class="lista">
+<li><b>Variable:</b> cualquier variable registrada en la base, incluidas las adicionales que declare cada instalación (por ejemplo, el voltaje de circuito abierto o el fill factor).</li>
+<li><b>Dónde:</b> los vidrios o módulos, si la variable es eléctrica, o los sensores, si es ambiental. Los puntos de color identifican cada serie.</li>
+<li><b>Cómo verla:</b> en el tiempo, a lo largo del día o contra otra variable.</li>
+<li>El periodo se elige con el selector de fechas de la parte superior.</li>
+</ul><div class="col"><div class="fig"><img src="img/explorar_tiempo.png" alt=""></div><p class="pie-fig">Modo «En el tiempo»: promedio de cada hora durante todo el periodo.</p></div>
+<div class="pie"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>9</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec solo-ceja"><div class="ceja">Pestañas · Explorar</div></div>
+<div class="col"><div class="fig"><img src="img/explorar_dia.png" alt=""></div><p class="pie-fig">Modo «A lo largo del día»: promedio de cada hora del día en el periodo elegido.</p></div><div class="col"><div class="fig"><img src="img/explorar_contra.png" alt=""></div><p class="pie-fig">Modo «Contra otra variable»: voltaje de circuito abierto según la irradiancia.</p></div><p class="parrafo">En el modo <b>contra otra variable</b> se elige además la variable del eje horizontal. Cada punto es el promedio de una hora; la segunda variable se toma del mismo vidrio, de la cara en la que está o del sitio, según corresponda. El botón <b>Descargar datos</b> entrega en formato CSV los valores de la gráfica.</p>
+<div class="pie"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>10</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Pestañas</div><h2>Tus datos</h2><p class="lead">Permite visualizar en la plataforma los datos de una instalación propia, con las mismas pestañas y gráficas.</p></div>
+<div class="rejilla-3">
+<div class="paso"><div class="paso-num">1</div><h3>Crea tu plantilla</h3><p>Describe la instalación en el formulario y descarga un archivo <code>.db</code> con las tablas listas.</p></div>
+<div class="paso"><div class="paso-num">2</div><h3>Llena las mediciones</h3><p>Copia los datos en las tablas de mediciones con Python, DB Browser for SQLite u otra herramienta.</p></div>
+<div class="paso"><div class="paso-num">3</div><h3>Carga tu base</h3><p>Súbela en la misma pestaña: se revisa, se procesa y se visualiza en las demás pestañas.</p></div>
+</div><div class="col"><div class="fig"><img src="img/datos_form.png" alt=""></div><p class="pie-fig">Formulario para crear la plantilla, completado con el ejemplo.</p></div><ul class="lista">
+<li>El formulario se organiza en tablas: instalación, tecnologías, superficies, cronograma de orientaciones (opcional), módulos, otras variables y sensores ambientales. Los campos con asterisco son obligatorios.</li>
+<li><b>Llenar con un ejemplo</b> completa el formulario con una instalación de muestra, útil como referencia.</li>
+<li><b>Generar plantilla</b> revisa la información y descarga la plantilla. Si hay errores, se indican antes de la descarga.</li>
+<li>Como alternativa, la <b>plantilla básica</b> contiene solo las columnas obligatorias, para completarla directamente en el archivo.</li>
+</ul>
+<div class="pie"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>11</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec solo-ceja"><div class="ceja">Pestañas · Tus datos</div></div>
+<div class="col"><div class="fig"><img src="img/datos_carga.png" alt=""></div><p class="pie-fig">Zona de carga de la base.</p></div><p class="parrafo">La base se carga arrastrando el archivo a la zona de carga o haciendo clic para elegirlo. Se aceptan dos tipos de archivo:</p><ul class="lista"><li>La base con el formato de la plantilla, de hasta <b>15 MB</b>. La plataforma la revisa y la procesa.</li>
+<li>Si es más grande, la base ya procesada en el computador con el programa de procesamiento de la plataforma, de hasta <b>40 MB</b>.</li></ul><p class="parrafo">Si la base tiene errores, se muestra la lista de problemas encontrados para corregirlos. Si es válida, la plataforma pasa a mostrar los datos cargados en todas las pestañas.</p><div class="col"><div class="fig"><img src="img/datos_cargada.png" alt=""></div><p class="pie-fig">Plataforma con una base propia cargada.</p></div><div class="caja"><h4>Privacidad y duración</h4><ul class="lista" style="margin-top:6px">
+<li>La base cargada <b>solo la ve quien la sube</b>, en la pestaña del navegador en la que se cargó.</li>
+<li>Se elimina del servidor a las <b>24 horas</b>. Para volver a verla después, debe cargarse de nuevo.</li>
+<li>La franja amarilla indica que se está viendo una base propia; el enlace <b>Volver a la plataforma de Sumicol</b> regresa a los datos del prototipo.</li>
+</ul></div>
+<div class="pie"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>12</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Referencia</div><h2>Descargas y preguntas frecuentes</h2></div>
+<div class="tabla"><table>
+<tr><th style="width:30%">Qué se descarga</th><th>Dónde</th></tr>
+<tr><td>Imagen de una gráfica (PNG)</td><td>Ícono de cámara en la esquina superior derecha de cada gráfica.</td></tr>
+<tr><td>Datos de una gráfica (CSV)</td><td>Botón <i>Descargar datos</i> en Explorar y en la matriz de irradiancia.</td></tr>
+<tr><td>Manual de uso (PDF)</td><td>Guía rápida del Resumen, pestaña Tus datos y pie de página.</td></tr>
+<tr><td>Guía para cargar datos (PDF)</td><td>Pestaña Tus datos.</td></tr>
+<tr><td>Plantilla básica (.db)</td><td>Pestaña Tus datos.</td></tr>
+</table></div><h3 style="margin-top:6px">Preguntas frecuentes</h3><div class="caja"><h4>Una gráfica aparece vacía o con huecos.</h4><p class="parrafo" style="margin-top:4px">No hay datos para el periodo, la cara o los vidrios elegidos, o hubo días sin medición. Conviene ampliar el rango de fechas o revisar los filtros.</p></div>
+<div class="caja"><h4>¿Por qué no aparece la pestaña Clima o alguna gráfica?</h4><p class="parrafo" style="margin-top:4px">Las pestañas y las gráficas dependen de los datos de la instalación. Sin mediciones ambientales no se muestra Clima, y sin sensor de irradiancia en una superficie no se calcula la eficiencia de sus módulos.</p></div>
+<div class="caja"><h4>¿Los promedios incluyen los días nublados?</h4><p class="parrafo" style="margin-top:4px">Sí. Los promedios por hora se calculan con todos los días del periodo elegido, soleados y nublados.</p></div>
+<div class="caja"><h4>¿La plataforma corrige los datos cargados?</h4><p class="parrafo" style="margin-top:4px">No. Muestra los datos tal como se cargan; las lecturas erróneas deben retirarse antes de cargar la base.</p></div>
+<div class="caja"><h4>¿Otras personas pueden ver mi base?</h4><p class="parrafo" style="margin-top:4px">No. Solo la ve quien la carga, en la pestaña del navegador en la que se cargó, y se elimina a las 24 horas.</p></div>
+<div class="caja"><h4>La carga de la base falla.</h4><p class="parrafo" style="margin-top:4px">La plataforma indica los errores encontrados. Los más comunes son fechas con otro formato, códigos que no coinciden entre tablas y columnas con nombres distintos a los de la plantilla. La Guía para cargar datos describe el formato completo.</p></div>
+<div class="pie"><span>Manual de uso · Plataforma de monitoreo fotovoltaico</span><span>13</span></div>
+</section>
+</body>
+</html>

@@ -222,7 +222,10 @@ def pagina(token):
             for n, t, txt in pasos]),
         html.P([html.Button("Descargar la guía (PDF)", id="btn-guia", n_clicks=0, className="enlace-btn"),
                 " · ",
-                html.Button("Descargar la plantilla básica", id="btn-plantilla-vacia", n_clicks=0, className="enlace-btn")],
+                html.Button("Descargar la plantilla básica", id="btn-plantilla-vacia", n_clicks=0, className="enlace-btn"),
+                " · ",
+                html.A("Descargar el manual de uso (PDF)", href="/assets/docs/manual_uso.pdf", download="manual_uso.pdf",
+                       className="enlace-btn")],
                className="nota"),
 
         html.Section(className="tarjeta tarjeta-grafica", children=[

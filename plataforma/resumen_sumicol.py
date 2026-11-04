@@ -7,6 +7,7 @@ from . import datos as D
 from .componentes import f_corta
 
 IMG = "/assets/img/sumicol"
+MANUAL = "/assets/docs/manual_uso.pdf"
 
 
 def cronograma_ancho():
@@ -36,6 +37,11 @@ def resumen():
          "captura-energia.png"),
         ("4", "Revisa el desempeño", "Potencia y eficiencia de cada vidrio a lo largo del día.",
          "captura-desempeno.png"),
+        ("5", "Explora cualquier variable", "Elige una variable y compárala entre vidrios o sensores: en el "
+                                            "tiempo, a lo largo del día o contra otra variable. Descarga los datos "
+                                            "en CSV.", "captura-explorar.png"),
+        ("6", "Visualiza tus datos", "Describe tu instalación, descarga la plantilla, llénala con tus mediciones "
+                                     "y cárgala. Solo tú la ves y se borra a las 24 horas.", "captura-datos.png"),
     ]
     return html.Div([
         html.Section(className="hero", children=html.Div(className="contenedor hero-int", children=[
@@ -135,8 +141,11 @@ def resumen():
             ]),
             html.Section(id="como", className="bloque-grande", children=[
                 html.Div("Guía rápida", className="ceja"),
-                html.H2("Cómo usar la plataforma"),
-                html.Div(className="rejilla-4", children=[
+                html.Div(className="titulo-con-accion", children=[
+                    html.H2("Cómo usar la plataforma"),
+                    html.A("Descargar el manual de uso (PDF)", href=MANUAL, download="manual_uso.pdf",
+                           className="btn btn-sec")]),
+                html.Div(className="rejilla-3", children=[
                     html.Div(className="tarjeta paso", children=[
                         html.Img(src=f"{IMG}/{img}", alt=f"Captura: {t}", className="paso-img"),
                         html.Div(className="paso-tit", children=[html.Span(n, className="paso-num"), t]),

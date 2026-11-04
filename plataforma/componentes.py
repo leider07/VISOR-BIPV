@@ -215,7 +215,9 @@ def pie():
             html.Span(className="pie-marca", children=[
                 html.Img(src="/assets/img/logos/favicon.png", alt="", className="pie-icono"),
                 "Proyecto Integra · Plataforma de Integración Fotovoltaica en Edificaciones"]),
-            html.A("proyecto-integra.site", href="https://proyecto-integra.site/", target="_blank", rel="noopener"),
+            html.Span(className="pie-enlaces", children=[
+                html.A("Manual de uso (PDF)", href="/assets/docs/manual_uso.pdf", download="manual_uso.pdf"),
+                html.A("proyecto-integra.site", href="https://proyecto-integra.site/", target="_blank", rel="noopener")]),
         ])),
     ])
 

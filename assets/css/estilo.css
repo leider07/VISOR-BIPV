@@ -202,6 +202,10 @@ h1, h2, h3 { font-family: var(--display); color: var(--tinta); margin: 0; }
 .pie-icono { width: 32px; height: 32px; background: #fff; border-radius: 8px; padding: 3px; }
 .pie a { color: #cfe8e2; }
 .pie a:hover { color: #fff; }
+.pie-enlaces { display: flex; gap: 22px; flex-wrap: wrap; }
+.titulo-con-accion { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.titulo-con-accion h2 { margin-bottom: 0; }
+#como .paso-img { height: 190px; }
 
 /* ---------- responsive ---------- */
 @media (max-width: 980px) {

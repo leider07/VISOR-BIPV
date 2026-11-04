@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "Si usas esta plataforma, por favor cítala así."
+title: "VISOR-BIPV: plataforma de monitoreo fotovoltaico"
+type: software
+authors:
+  - family-names: "Castro García"
+    given-names: "Leider Fabián"
+    email: fabianleider0707@gmail.com
+    affiliation: "Universidad de Antioquia (GIMEL y CIDEMAT)"
+repository-code: "https://github.com/leider07/VISOR-BIPV"
+license: MIT
+date-released: 2026-11-04
+abstract: >-
+  Plataforma web (Dash y Plotly) para visualizar datos históricos de instalaciones
+  fotovoltaicas: recurso solar, energía y desempeño de cada módulo. El primer caso es el
+  prototipo BIPV de Sumicol, desarrollado en el Proyecto Integra.
+keywords:
+  - fotovoltaica
+  - BIPV
+  - monitoreo
+  - Dash
+  - Plotly

@@ -6,3 +6,5 @@ venv/
 .DS_Store
 Thumbs.db
 desktop.ini
+formato/guia/_pagina_*.png
+manual/_pagina_*.png
