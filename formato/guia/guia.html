@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Guía para cargar tus datos · Formato 1.1</title>
+<title>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</title>
 <style>
 @font-face { font-family: 'Montserrat'; font-weight: 600; src: url('../../assets/fonts/montserrat-latin-600-normal.woff2') format('woff2'); }
 @font-face { font-family: 'Montserrat'; font-weight: 700; src: url('../../assets/fonts/montserrat-latin-700-normal.woff2') format('woff2'); }
@@ -32,6 +32,9 @@ h2 { font-size: 19pt; font-weight: 800; color: var(--verde); letter-spacing: -0.
 h3 { font-size: 11.5pt; font-weight: 700; }
 h4 { font-size: 9.5pt; font-weight: 700; color: var(--verde); }
 p { margin: 0; }
+.solo-ceja { margin-bottom: 4px; }
+.figura-diagrama { border: 1px solid #d5e4e0; border-radius: 10px; padding: 14px; background: #fff; text-align: center; margin: 4px 0 12px; }
+.figura-diagrama img { width: 74%; height: auto; image-rendering: auto; }
 .ceja { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 8pt; letter-spacing: 1.4px;
   text-transform: uppercase; color: var(--turq); }
 .lead { font-size: 11.5pt; color: var(--tinta-2); max-width: 6.4in; }
@@ -88,307 +91,140 @@ svg .tx, svg text.tx { font-family: 'Source Sans 3', sans-serif; }
 svg .mono-svg text { font-family: 'DejaVu Sans Mono', monospace; }
 svg .mono-svg text.tx { font-family: 'Source Sans 3', sans-serif; }
 svg text.mt { font-family: 'Montserrat', sans-serif; }
+/* texto justificado */
+body { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+.paso p, .portada-cuerpo .rejilla-2 li { text-align: left; }
+th, td.k, td.d, .codigo, code, .tabla-nombre, .paso-num, h1, h2, h3, h4, .ceja { text-align: left; hyphens: manual; }
+.t-cab { display: flex; align-items: baseline; gap: 10px; margin-top: 2px; }
+.t-cab h3 { font-family: 'DejaVu Sans Mono', monospace; font-size: 11pt; color: var(--verde-osc); }
+.t-desc { font-size: 9.8pt; color: var(--tinta-2); margin: 2px 0 5px; }
+.bloque-tabla { display: flex; flex-direction: column; }
+.parrafo { font-size: 10pt; color: var(--tinta-2); }
+td.o { text-align: center; width: 22px; }
 </style>
 </head>
 <body>
-
-<!-- ================================================================ 1 · PORTADA -->
 <section class="pagina portada">
   <div class="portada-top">
     <div class="ceja">Plataforma de monitoreo fotovoltaico · Proyecto Integra</div>
     <h1>Cómo preparar y cargar los datos de tu instalación</h1>
-    <p>Guía práctica del formato de carga 1.1: qué tablas lleva tu base, cómo llenarlas y qué revisar antes de subirla a la plataforma.</p>
+    <p>Guía para preparar la base de datos de una instalación fotovoltaica: estructura, contenido de cada tabla, procedimiento de llenado y un ejemplo completo.</p>
   </div>
   <div class="portada-cuerpo">
     <div class="rejilla-3">
       <div class="paso"><div class="paso-num">1</div><h3>Crea tu plantilla</h3>
-        <p>En la pestaña <b>Tus datos</b>, describe tu instalación en el formulario. Descargas un archivo <code>.db</code> con todas las tablas listas.</p></div>
+        <p>En la pestaña <b>Tus datos</b>, describe tu instalación en el formulario. Se descarga un archivo <code>.db</code> con todas las tablas listas.</p></div>
       <div class="paso"><div class="paso-num">2</div><h3>Llena tus mediciones</h3>
-        <p>Copia tus datos en las tablas de mediciones con Python o con DB Browser for SQLite (páginas 6 y 7).</p></div>
+        <p>Copia tus datos en las tablas de mediciones con Python o con DB Browser for SQLite (páginas 7 y 8).</p></div>
       <div class="paso"><div class="paso-num">3</div><h3>Carga tu base</h3>
-        <p>Súbela en <b>Tus datos</b>. Se revisa, se procesa y la ves en las pestañas Clima, Energía, Desempeño y Explorar.</p></div>
+        <p>Súbela en <b>Tus datos</b>. Se revisa, se procesa y se visualiza en las pestañas Clima, Energía, Desempeño y Explorar.</p></div>
     </div>
     <div class="rejilla-2">
       <div class="caja">
         <h4>Lo que necesitas</h4>
         <ul class="lista" style="margin-top:6px">
           <li>La <b>potencia máxima</b> de cada módulo, con su fecha y hora (obligatoria).</li>
-          <li>Si las tienes: voltajes, corrientes u otras variables eléctricas.</li>
-          <li>Mediciones ambientales: irradiancia, temperatura, humedad, viento…</li>
-          <li>Los datos de tu instalación: tipos de módulo, dónde está cada uno y qué sensores hay.</li>
+          <li>Si se dispone de ellas: voltajes, corrientes u otras variables eléctricas.</li>
+          <li>Mediciones ambientales: irradiancia, temperatura, humedad, viento u otras.</li>
+          <li>La descripción de la instalación: tipos de módulo, ubicación de cada módulo y sensores.</li>
         </ul>
       </div>
       <div class="caja">
         <h4>Lo que debes saber</h4>
         <ul class="lista" style="margin-top:6px">
-          <li>La plataforma es un <b>visor</b>: muestra tus datos tal como los cargas, sin filtrarlos.</li>
-          <li>Tu base <b>solo la ves tú</b> y se borra del servidor a las 24 horas.</li>
-          <li>Se cargan bases de hasta <b>15 MB</b> (o hasta 40 MB si ya vienen procesadas; ver página 8).</li>
+          <li>La plataforma es un <b>visor</b>: presenta los datos tal como se cargan, sin filtrarlos.</li>
+          <li>La base cargada <b>solo es visible para quien la sube</b> y se elimina del servidor a las 24 horas.</li>
+          <li>Se admiten bases de hasta <b>15 MB</b>. Las más grandes se procesan antes en el computador y se cargan ya procesadas (hasta 40 MB).</li>
         </ul>
       </div>
     </div>
-    <div class="caja" style="display:flex; gap:18px; align-items:center;">
-      <div style="flex:1">
-        <h4>Contenido</h4>
-        <table class="indice" style="margin-top:6px; font-size:9.6pt">
-          <tr><td style="width:40px">2</td><td>Así se organiza tu base: las 10 tablas y cómo se conectan</td></tr>
-          <tr><td>3</td><td>Un ejemplo completo: cómo se describe una instalación</td></tr>
-          <tr><td>4</td><td>Variables y sensores: qué significa cada columna</td></tr>
-          <tr><td>5</td><td>Tus mediciones: cómo deben verse las tablas</td></tr>
-          <tr><td>6–7</td><td>Cómo llenar la plantilla: con Python o con DB Browser for SQLite</td></tr>
-          <tr><td>8</td><td>Antes de cargar: lista de chequeo, errores frecuentes y límites</td></tr>
-        </table>
-      </div>
+    <div class="caja">
+      <h4>Contenido</h4>
+      <table class="indice" style="margin-top:6px; font-size:9.6pt">
+        <tr><td style="width:40px">2</td><td>Estructura de la base de datos</td></tr>
+        <tr><td>3–6</td><td>Descripción de las tablas</td></tr>
+        <tr><td>7</td><td>Llenado de la plantilla con Python</td></tr>
+        <tr><td>8</td><td>Llenado de la plantilla con DB Browser for SQLite</td></tr>
+        <tr><td>9–10</td><td>Ejemplo de una base completa</td></tr>
+      </table>
     </div>
   </div>
-  <div class="pie"><span>Guía del formato de carga 1.1</span><span>1</span></div>
+  <div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>1</span></div>
 </section>
-
-<!-- ================================================================ 2 · ESTRUCTURA -->
 <section class="pagina">
-  <div class="tit-sec"><div class="ceja">Estructura</div><h2>Así se organiza tu base</h2>
-    <p class="lead">Un archivo SQLite con 10 tablas: 7 describen tu instalación (se llenan una sola vez) y 3 guardan tus mediciones. Las tablas se unen por <b>códigos</b> que tú eliges, como <code>techo</code> o <code>M1</code>.</p></div>
-  <svg viewBox="0 0 700 400" width="100%" style="display:block" class="tx">
-    <defs>
-      <marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0,0 L10,5 L0,10 z" fill="#2f978d"/></marker>
-    </defs>
-    <rect x="0" y="0" width="445" height="400" rx="14" fill="#eef6f3"/>
-    <text x="16" y="24" class="mt" font-weight="700" font-size="11" fill="#1b554f" letter-spacing="1">DESCRIBE TU INSTALACIÓN · SE LLENA UNA VEZ</text>
-    <rect x="462" y="125" width="238" height="275" rx="14" fill="#fdf6d8"/>
-    <text x="476" y="149" class="mt" font-weight="700" font-size="11" fill="#7a6400" letter-spacing="1">TUS MEDICIONES</text>
-
-    <!-- conectores -->
-    <g stroke="#2f978d" stroke-width="1.8" fill="none">
-      <path d="M105,177 L170,215" marker-end="url(#f)"/>
-      <path d="M325,177 L270,215" marker-end="url(#f)"/>
-      <path d="M325,125 L325,92" marker-end="url(#f)"/>
-      <path d="M200,336 L230,336" marker-end="url(#f)"/>
-      <path d="M310,240 C390,240 410,186 478,186" marker-end="url(#f)"/>
-      <path d="M310,255 C400,255 410,261 478,261" marker-end="url(#f)"/>
-      <path d="M420,336 L478,336" marker-end="url(#f)"/>
-    </g>
-    <g stroke="#2f978d" stroke-width="1.6" fill="none" stroke-dasharray="5 4">
-      <path d="M290,310 L290,269" marker-end="url(#f)"/>
-      <path d="M405,310 L405,179" marker-end="url(#f)"/>
-    </g>
-    <g font-size="10.5" fill="#35504c">
-      <text x="298" y="293">temp. de módulo</text>
-      <text x="417" y="287" transform="rotate(-90 417 287)" text-anchor="middle">irradiancia</text>
-      <text x="430" y="328" font-size="9.5">columnas</text>
-    </g>
-
-    <!-- cajas -->
-    <g class="mono-svg">
-      <!-- instalacion -->
-      <rect x="10" y="40" width="190" height="52" rx="8" fill="#fff" stroke="#1b554f" stroke-width="1.4"/>
-      <text x="22" y="61" font-size="12" font-weight="700" fill="#123c37">instalacion</text>
-      <text x="22" y="80" font-size="10" fill="#5a716d" class="tx">Nombre y datos del proyecto</text>
-      <!-- cronograma -->
-      <rect x="230" y="40" width="190" height="52" rx="8" fill="#fff" stroke="#1b554f" stroke-width="1.4" stroke-dasharray="5 3"/>
-      <text x="242" y="61" font-size="11" font-weight="700" fill="#123c37">cronograma_orientaciones</text>
-      <text x="242" y="80" font-size="10" fill="#5a716d" class="tx">Opcional · si alguna superficie se giró</text>
-      <!-- tecnologias -->
-      <rect x="10" y="125" width="190" height="52" rx="8" fill="#fff" stroke="#1b554f" stroke-width="1.4"/>
-      <text x="22" y="146" font-size="12" font-weight="700" fill="#123c37">tecnologias</text>
-      <text x="22" y="165" font-size="10" fill="#5a716d" class="tx">Tipos de módulo: STC, área…</text>
-      <!-- superficies -->
-      <rect x="230" y="125" width="190" height="52" rx="8" fill="#fff" stroke="#1b554f" stroke-width="1.4"/>
-      <text x="242" y="146" font-size="12" font-weight="700" fill="#123c37">superficies</text>
-      <text x="242" y="165" font-size="10" fill="#5a716d" class="tx">Techos, fachadas, caras…</text>
-      <!-- modulos -->
-      <rect x="120" y="215" width="190" height="54" rx="8" fill="#1b554f"/>
-      <text x="132" y="237" font-size="12" font-weight="700" fill="#fff">modulos</text>
-      <text x="132" y="257" font-size="10" fill="#cfe5e0" class="tx">Cada módulo: dónde y de qué tipo</text>
-      <!-- variables -->
-      <rect x="10" y="310" width="190" height="52" rx="8" fill="#fff" stroke="#1b554f" stroke-width="1.4"/>
-      <text x="22" y="331" font-size="12" font-weight="700" fill="#123c37">variables</text>
-      <text x="22" y="350" font-size="10" fill="#5a716d" class="tx">Qué se mide y en qué unidad</text>
-      <!-- sensores -->
-      <rect x="230" y="310" width="190" height="52" rx="8" fill="#fff" stroke="#1b554f" stroke-width="1.4"/>
-      <text x="242" y="331" font-size="12" font-weight="700" fill="#123c37">sensores</text>
-      <text x="242" y="350" font-size="10" fill="#5a716d" class="tx">Qué mide y dónde está cada uno</text>
-      <!-- mediciones -->
-      <rect x="480" y="160" width="208" height="52" rx="8" fill="#fff" stroke="#b39300" stroke-width="1.4"/>
-      <text x="492" y="181" font-size="11.5" font-weight="700" fill="#5c4b00">mediciones_electricas</text>
-      <text x="492" y="200" font-size="10" fill="#6b5a10" class="tx">Una fila por módulo y lectura</text>
-      <rect x="480" y="235" width="208" height="52" rx="8" fill="#fff" stroke="#b39300" stroke-width="1.4" stroke-dasharray="5 3"/>
-      <text x="492" y="256" font-size="11.5" font-weight="700" fill="#5c4b00">energia_diaria</text>
-      <text x="492" y="275" font-size="10" fill="#6b5a10" class="tx">Opcional · energía por día</text>
-      <rect x="480" y="310" width="208" height="52" rx="8" fill="#fff" stroke="#b39300" stroke-width="1.4"/>
-      <text x="492" y="331" font-size="11.5" font-weight="700" fill="#5c4b00">mediciones_ambientales</text>
-      <text x="492" y="350" font-size="10" fill="#6b5a10" class="tx">Una columna por sensor</text>
-    </g>
-    <g font-size="9.5" fill="#5a716d">
-      <rect x="18" y="378" width="22" height="10" rx="3" fill="#fff" stroke="#1b554f"/><text x="46" y="387">obligatoria</text>
-      <rect x="112" y="378" width="22" height="10" rx="3" fill="#fff" stroke="#1b554f" stroke-dasharray="4 2"/><text x="140" y="387">opcional</text>
-      <line x1="200" y1="383" x2="226" y2="383" stroke="#2f978d" stroke-width="1.8" marker-end="url(#f)"/><text x="232" y="387">«usa el código de»</text>
-    </g>
-  </svg>
-  <div class="rejilla-2">
-    <div class="caja"><h4>Las conexiones, en palabras</h4>
-      <ul class="lista" style="margin-top:6px; font-size:9.8pt">
-        <li>Cada <b>módulo</b> dice en qué <b>superficie</b> está y de qué <b>tecnología</b> es.</li>
-        <li>Cada <b>sensor</b> dice qué <b>variable</b> mide. Si mide irradiancia, a qué superficie le sirve de referencia; si mide la temperatura de un módulo, a cuál está pegado.</li>
-        <li>Las mediciones eléctricas y la energía se guardan con el código de su módulo.</li>
-      </ul></div>
-    <div class="caja"><h4>¿Por qué <code>mediciones_ambientales</code> aparece sin flechas?</h4>
-      <p style="margin-top:6px; font-size:9.8pt">Porque se conecta por el <b>nombre de sus columnas</b>: cada columna es un sensor de la tabla <code>sensores</code> (por ejemplo, la columna <code>G_techo</code> es el sensor <code>G_techo</code>). Los programas como DB Browser no dibujan ese tipo de relación, pero la plataforma la revisa al cargar.</p></div>
-  </div>
-  <div class="pie"><span>Guía del formato de carga 1.1</span><span>2</span></div>
+<div class="tit-sec"><div class="ceja">Estructura</div><h2>Estructura de la base de datos</h2><p class="lead">La base de datos es un archivo SQLite con diez tablas. Siete describen la instalación y se llenan una sola vez; las tres restantes contienen las mediciones. Las tablas se relacionan mediante códigos definidos por el usuario, como <code>techo</code> o <code>M1</code>.</p></div>
+<div class="figura-diagrama"><img src="diagrama.png" alt="Diagrama de las tablas de la base de datos"></div>
+<p class="parrafo">Cada línea une una columna con la tabla donde se define su código: el punto se ubica en la tabla que usa el código. La tabla <code>mediciones_ambientales</code> no presenta líneas porque se relaciona con <code>sensores</code> mediante el nombre de sus columnas: cada columna corresponde a un <code>sensor_id</code>. Del mismo modo, las columnas de <code>mediciones_electricas</code> corresponden a variables de tipo eléctrico de la tabla <code>variables</code>. La plataforma verifica ambas relaciones al cargar la base.</p>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>2</span></div>
 </section>
-
-<!-- ================================================================ 3 · EJEMPLO -->
 <section class="pagina">
-  <div class="tit-sec"><div class="ceja">Ejemplo</div><h2>Un ejemplo completo</h2>
-    <p class="lead">Una instalación con un techo y una fachada, dos tipos de módulo y tres sensores. Así queda la parte que describe la instalación (es lo mismo que llenas en el formulario de <b>Tus datos</b>).</p></div>
-  <div class="tabla"><div class="tabla-nombre">instalacion <span>una sola fila</span></div>
-    <table><tr><th>nombre</th><th>descripcion</th><th>ciudad</th><th>pais</th></tr>
-      <tr><td>Techo solar de ejemplo</td><td>Dos tecnologías en un techo y una fachada</td><td>Medellín</td><td>Colombia</td></tr></table></div>
-  <div class="tabla"><div class="tabla-nombre">superficies</div>
-    <table><tr><th>superficie_id</th><th>nombre</th><th>inclinacion_deg</th><th>orientacion</th><th>descripcion</th></tr>
-      <tr><td class="d">techo</td><td>Techo</td><td>10</td><td>Sur</td><td class="no">(vacío)</td></tr>
-      <tr><td class="d">fachada</td><td>Fachada oeste</td><td>90</td><td>Oeste</td><td class="no">(vacío)</td></tr></table></div>
-  <div class="tabla"><div class="tabla-nombre">tecnologias <span>una fila por tipo de módulo</span></div>
-    <table><tr><th>tecnologia_id</th><th>nombre</th><th>tipo</th><th>potencia_stc_w</th><th>area_m2</th><th>transmitancia_pct</th></tr>
-      <tr><td class="d">MONO</td><td>Monocristalino 450 W</td><td>c-Si mono</td><td>450</td><td>2.0</td><td class="no">(vacío)</td></tr>
-      <tr><td class="d">CIGS</td><td>CIGS 150 W</td><td>CIGS</td><td>150</td><td>1.1</td><td class="no">(vacío)</td></tr></table></div>
-  <div style="display:grid; grid-template-columns: 0.9fr 1.35fr; gap:12px">
-    <div class="tabla compacta"><div class="tabla-nombre">modulos</div>
-      <table><tr><th>modulo_id</th><th>superficie_id</th><th>tecnologia_id</th></tr>
-        <tr><td class="d">M1</td><td class="d">techo</td><td class="d">MONO</td></tr>
-        <tr><td class="d">C1</td><td class="d">techo</td><td class="d">CIGS</td></tr>
-        <tr><td class="d">F1</td><td class="d">fachada</td><td class="d">MONO</td></tr></table></div>
-    <div class="tabla compacta"><div class="tabla-nombre">sensores</div>
-      <table><tr><th>sensor_id</th><th>variable_id</th><th>superficie_id</th><th>modulo_id</th></tr>
-        <tr><td class="d">G_techo</td><td class="d">irradiancia</td><td class="d">techo</td><td class="no">—</td></tr>
-        <tr><td class="d">T_amb</td><td class="d">temperatura_ambiente</td><td class="no">—</td><td class="no">—</td></tr>
-        <tr><td class="d">T_M1</td><td class="d">temperatura_modulo</td><td class="no">—</td><td class="d">M1</td></tr></table></div>
-  </div>
-  <div class="rejilla-2">
-    <div class="caja"><h4>Cómo leer el ejemplo</h4>
-      <ul class="lista" style="margin-top:6px; font-size:9.8pt">
-        <li><code>M1</code> y <code>C1</code> están en el techo; <code>F1</code> en la fachada.</li>
-        <li><code>G_techo</code> es el piranómetro del techo: con él se calcula la eficiencia de <code>M1</code> y <code>C1</code>.</li>
-        <li><code>T_M1</code> mide la temperatura del módulo <code>M1</code>.</li>
-        <li><code>T_amb</code> es del sitio: no lleva superficie ni módulo.</li>
-        <li>La fachada no tiene piranómetro: se verá su potencia, pero no su eficiencia.</li>
-      </ul></div>
-    <div class="caja"><h4>Reglas para los códigos</h4>
-      <ul class="lista" style="margin-top:6px; font-size:9.8pt">
-        <li>Solo letras sin tilde, números y <code>_</code>: <code>fachada_sur</code> ✓, <code>fachada sur</code> ✗.</li>
-        <li>Se escriben <b>igual</b> en todas las tablas (mayúsculas incluidas).</li>
-        <li>Los nombres para el público (con tildes y espacios) van en la columna <code>nombre</code>.</li>
-        <li><b>Inclinación</b>: 0° horizontal, 90° vertical. <b>Orientación</b>: Norte, Noreste, Este, Sureste, Sur, Suroeste, Oeste o Noroeste.</li>
-      </ul></div>
-  </div>
-  <div class="nota"><b>¿Una superficie se giró?</b> Usa la tabla opcional <code>cronograma_orientaciones</code> (también está en el formulario): una fila por periodo, con la superficie, la fecha <code>desde</code>, la fecha <code>hasta</code> (vacía si siguió así hasta el final) y la <code>orientacion</code> de ese periodo. Los periodos de una misma superficie no se pueden cruzar.</div>
-  <div class="pie"><span>Guía del formato de carga 1.1</span><span>3</span></div>
+<div class="tit-sec"><h2>Descripción de las tablas</h2><p class="lead">Para cada tabla se indica su propósito y el contenido de sus columnas. <span class="si">●</span> obligatoria · <span class="no">○</span> opcional.</p></div>
+<div class="caja"><h4>Reglas generales</h4>
+<ul class="lista" style="margin-top:6px; font-size:9.6pt">
+<li>Los nombres de tablas y columnas deben coincidir exactamente con los de esta guía.</li>
+<li>Los códigos (<code>_id</code>) se escriben con letras sin tilde, números y guion bajo (<code>fachada_sur</code>), y de forma idéntica en todas las tablas, incluidas mayúsculas y minúsculas.</li>
+<li>Las fechas y horas se escriben <code>AAAA-MM-DD HH:MM:SS</code>, en hora local; las fechas solas, <code>AAAA-MM-DD</code>.</li>
+<li>Los decimales se escriben con punto, sin separador de miles. Un dato faltante es una celda vacía, nunca 0, −999 ni texto.</li>
+<li>Unidades: W, V, A, Wh, W/m², °C, % y m/s; las variables adicionales usan la unidad que se declare en <code>variables</code>.</li>
+<li>La plataforma presenta los datos tal como se cargan: no aplica filtros ni descarta lecturas.</li>
+<li>La plantilla generada con el formulario incluye las columnas que corresponden a lo declarado. La plantilla básica solo incluye las columnas obligatorias, la potencia máxima y las variables ambientales fijas; las columnas opcionales y las variables <code>voc_v</code>, <code>isc_a</code>, <code>vmpp_v</code> e <code>impp_a</code> se agregan cuando se necesiten.</li>
+</ul></div><div class="bloque-tabla"><div class="t-cab"><h3>instalacion</h3><span class="badge">obligatoria</span></div><p class="t-desc">Datos generales del proyecto. Contiene una sola fila.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">nombre</td><td class="tipo">texto</td><td class="o si">●</td><td>Nombre de la instalación que se muestra en la plataforma.</td></tr><tr><td class="k">descripcion</td><td class="tipo">texto</td><td class="o no">○</td><td>Descripción breve del proyecto.</td></tr><tr><td class="k">responsable</td><td class="tipo">texto</td><td class="o no">○</td><td>Grupo o entidad a cargo.</td></tr><tr><td class="k">ciudad, pais</td><td class="tipo">texto</td><td class="o no">○</td><td>Ubicación general.</td></tr></table></div></div><div class="bloque-tabla"><div class="t-cab"><h3>tecnologias</h3><span class="badge">obligatoria</span></div><p class="t-desc">Una fila por cada tipo de módulo. La potencia STC y el área se usan para calcular la eficiencia.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">tecnologia_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código único de la tecnología.</td></tr><tr><td class="k">nombre</td><td class="tipo">texto</td><td class="o si">●</td><td>Nombre que aparece en las gráficas y los filtros.</td></tr><tr><td class="k">tipo</td><td class="tipo">texto</td><td class="o si">●</td><td>Uno de: <code>c-Si mono</code>, <code>c-Si poli</code>, <code>CdTe</code>, <code>CIGS</code>, <code>a-Si</code>, <code>perovskita</code>, <code>vidrio semitransparente</code>, <code>otro</code>.</td></tr><tr><td class="k">potencia_stc_w</td><td class="tipo">número</td><td class="o si">●</td><td>Potencia nominal en condiciones estándar de medida (W).</td></tr><tr><td class="k">area_m2</td><td class="tipo">número</td><td class="o si">●</td><td>Área del módulo (m²).</td></tr><tr><td class="k">transmitancia_pct</td><td class="tipo">número</td><td class="o no">○</td><td>Transmitancia visible (%), para módulos semitransparentes.</td></tr><tr><td class="k">coef_temp_pmax</td><td class="tipo">número</td><td class="o no">○</td><td>Coeficiente de temperatura de la potencia (%/°C).</td></tr><tr><td class="k">fabricante, modelo</td><td class="tipo">texto</td><td class="o no">○</td><td>Referencia comercial.</td></tr></table></div></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>3</span></div>
 </section>
-
-<!-- ================================================================ 4 · VARIABLES Y SENSORES -->
-<section class="pagina" style="gap:9px">
-  <div class="tit-sec"><div class="ceja">Variables y sensores</div><h2>Qué significa cada columna</h2>
-    <p class="lead">La tabla <code>variables</code> le dice a la plataforma qué se mide y cómo mostrarlo. La plantilla ya trae las más comunes; tú agregas las tuyas.</p></div>
-  <div class="tabla"><div class="tabla-nombre">variables <span>columnas explicadas</span></div>
-    <table>
-      <tr><th style="width:18%">Columna</th><th>Qué es</th><th style="width:27%">Ejemplo</th></tr>
-      <tr><td class="k">variable_id</td><td>Código de la variable. En las eléctricas es también el <b>nombre de la columna</b> en <code>mediciones_electricas</code>.</td><td class="d">ff</td></tr>
-      <tr><td class="k">nombre</td><td>Cómo se llama en las gráficas.</td><td>Fill factor</td></tr>
-      <tr><td class="k">unidad</td><td>Unidad de medida (vacía si no tiene).</td><td>V · A · W/m² · mm</td></tr>
-      <tr><td class="k">tipo</td><td><code>electrica</code> si se mide en cada módulo; <code>ambiental</code> si la mide un sensor.</td><td class="d">electrica</td></tr>
-      <tr><td class="k">agregacion</td><td>La plataforma muestra <b>valores por hora</b>. Esta columna dice cómo convertir tus lecturas de una hora en un solo valor (ver abajo).</td><td class="d">promedio</td></tr>
-      <tr><td class="k">min_valido<br>max_valido</td><td>Opcionales. El <b>rango posible</b> de la variable. No borran nada: al cargar, la plataforma solo te <b>avisa</b> si hay valores por fuera, para que los revises.</td><td>0 y 1 (un fill factor no pasa de 1)</td></tr>
-    </table></div>
-  <div class="rejilla-2">
-    <div class="caja"><h4>¿Qué agregación elijo?</h4>
-      <table style="margin-top:6px">
-        <tr><th>Agregación</th><th>Úsala para</th></tr>
-        <tr><td class="d">promedio</td><td>Casi todo: potencia, voltaje, corriente, temperatura, irradiancia, humedad, viento.</td></tr>
-        <tr><td class="d">suma</td><td>Cantidades que se acumulan: lluvia (mm), energía de cada intervalo (Wh).</td></tr>
-        <tr><td class="d">maximo</td><td>Picos: ráfaga de viento, potencia pico.</td></tr>
-        <tr><td class="d">minimo</td><td>Valores mínimos: corriente mínima, temperatura mínima.</td></tr>
-      </table></div>
-    <div class="caja"><h4>Variables que ya trae la plantilla</h4>
-      <table style="margin-top:6px">
-        <tr><th>variable_id</th><th>Unidad</th><th>Se ve en</th></tr>
-        <tr><td class="d">potencia_max_w <span class="badge">oblig.</span></td><td>W</td><td>Energía · Desempeño</td></tr>
-        <tr><td class="d">voc_v · isc_a<br>vmpp_v · impp_a</td><td>V · A</td><td>Explorar</td></tr>
-        <tr><td class="d">irradiancia</td><td>W/m²</td><td>Clima · Desempeño</td></tr>
-        <tr><td class="d">temperatura_ambiente<br>temperatura_modulo</td><td>°C</td><td>Clima</td></tr>
-        <tr><td class="d">humedad_relativa</td><td>%</td><td>Clima</td></tr>
-        <tr><td class="d">velocidad_viento</td><td>m/s</td><td>Clima</td></tr>
-      </table>
-      <p style="font-size:8.6pt; color:var(--tinta-3); margin-top:4px">Las que no uses se pueden borrar (menos la potencia). Todas se ven también en <b>Explorar</b>.</p></div>
-  </div>
-  <div class="tabla"><div class="tabla-nombre">sensores <span>una fila por cada columna de mediciones_ambientales</span></div>
-    <table>
-      <tr><th style="width:18%">Columna</th><th>Qué es</th><th style="width:30%">Cuándo es obligatoria</th></tr>
-      <tr><td class="k">sensor_id</td><td>Nombre exacto de su columna en <code>mediciones_ambientales</code>.</td><td>Siempre</td></tr>
-      <tr><td class="k">variable_id</td><td>Qué mide (una variable de tipo ambiental).</td><td>Siempre</td></tr>
-      <tr><td class="k">superficie_id</td><td>Superficie a la que le sirve de referencia.</td><td>Si mide <b>irradiancia</b> (uno por superficie)</td></tr>
-      <tr><td class="k">modulo_id</td><td>Módulo al que está pegado. (<code>modelo</code>, <code>fabricante</code> y <code>descripcion</code> son opcionales.)</td><td>Si mide <b>temperatura_modulo</b></td></tr>
-    </table></div>
-  <div class="pie"><span>Guía del formato de carga 1.1</span><span>4</span></div>
-</section>
-
-<!-- ================================================================ 5 · MEDICIONES -->
 <section class="pagina">
-  <div class="tit-sec"><div class="ceja">Mediciones</div><h2>Cómo deben verse tus mediciones</h2>
-    <p class="lead">Estas son las tablas que llenas con tus datos. La plantilla del formulario ya trae exactamente las columnas que declaraste.</p></div>
-  <div class="tabla"><div class="tabla-nombre">mediciones_electricas <span>una fila por módulo y por lectura</span></div>
-    <table><tr><th>fecha_hora</th><th>modulo_id</th><th>potencia_max_w</th><th>voc_v</th><th>isc_a</th><th>ff</th></tr>
-      <tr><td class="d">2026-05-01 12:00:00</td><td class="d">M1</td><td>385.2</td><td>44.1</td><td>11.2</td><td>0.77</td></tr>
-      <tr><td class="d">2026-05-01 12:00:00</td><td class="d">C1</td><td>121.7</td><td>51.3</td><td>3.4</td><td>0.69</td></tr>
-      <tr><td class="d">2026-05-01 12:05:00</td><td class="d">M1</td><td>379.8</td><td>44.0</td><td>11.0</td><td class="no">(vacío)</td></tr></table></div>
-  <div class="tabla"><div class="tabla-nombre">mediciones_ambientales <span>una fila por lectura · una columna por sensor</span></div>
-    <table><tr><th>fecha_hora</th><th>G_techo</th><th>T_amb</th><th>T_M1</th></tr>
-      <tr><td class="d">2026-05-01 12:00:00</td><td>865.0</td><td>24.6</td><td>47.9</td></tr>
-      <tr><td class="d">2026-05-01 12:05:00</td><td>851.3</td><td>24.8</td><td>48.2</td></tr></table></div>
-  <div class="tabla"><div class="tabla-nombre">energia_diaria <span>opcional · si tu equipo ya la calcula</span></div>
-    <table><tr><th>fecha</th><th>modulo_id</th><th>energia_wh</th><th>data_points</th></tr>
-      <tr><td class="d">2026-05-01</td><td class="d">M1</td><td>2410.5</td><td>168</td></tr></table></div>
-  <p style="font-size:9.5pt; color:var(--tinta-2)">Si no incluyes <code>energia_diaria</code>, la plataforma calcula la energía de cada día a partir de la potencia. <code>data_points</code> (cuántas lecturas se usaron) es solo informativo.</p>
-  <div class="rejilla-2">
-    <div class="caja"><h4>Reglas de los datos</h4>
-      <ul class="lista" style="margin-top:6px; font-size:9.8pt">
-        <li><b>Fecha y hora:</b> <code>AAAA-MM-DD HH:MM:SS</code>, en hora local. Fechas solas: <code>AAAA-MM-DD</code>.</li>
-        <li><b>Decimales con punto</b> (<code>12.5</code>), sin separador de miles.</li>
-        <li><b>Dato faltante = celda vacía.</b> Nunca 0, −999, «N/A» ni texto.</li>
-        <li><b>Unidades:</b> W, V, A, Wh, W/m², °C, %, m/s; las tuyas, como las declaraste.</li>
-        <li><b>Intervalo:</b> el que use tu equipo (1 a 15 minutos es lo usual). Las dos tablas se cruzan por minuto.</li>
-        <li>No repitas la misma lectura (mismo módulo y misma fecha_hora).</li>
-      </ul></div>
-    <div class="caja"><h4>Depura antes de cargar</h4>
-      <p style="margin-top:6px; font-size:9.8pt">La plataforma no filtra: lo que cargas es lo que se ve. Antes de subir tu base, retira lo que no quieras mostrar:</p>
-      <ul class="lista" style="margin-top:4px; font-size:9.8pt">
-        <li>Lecturas erróneas (picos imposibles, sensores desconectados).</li>
-        <li>Horas que no te interesan (por ejemplo, la noche).</li>
-        <li>Días incompletos que distorsionen la energía diaria.</li>
-        <li>Calibraciones y cambios de sensor ya aplicados.</li>
-      </ul></div>
-  </div>
-  <div class="pie"><span>Guía del formato de carga 1.1</span><span>5</span></div>
+<div class="tit-sec solo-ceja"><div class="ceja">Descripción de las tablas</div></div>
+<div class="bloque-tabla"><div class="t-cab"><h3>superficies</h3><span class="badge">obligatoria</span></div><p class="t-desc">Una fila por cada superficie con módulos: cubierta, fachada o cara de un prototipo.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">superficie_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código único de la superficie.</td></tr><tr><td class="k">nombre</td><td class="tipo">texto</td><td class="o si">●</td><td>Nombre que se muestra en la plataforma.</td></tr><tr><td class="k">inclinacion_deg</td><td class="tipo">número</td><td class="o si">●</td><td>Inclinación entre 0° (horizontal) y 90° (vertical).</td></tr><tr><td class="k">orientacion</td><td class="tipo">texto</td><td class="o no">○</td><td>Orientación fija: Norte, Noreste, Este, Sureste, Sur, Suroeste, Oeste o Noroeste. Se deja vacía si la superficie es horizontal o si cambió de orientación (en ese caso se usa el cronograma).</td></tr><tr><td class="k">descripcion</td><td class="tipo">texto</td><td class="o no">○</td><td>Descripción breve.</td></tr></table></div></div><div class="bloque-tabla"><div class="t-cab"><h3>cronograma_orientaciones</h3><span class="badge op">opcional</span></div><p class="t-desc">Se usa solo si alguna superficie cambió de orientación o de inclinación. Una fila por superficie y periodo; los periodos de una misma superficie no pueden cruzarse.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">superficie_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código de la superficie (debe existir en <code>superficies</code>).</td></tr><tr><td class="k">desde</td><td class="tipo">fecha y hora</td><td class="o si">●</td><td>Inicio del periodo.</td></tr><tr><td class="k">hasta</td><td class="tipo">fecha y hora</td><td class="o no">○</td><td>Fin del periodo. Vacío si la superficie se mantuvo así hasta el final de los datos.</td></tr><tr><td class="k">orientacion</td><td class="tipo">texto</td><td class="o si">●</td><td>Orientación durante el periodo.</td></tr><tr><td class="k">inclinacion_deg</td><td class="tipo">número</td><td class="o no">○</td><td>Inclinación durante el periodo, solo si también cambió.</td></tr></table></div></div><div class="bloque-tabla"><div class="t-cab"><h3>modulos</h3><span class="badge">obligatoria</span></div><p class="t-desc">Una fila por cada módulo con medición eléctrica.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">modulo_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código único del módulo.</td></tr><tr><td class="k">superficie_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Superficie donde está instalado (debe existir en <code>superficies</code>).</td></tr><tr><td class="k">tecnologia_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Tecnología del módulo (debe existir en <code>tecnologias</code>). El área del módulo se toma de ella.</td></tr><tr><td class="k">nombre</td><td class="tipo">texto</td><td class="o no">○</td><td>Nombre que se muestra; si se deja vacío, se usa el de la tecnología.</td></tr></table></div></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>4</span></div>
 </section>
-
-<!-- ================================================================ 6 · LLENAR CON PYTHON -->
 <section class="pagina">
-  <div class="tit-sec"><div class="ceja">Llenar la plantilla · opción A</div><h2>Con Python</h2>
-    <p class="lead">La forma más rápida si tus datos están en archivos CSV o Excel, o si son muchos. Necesitas Python con la librería pandas (<code>pip install pandas</code>).</p></div>
-  <div class="codigo"><span class="c"># llenar_plantilla.py · copia tus mediciones en la plantilla del formulario</span>
+<div class="tit-sec solo-ceja"><div class="ceja">Descripción de las tablas</div></div>
+<div class="bloque-tabla"><div class="t-cab"><h3>variables</h3><span class="badge">obligatoria</span></div><p class="t-desc">Lista de las variables medidas. Las variables fijas tienen un código reservado; las demás son variables adicionales que define el usuario y se presentan en la pestaña Explorar.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">variable_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código de la variable. En las variables eléctricas corresponde al nombre de la columna en <code>mediciones_electricas</code>.</td></tr><tr><td class="k">nombre</td><td class="tipo">texto</td><td class="o si">●</td><td>Nombre que se muestra en las gráficas.</td></tr><tr><td class="k">unidad</td><td class="tipo">texto</td><td class="o si">●</td><td>Unidad de medida; vacía si la variable no tiene unidad.</td></tr><tr><td class="k">tipo</td><td class="tipo">texto</td><td class="o si">●</td><td><code>electrica</code> si se mide en cada módulo; <code>ambiental</code> si la registra un sensor.</td></tr><tr><td class="k">agregacion</td><td class="tipo">texto</td><td class="o no">○</td><td>Forma de resumir las lecturas de una hora en un solo valor, ya que la plataforma presenta valores horarios: <code>promedio</code>, <code>suma</code>, <code>minimo</code> o <code>maximo</code>. Si se deja vacía, se usa <code>promedio</code>.</td></tr></table></div></div><div style="display:grid; grid-template-columns: 1fr; gap:10px">
+<div class="tabla"><div class="tabla-nombre">Selección de la agregación</div><table>
+<tr><th>Agregación</th><th>Uso recomendado</th></tr>
+<tr><td class="d">promedio</td><td>Potencia, voltaje, corriente, temperatura, irradiancia, humedad y viento.</td></tr>
+<tr><td class="d">suma</td><td>Magnitudes acumulativas: precipitación (mm) o energía por intervalo (Wh).</td></tr>
+<tr><td class="d">maximo</td><td>Valores pico, como ráfagas de viento.</td></tr>
+<tr><td class="d">minimo</td><td>Valores mínimos, como la corriente mínima.</td></tr></table></div>
+<div class="tabla"><div class="tabla-nombre">Variables fijas</div><table>
+<tr><th>variable_id</th><th>Unidad</th><th>Tipo</th></tr>
+<tr><td class="d">potencia_max_w <span class="badge">oblig.</span></td><td>W</td><td>eléctrica</td></tr>
+<tr><td class="d">voc_v · isc_a · vmpp_v · impp_a</td><td>V · A</td><td>eléctrica</td></tr>
+<tr><td class="d">irradiancia</td><td>W/m²</td><td>ambiental</td></tr>
+<tr><td class="d">temperatura_ambiente · temperatura_modulo</td><td>°C</td><td>ambiental</td></tr>
+<tr><td class="d">humedad_relativa · velocidad_viento</td><td>% · m/s</td><td>ambiental</td></tr></table></div></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>5</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec solo-ceja"><div class="ceja">Descripción de las tablas</div></div>
+<div class="bloque-tabla"><div class="t-cab"><h3>sensores</h3><span class="badge">obligatoria</span></div><p class="t-desc">Una fila por cada columna de <code>mediciones_ambientales</code>: indica qué mide cada sensor y dónde está ubicado. Cada superficie admite un solo sensor de irradiancia; los sensores del sitio (temperatura ambiente, humedad, viento) no llevan superficie ni módulo.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">sensor_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Nombre exacto de la columna en <code>mediciones_ambientales</code>.</td></tr><tr><td class="k">variable_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Variable que mide (de tipo ambiental, en <code>variables</code>).</td></tr><tr><td class="k">superficie_id</td><td class="tipo">texto</td><td class="o no">○</td><td>Obligatoria si el sensor mide irradiancia: superficie a la que sirve de referencia.</td></tr><tr><td class="k">modulo_id</td><td class="tipo">texto</td><td class="o no">○</td><td>Obligatoria si el sensor mide temperatura de módulo: módulo al que está adherido.</td></tr><tr><td class="k">modelo, fabricante, descripcion</td><td class="tipo">texto</td><td class="o no">○</td><td>Referencia del equipo y notas.</td></tr></table></div></div><div class="bloque-tabla"><div class="t-cab"><h3>mediciones_electricas</h3><span class="badge">obligatoria</span></div><p class="t-desc">Una fila por módulo y por lectura. No puede haber dos filas con el mismo módulo y la misma fecha y hora.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">fecha_hora</td><td class="tipo">fecha y hora</td><td class="o si">●</td><td>Momento de la lectura.</td></tr><tr><td class="k">modulo_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código del módulo (debe existir en <code>modulos</code>).</td></tr><tr><td class="k">potencia_max_w</td><td class="tipo">número</td><td class="o si">●</td><td>Potencia máxima (W).</td></tr><tr><td class="k">‹variable eléctrica›</td><td class="tipo">número</td><td class="o no">○</td><td>Una columna por cada variable eléctrica declarada en <code>variables</code>, por ejemplo <code>voc_v</code>, <code>isc_a</code>, <code>vmpp_v</code> o <code>impp_a</code>.</td></tr></table></div></div><div class="bloque-tabla"><div class="t-cab"><h3>energia_diaria</h3><span class="badge op">opcional</span></div><p class="t-desc">Energía diaria calculada por el equipo de medición. Si no se incluye, la plataforma la calcula a partir de la potencia.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">fecha</td><td class="tipo">fecha</td><td class="o si">●</td><td>Día.</td></tr><tr><td class="k">modulo_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código del módulo.</td></tr><tr><td class="k">energia_wh</td><td class="tipo">número</td><td class="o si">●</td><td>Energía del día (Wh).</td></tr><tr><td class="k">data_points</td><td class="tipo">entero</td><td class="o no">○</td><td>Número de lecturas usadas en el cálculo (informativo).</td></tr></table></div></div><div class="bloque-tabla"><div class="t-cab"><h3>mediciones_ambientales</h3><span class="badge">obligatoria</span></div><p class="t-desc">Una fila por lectura y una columna por sensor. Cada nombre de columna debe estar declarado en <code>sensores</code>.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">fecha_hora</td><td class="tipo">fecha y hora</td><td class="o si">●</td><td>Momento de la lectura; no puede repetirse.</td></tr><tr><td class="k">‹sensor_id›</td><td class="tipo">número</td><td class="o si">●</td><td>Una columna por sensor, en la unidad de la variable que mide.</td></tr></table></div></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>6</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Llenado de la plantilla · opción A</div><h2>Con Python</h2><p class="lead">Procedimiento recomendado cuando los datos están en archivos CSV o Excel, o cuando el volumen es grande. Requiere Python 3 y la librería pandas (<code>pip install pandas</code>).</p></div>
+<p class="parrafo">El siguiente programa lee las mediciones desde archivos CSV o Excel, convierte las fechas al formato requerido, elimina lecturas duplicadas y agrega los datos a las tablas de la plantilla. Los nombres de las columnas de los archivos deben coincidir con los de la plantilla. El parámetro <code>dayfirst=True</code> corresponde a fechas escritas como 01/05/2026; si las fechas ya están en formato 2026-05-01, puede omitirse.</p><div class="codigo"><span class="c"># llenar_plantilla.py · copia las mediciones en la plantilla generada por el formulario</span>
 import sqlite3
 import pandas as pd
 
 base = sqlite3.connect("plantilla_mi_instalacion.db")
 FORMATO = "%Y-%m-%d %H:%M:%S"
 
-<span class="c"># 1. Eléctricas: fecha_hora, modulo_id, potencia_max_w (y las demás que declaraste)</span>
+<span class="c"># 1. Mediciones eléctricas: fecha_hora, modulo_id, potencia_max_w y las demás variables declaradas</span>
 el = pd.read_csv("mediciones_electricas.csv")      <span class="c"># o pd.read_excel("archivo.xlsx")</span>
 el["fecha_hora"] = pd.to_datetime(el["fecha_hora"], dayfirst=True).dt.strftime(FORMATO)
 el = el.drop_duplicates(["modulo_id", "fecha_hora"])
 el.to_sql("mediciones_electricas", base, if_exists="append", index=False)
 
-<span class="c"># 2. Ambientales: fecha_hora + una columna por sensor (G_techo, T_amb, T_M1…)</span>
+<span class="c"># 2. Mediciones ambientales: fecha_hora y una columna por sensor</span>
 amb = pd.read_csv("mediciones_ambientales.csv")
 amb["fecha_hora"] = pd.to_datetime(amb["fecha_hora"], dayfirst=True).dt.strftime(FORMATO)
 amb = amb.drop_duplicates("fecha_hora")
@@ -399,103 +235,53 @@ amb.to_sql("mediciones_ambientales", base, if_exists="append", index=False)
 <span class="c"># en.to_sql("energia_diaria", base, if_exists="append", index=False)</span>
 
 base.commit()
-base.close()
-print("Listo")</div>
-  <div class="rejilla-2">
-    <div class="caja"><h4>Consejos</h4>
-      <ul class="lista" style="margin-top:6px; font-size:9.8pt">
-        <li>Los <b>nombres de las columnas</b> del CSV deben ser iguales a los de la plantilla. Si no, renómbralas: <code>el = el.rename(columns={"Pmax": "potencia_max_w"})</code>.</li>
-        <li>Usa siempre <code>if_exists="append"</code>: así se respetan las columnas y reglas de la plantilla.</li>
-        <li><code>dayfirst=True</code> sirve si tus fechas vienen como 01/05/2026; quítalo si vienen como 2026-05-01.</li>
-      </ul></div>
-    <div class="caja"><h4>Si aparece un error al ejecutar</h4>
-      <table style="margin-top:6px">
-        <tr><th>Mensaje</th><th>Qué hacer</th></tr>
-        <tr><td class="d">UNIQUE constraint failed</td><td>Hay lecturas repetidas o ya las cargaste antes.</td></tr>
-        <tr><td class="d">CHECK constraint failed</td><td>Una fecha está mal escrita.</td></tr>
-        <tr><td class="d">has no column named …</td><td>Una columna del CSV no existe en la plantilla.</td></tr>
-        <tr><td class="d">FOREIGN KEY constraint failed</td><td>Un <code>modulo_id</code> no está en <code>modulos</code>.</td></tr>
-      </table></div>
-  </div>
-  <div class="pie"><span>Guía del formato de carga 1.1</span><span>6</span></div>
+base.close()</div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>7</span></div>
 </section>
-
-<!-- ================================================================ 7 · LLENAR CON DB BROWSER -->
 <section class="pagina">
-  <div class="tit-sec"><div class="ceja">Llenar la plantilla · opción B</div><h2>Con DB Browser for SQLite</h2>
-    <p class="lead">Un programa gratuito con ventanas, sin programar (sqlitebrowser.org). Sirve para bases pequeñas o medianas.</p></div>
-  <div class="rejilla-2">
-    <div class="caja"><h4>Preparar tus archivos</h4>
+<div class="tit-sec"><div class="ceja">Llenado de la plantilla · opción B</div><h2>Con DB Browser for SQLite</h2><p class="lead">Programa gratuito con interfaz gráfica (sqlitebrowser.org), adecuado para bases pequeñas o medianas y para quienes no programan.</p></div>
+<div class="rejilla-2">
+    <div class="caja"><h4>Preparación de los archivos</h4>
       <ul class="lista" style="margin-top:6px; font-size:9.8pt">
-        <li>Guarda cada tabla de mediciones como un <b>CSV</b> (en Excel: <i>Guardar como › CSV UTF-8</i>).</li>
-        <li>La primera fila debe tener los <b>nombres exactos de las columnas</b> de la plantilla.</li>
-        <li>Revisa que las fechas queden como <code>2026-05-01 12:00:00</code>. Excel suele cambiarlas a 01/05/2026: dales el formato personalizado <code>aaaa-mm-dd hh:mm:ss</code> antes de guardar.</li>
-        <li>Revisa que los decimales usen <b>punto</b>.</li>
+        <li>Guardar cada tabla de mediciones como archivo <b>CSV</b> (en Excel: <i>Guardar como › CSV UTF-8</i>).</li>
+        <li>La primera fila debe contener los <b>nombres exactos de las columnas</b> de la plantilla.</li>
+        <li>Verificar que las fechas tengan el formato <code>2026-05-01 12:00:00</code>. Excel suele convertirlas a 01/05/2026; para evitarlo, aplicar el formato personalizado <code>aaaa-mm-dd hh:mm:ss</code> antes de guardar.</li>
+        <li>Verificar que los decimales usen punto.</li>
+        <li>Si se parte de la plantilla básica, agregar antes las columnas opcionales que se usarán: <i>Modificar tabla › Agregar campo</i>, con el nombre exacto de la columna.</li>
       </ul></div>
-    <div class="caja"><h4>Importar cada CSV</h4>
+    <div class="caja"><h4>Importación de cada archivo</h4>
       <ol class="pasos-dbb" style="margin-top:8px">
-        <li>Abre la plantilla: <i>Abrir base de datos</i> y elige tu archivo <code>.db</code>.</li>
-        <li>Ve a <i>Archivo › Importar › Tabla desde archivo CSV</i> y elige el CSV.</li>
-        <li>En <i>Nombre de la tabla</i> escribe la tabla de la plantilla, por ejemplo <code>mediciones_electricas</code>.</li>
-        <li>Marca <i>Nombres de columna en la primera línea</i>; separador: coma (o punto y coma si así lo guardó Excel).</li>
-        <li>Acepta. Cuando pregunte si quieres agregar los datos a la tabla existente, responde <b>Sí</b>.</li>
-        <li>Repite con <code>mediciones_ambientales</code> (y <code>energia_diaria</code> si la tienes).</li>
-        <li>Guarda: <i>Escribir cambios</i> (Ctrl + S).</li>
+        <li>Abrir la plantilla con <i>Abrir base de datos</i>.</li>
+        <li>Seleccionar <i>Archivo › Importar › Tabla desde archivo CSV</i> y elegir el archivo.</li>
+        <li>En <i>Nombre de la tabla</i>, escribir la tabla de la plantilla, por ejemplo <code>mediciones_electricas</code>.</li>
+        <li>Marcar <i>Nombres de columna en la primera línea</i> y elegir el separador (coma o punto y coma).</li>
+        <li>Aceptar y confirmar que los datos se agregan a la tabla existente.</li>
+        <li>Repetir con <code>mediciones_ambientales</code> y, si aplica, con <code>energia_diaria</code>.</li>
+        <li>Guardar con <i>Escribir cambios</i> (Ctrl + S).</li>
       </ol></div>
   </div>
-  <div class="caja"><h4>Revisar que quedó bien</h4>
-    <p style="margin-top:6px; font-size:9.8pt">En la pestaña <i>Hojear datos</i> elige cada tabla de mediciones y mira las primeras filas: las fechas deben verse como <code>2026-05-01 12:00:00</code> y los números alineados a la derecha (si se ven a la izquierda, se guardaron como texto). En la pestaña <i>Ejecutar SQL</i> puedes contar las lecturas por módulo:</p>
+  <div class="caja"><h4>Verificación</h4>
+    <p style="margin-top:6px; font-size:9.8pt">En la pestaña <i>Hojear datos</i>, revisar las primeras filas de cada tabla de mediciones: las fechas deben aparecer como <code>2026-05-01 12:00:00</code> y los números alineados a la derecha; si aparecen a la izquierda, se guardaron como texto. En la pestaña <i>Ejecutar SQL</i> puede consultarse el número de lecturas por módulo:</p>
     <div class="codigo" style="margin-top:8px">SELECT modulo_id, COUNT(*) AS lecturas, MIN(fecha_hora) AS desde, MAX(fecha_hora) AS hasta
 FROM mediciones_electricas GROUP BY modulo_id;</div></div>
-  <div class="tabla"><div class="tabla-nombre">Qué verás según tus datos</div>
-    <table>
-      <tr><th>Pestaña</th><th>Necesita</th></tr>
-      <tr><td>Energía</td><td>Potencia máxima (o la tabla de energía diaria)</td></tr>
-      <tr><td>Desempeño: eficiencia y potencia vs irradiancia</td><td>Potencia máxima + un sensor de irradiancia en la superficie del módulo</td></tr>
-      <tr><td>Clima</td><td>Irradiancia, temperaturas, humedad o viento (cada gráfica aparece solo si hay datos para ella)</td></tr>
-      <tr><td>Explorar</td><td>Cualquier variable, incluidas las que agregues</td></tr>
-    </table></div>
-  <div class="nota"><b>Si DB Browser rechaza filas</b> al importar, casi siempre es por una fecha mal escrita, una lectura repetida o un código de módulo que no existe en la tabla <code>modulos</code>. La plantilla trae esas reglas para avisarte a tiempo.</div>
-  <div class="pie"><span>Guía del formato de carga 1.1</span><span>7</span></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>8</span></div>
 </section>
-
-<!-- ================================================================ 8 · ANTES DE CARGAR -->
 <section class="pagina">
-  <div class="tit-sec"><div class="ceja">Antes de cargar</div><h2>Lista de chequeo y errores frecuentes</h2></div>
-  <div class="caja"><h4>Revisa antes de subir</h4>
-      <ul class="lista check check-2" style="margin-top:8px; font-size:9.8pt">
-        <li><code>instalacion</code> tiene una sola fila, con nombre.</li>
-        <li>Cada módulo tiene superficie y tecnología.</li>
-        <li>Cada tecnología tiene potencia STC y área.</li>
-        <li>Cada columna de <code>mediciones_ambientales</code> está en <code>sensores</code>.</li>
-        <li>Hay un solo sensor de irradiancia por superficie.</li>
-        <li>Las fechas usan <code>AAAA-MM-DD HH:MM:SS</code>.</li>
-        <li>Los datos faltantes son celdas vacías.</li>
-        <li>Quitaste lo que no quieres mostrar (la plataforma no filtra).</li>
-      </ul></div>
-  <div class="caja"><h4>Tamaño del archivo</h4>
-      <table style="margin-top:6px">
-        <tr><th>Tu base pesa…</th><th>Qué hacer</th></tr>
-        <tr><td>Hasta 15 MB</td><td>Súbela directamente en <b>Tus datos</b>.</td></tr>
-        <tr><td>Más de 15 MB</td><td>Procésala en tu computador y sube el resultado (hasta 40 MB).</td></tr>
-      </table>
-      <p style="font-size:9.3pt; margin-top:6px">Para procesarla, descarga el código de la plataforma y ejecuta:</p>
-      <div class="codigo" style="margin-top:4px; font-size:7.8pt">python procesamiento/procesar.py mi_base.db --destino mi_visor.db</div>
-      <p style="font-size:9.3pt; margin-top:4px">Luego sube <code>mi_visor.db</code>. Como referencia: un año de 12 módulos a 1 minuto pesa unos 200 MB; procesado, unos 30 MB.</p></div>
-  <div class="tabla err"><div class="tabla-nombre">Mensajes de la revisión al cargar <span>y cómo resolverlos</span></div>
-    <table>
-      <tr><th style="width:40%">Mensaje</th><th>Qué hacer</th></tr>
-      <tr><td>… fecha(s) mal escrita(s)</td><td>Escríbelas como <code>2026-05-01 12:00:00</code>. Revisa que Excel no las haya cambiado.</td></tr>
-      <tr><td>… usa códigos que no existen en <code>modulos</code></td><td>Escribe el código exactamente igual en las dos tablas (mayúsculas incluidas).</td></tr>
-      <tr><td>… lectura(s) repetido(s)</td><td>Hay dos filas del mismo módulo con la misma fecha y hora: deja una.</td></tr>
-      <tr><td>… valor(es) con texto en lugar de número</td><td>Usa punto decimal y deja vacías las celdas sin dato (sin «N/A» ni «-»).</td></tr>
-      <tr><td>Sensores declarados … sin columna</td><td>Agrega la columna a <code>mediciones_ambientales</code> o borra el sensor.</td></tr>
-      <tr><td>El sensor de irradiancia … necesita <code>superficie_id</code></td><td>Indica a qué superficie le sirve de referencia.</td></tr>
-      <tr><td>La superficie … tiene 2 sensores de irradiancia</td><td>Deja uno solo (o une las dos columnas en una antes de cargar).</td></tr>
-      <tr><td>Aviso: columnas … que se ignoran</td><td>Hay columnas que no están declaradas: decláralas en <code>variables</code>/<code>sensores</code> o bórralas.</td></tr>
-      <tr><td>Aviso: valores fuera de mín–máx</td><td>Revísalos: la plataforma los mostrará tal cual.</td></tr>
-    </table></div>
-  <div class="pie"><span>Guía del formato de carga 1.1 · Proyecto Integra · proyecto-integra.site</span><span>8</span></div>
+<div class="tit-sec"><h2>Ejemplo de una base completa</h2><p class="lead">Instalación con un techo y una fachada, dos tecnologías, tres módulos y tres sensores. Se muestran todas las tablas con algunas filas de mediciones.</p></div>
+<div style="display:flex; flex-direction:column; gap:8px"><div class="tabla compacta"><div class="tabla-nombre">instalacion <span>una sola fila</span></div><table><tr><th>nombre</th><th>descripcion</th><th>ciudad</th><th>pais</th></tr><tr><td>Techo solar de ejemplo</td><td>Dos tecnologías en un techo y una fachada</td><td>Medellín</td><td>Colombia</td></tr></table></div><div style="display:flex; flex-direction:column; gap:8px"><div class="tabla compacta"><div class="tabla-nombre">tecnologias</div><table><tr><th>tecnologia_id</th><th>nombre</th><th>tipo</th><th>potencia_stc_w</th><th>area_m2</th></tr><tr><td class="d">MONO</td><td>Monocristalino 450 W</td><td>c-Si mono</td><td>450</td><td>2.0</td></tr><tr><td class="d">CIGS</td><td>CIGS 150 W</td><td>CIGS</td><td>150</td><td>1.1</td></tr></table></div><div class="tabla compacta"><div class="tabla-nombre">superficies</div><table><tr><th>superficie_id</th><th>nombre</th><th>inclinacion_deg</th><th>orientacion</th></tr><tr><td class="d">techo</td><td>Techo</td><td>10</td><td>Sur</td></tr><tr><td class="d">fachada</td><td>Fachada oeste</td><td>90</td><td>Oeste</td></tr></table></div></div><div style="display:grid; grid-template-columns: 0.9fr 1.35fr; gap:12px"><div class="tabla compacta"><div class="tabla-nombre">modulos</div><table><tr><th>modulo_id</th><th>superficie_id</th><th>tecnologia_id</th></tr><tr><td class="d">M1</td><td>techo</td><td>MONO</td></tr><tr><td class="d">C1</td><td>techo</td><td>CIGS</td></tr><tr><td class="d">F1</td><td>fachada</td><td>MONO</td></tr></table></div><div class="tabla compacta"><div class="tabla-nombre">sensores</div><table><tr><th>sensor_id</th><th>variable_id</th><th>superficie_id</th><th>modulo_id</th></tr><tr><td class="d">G_techo</td><td>irradiancia</td><td>techo</td><td>—</td></tr><tr><td class="d">T_amb</td><td>temperatura_ambiente</td><td>—</td><td>—</td></tr><tr><td class="d">T_M1</td><td>temperatura_modulo</td><td>—</td><td class="d">M1</td></tr></table></div></div><div class="tabla compacta"><div class="tabla-nombre">variables <span>filas agregadas a las de la plantilla</span></div><table><tr><th>variable_id</th><th>nombre</th><th>unidad</th><th>tipo</th><th>agregacion</th></tr><tr><td class="d">ff</td><td>Fill factor</td><td>—</td><td>electrica</td><td>promedio</td></tr></table></div></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>9</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec solo-ceja"><div class="ceja">Ejemplo</div><p class="lead">Algunas filas de las tablas de mediciones de la misma instalación.</p></div>
+<div style="display:flex; flex-direction:column; gap:10px"><div class="tabla compacta"><div class="tabla-nombre">mediciones_electricas</div><table><tr><th>fecha_hora</th><th>modulo_id</th><th>potencia_max_w</th><th>voc_v</th><th>isc_a</th><th>ff</th></tr><tr><td class="d">2026-05-01 12:00:00</td><td class="d">M1</td><td>385.2</td><td>44.1</td><td>11.2</td><td>0.77</td></tr><tr><td class="d">2026-05-01 12:00:00</td><td class="d">C1</td><td>121.7</td><td>51.3</td><td>3.4</td><td>0.69</td></tr><tr><td class="d">2026-05-01 12:05:00</td><td class="d">M1</td><td>379.8</td><td>44.0</td><td>11.0</td><td class="no">(vacío)</td></tr></table></div><div style="display:grid; grid-template-columns: 1.3fr 1fr; gap:12px"><div class="tabla compacta"><div class="tabla-nombre">mediciones_ambientales</div><table><tr><th>fecha_hora</th><th>G_techo</th><th>T_amb</th><th>T_M1</th></tr><tr><td class="d">2026-05-01 12:00:00</td><td>865.0</td><td>24.6</td><td>47.9</td></tr><tr><td class="d">2026-05-01 12:05:00</td><td>851.3</td><td>24.8</td><td>48.2</td></tr></table></div><div class="tabla compacta"><div class="tabla-nombre">energia_diaria</div><table><tr><th>fecha</th><th>modulo_id</th><th>energia_wh</th></tr><tr><td class="d">2026-05-01</td><td class="d">M1</td><td>2410.5</td></tr></table></div></div></div>
+<div class="caja"><h4>Lectura del ejemplo</h4>
+<ul class="lista" style="margin-top:6px; font-size:9.6pt">
+<li>Los módulos <code>M1</code> y <code>C1</code> están instalados en el techo y <code>F1</code> en la fachada; <code>M1</code> y <code>F1</code> son de la misma tecnología.</li>
+<li><code>G_techo</code> es la referencia de irradiancia del techo: con ella se calcula la eficiencia de <code>M1</code> y <code>C1</code>. La fachada no tiene sensor de irradiancia, por lo que de <code>F1</code> se presenta la potencia y la energía, pero no la eficiencia.</li>
+<li><code>T_M1</code> registra la temperatura del módulo <code>M1</code> y <code>T_amb</code> la temperatura ambiente del sitio.</li>
+<li>El fill factor (<code>ff</code>) es una variable adicional: se declara en <code>variables</code> y tiene su propia columna en <code>mediciones_electricas</code>. Una celda vacía indica que esa lectura no está disponible.</li>
+</ul></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>10</span></div>
 </section>
 </body>
 </html>
