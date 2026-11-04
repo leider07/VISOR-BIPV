@@ -16,7 +16,7 @@ AMBIENTE = "#b9770e"
 PALETA_SUPERFICIE = ["#1b554f", "#2f978d", "#d9a20b", "#73879a", "#8e5b9f", "#c0504d", "#4a7fb5", "#7a9a3a"]
 PALETA_MODULO = ["#123c37", "#2f978d", "#d9a20b", "#73879a", "#8e5b9f", "#c0504d", "#4a7fb5", "#7a9a3a",
                  "#5c3d2e", "#e07a5f", "#3d405b", "#81b29a"]
-FUENTE = "'Source Sans 3', 'Segoe UI', sans-serif"
+FUENTE = "SourceSans3, Segoe UI, sans-serif"   # sin comillas: con comillas, algunas versiones de Plotly no exportan PNG
 
 LOCALE_ES = {
     "dictionary": {
