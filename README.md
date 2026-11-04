@@ -1,4 +1,4 @@
-<img width="693" height="703" alt="imagen" src="https://github.com/user-attachments/assets/f3c3d5fa-75dc-48d9-b9ca-58efc69058cb" /># VISOR-BIPV · Plataforma de monitoreo fotovoltaico
+# VISOR-BIPV · Plataforma de monitoreo fotovoltaico
 
 Plataforma web para visualizar los datos históricos de instalaciones fotovoltaicas: el recurso
 solar y las condiciones del sitio, la energía generada por cada módulo y su desempeño (potencia y
