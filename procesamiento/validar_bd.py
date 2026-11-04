@@ -1,5 +1,5 @@
 """
-Validador del formato de carga 1.1 de la plataforma de monitoreo fotovoltaico.
+Validador del formato de carga de la plataforma de monitoreo fotovoltaico.
 
 Revisa una base SQLite contra la guía (formato/guia_formato.md) y entrega:
   - ERRORES: impiden cargar la base (tablas o columnas obligatorias que faltan, códigos que no
@@ -19,13 +19,12 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-VERSION = "1.1"
 FECHA_HORA = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]"
 FECHA = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
 
 # tabla: (obligatoria, {columna: obligatoria})
 TABLAS = {
-    "instalacion": (True, {"nombre": True, "version_formato": True, "descripcion": False,
+    "instalacion": (True, {"nombre": True, "descripcion": False,
                            "responsable": False, "ciudad": False, "pais": False}),
     "tecnologias": (True, {"tecnologia_id": True, "nombre": True, "tipo": True, "potencia_stc_w": True,
                            "area_m2": True, "transmitancia_pct": False, "coef_temp_pmax": False,
@@ -34,7 +33,7 @@ TABLAS = {
                            "orientacion": False, "descripcion": False}),
     "modulos": (True, {"modulo_id": True, "superficie_id": True, "tecnologia_id": True, "nombre": False}),
     "variables": (True, {"variable_id": True, "nombre": True, "unidad": True, "tipo": True,
-                         "agregacion": True, "min_valido": False, "max_valido": False}),
+                         "agregacion": False}),
     "sensores": (True, {"sensor_id": True, "variable_id": True, "superficie_id": False,
                         "modulo_id": False, "modelo": False, "fabricante": False, "descripcion": False}),
     "cronograma_orientaciones": (False, {"superficie_id": True, "desde": True, "hasta": True,
@@ -91,6 +90,10 @@ class Validador:
 
     def existe(self, tabla):
         return tabla in self.cols
+
+    def col(self, tabla, col):
+        """La columna entre comillas, o NULL si la tabla no la trae (columnas opcionales)."""
+        return q(col) if col in self.cols.get(tabla, []) else "NULL"
 
     def ids(self, tabla, col):
         return {r[0] for r in self.todos(f"SELECT {q(col)} FROM {q(tabla)}")} if self.existe(tabla) else set()
@@ -160,7 +163,7 @@ class Validador:
         if col not in self.cols.get(tabla, []):
             return
         marcas = ", ".join("?" * len(lista))
-        cond = f"{q(col)} NOT IN ({marcas})" + (f" AND {q(col)} IS NOT NULL" if permitir_vacio else "")
+        cond = f"{q(col)} NOT IN ({marcas})" + (f" AND {q(col)} IS NOT NULL AND TRIM({q(col)}) <> ''" if permitir_vacio else "")
         malos = self.todos(f"SELECT DISTINCT {q(col)} FROM {q(tabla)} WHERE {cond}", *lista)
         if malos:
             self.r.error(f"`{tabla}.{col}` tiene valores no permitidos: {ejemplos([m[0] for m in malos])}. "
@@ -212,11 +215,9 @@ class Validador:
         if n != 1:
             self.r.error(f"`instalacion` debe tener exactamente 1 fila (tiene {n})")
         if n:
-            nombre, version = self.con.execute("SELECT nombre, version_formato FROM instalacion").fetchone()
+            nombre = self.uno("SELECT nombre FROM instalacion")
             if not nombre or not str(nombre).strip():
                 self.r.error("`instalacion.nombre` está vacío")
-            if str(version).strip() != VERSION:
-                self.r.aviso(f"`instalacion.version_formato` es {version!r}; este validador revisa la versión {VERSION}")
             self.info(f"Instalación: {nombre}")
 
     def info(self, t):
@@ -258,11 +259,11 @@ class Validador:
         self.info(f"Módulos: {n}")
 
     def variables(self):
-        self.vacios("variables", ["variable_id", "nombre", "tipo", "agregacion"])
+        self.vacios("variables", ["variable_id", "nombre", "tipo"])
         self.duplicados("variables", ["variable_id"], "código(s)")
         self.codigos("variables", "variable_id")
         self.en_lista("variables", "tipo", ["electrica", "ambiental"], permitir_vacio=False)
-        self.en_lista("variables", "agregacion", AGREGACIONES, permitir_vacio=False)
+        self.en_lista("variables", "agregacion", AGREGACIONES)     # vacía = promedio
         filas = self.todos("SELECT variable_id, tipo FROM variables")
         self.vars = dict(filas)
         if "potencia_max_w" not in self.vars:
@@ -270,10 +271,6 @@ class Validador:
         for v, t in self.vars.items():
             if v in VARIABLES_FIJAS and t != VARIABLES_FIJAS[v]:
                 self.r.error(f"La variable fija `{v}` debe ser de tipo `{VARIABLES_FIJAS[v]}` (dice `{t}`)")
-        malos = self.todos("SELECT variable_id FROM variables WHERE min_valido IS NOT NULL AND max_valido IS NOT NULL "
-                           "AND min_valido >= max_valido")
-        if malos:
-            self.r.error(f"`variables`: min_valido debe ser menor que max_valido ({ejemplos([m[0] for m in malos])})")
         fijas = [v for v in self.vars if v in VARIABLES_FIJAS]
         adic = [v for v in self.vars if v not in VARIABLES_FIJAS]
         self.info(f"Variables fijas: {', '.join(fijas) or 'ninguna'}")
@@ -287,7 +284,8 @@ class Validador:
         self.referencia("sensores", "variable_id", "variables", "variable_id")
         self.referencia("sensores", "superficie_id", "superficies", "superficie_id")
         self.referencia("sensores", "modulo_id", "modulos", "modulo_id")
-        filas = self.todos("SELECT sensor_id, variable_id, superficie_id, modulo_id FROM sensores")
+        filas = self.todos(f"SELECT sensor_id, variable_id, {self.col('sensores', 'superficie_id')}, "
+                           f"{self.col('sensores', 'modulo_id')} FROM sensores")
         self.sens = {s: (v, sup, m) for s, v, sup, m in filas}
         for s, (v, sup, m) in self.sens.items():
             if v in self.vars and self.vars[v] != "ambiental":
@@ -331,7 +329,8 @@ class Validador:
                 cruces.append((s1, d1, d2))
         if cruces:
             self.r.error(f"`{t}`: periodos que se cruzan (superficie, inicio, inicio del siguiente): {ejemplos(cruces)}")
-        sin = self.todos("SELECT superficie_id FROM superficies WHERE orientacion IS NULL AND inclinacion_deg > 0 "
+        sin = self.todos(f"SELECT superficie_id FROM superficies WHERE {self.col('superficies', 'orientacion')} IS NULL "
+                         "AND inclinacion_deg > 0 "
                          f"AND superficie_id NOT IN (SELECT superficie_id FROM {t})")
         for (s,) in sin:
             self.r.aviso(f"La superficie `{s}` no tiene orientación fija ni periodos en el cronograma")
@@ -351,7 +350,7 @@ class Validador:
         faltan = sorted(electricas - set(cols))
         if faltan:
             self.r.error(f"Variables eléctricas declaradas en `variables` sin columna en `{t}`: {', '.join(faltan)}")
-        self.valores_fuera(t, [c for c in cols if c in electricas], lambda c: c)
+        self.solo_numeros(t, [c for c in cols if c in electricas])
         n, ini, fin = self.con.execute(f"SELECT COUNT(*), MIN(fecha_hora), MAX(fecha_hora) FROM {t}").fetchone()
         if not n:
             self.r.error(f"`{t}` está vacía")
@@ -390,25 +389,18 @@ class Validador:
         faltan = [s for s in self.sens if s not in cols]
         if faltan:
             self.r.error(f"Sensores declarados en `sensores` sin columna en `{t}`: {', '.join(faltan)}")
-        self.valores_fuera(t, [c for c in cols if c in self.sens], lambda c: self.sens[c][0])
+        self.solo_numeros(t, [c for c in cols if c in self.sens])
         n, ini, fin = self.con.execute(f"SELECT COUNT(*), MIN(fecha_hora), MAX(fecha_hora) FROM {t}").fetchone()
         if not n:
             self.r.aviso(f"`{t}` está vacía: sin páginas de clima ni eficiencia")
         else:
             self.info(f"Mediciones ambientales: {n:,} lecturas, del {ini} al {fin}")
 
-    def valores_fuera(self, tabla, columnas, variable_de):
-        limites = {v: (mn, mx) for v, mn, mx in self.todos("SELECT variable_id, min_valido, max_valido FROM variables")}
+    def solo_numeros(self, tabla, columnas):
         for c in columnas:
-            mn, mx = limites.get(variable_de(c), (None, None))
-            cond = [f"{q(c)} < {mn}" for _ in [0] if mn is not None] + [f"{q(c)} > {mx}" for _ in [0] if mx is not None]
             texto = self.uno(f"SELECT COUNT(*) FROM {q(tabla)} WHERE typeof({q(c)}) = 'text' AND TRIM({q(c)}) <> ''")
             if texto:
                 self.r.error(f"`{tabla}.{c}`: {texto:,} valor(es) con texto en lugar de número")
-            if cond:
-                n = self.uno(f"SELECT COUNT(*) FROM {q(tabla)} WHERE {q(c)} IS NOT NULL AND ({' OR '.join(cond)})")
-                if n:
-                    self.r.aviso(f"`{tabla}.{c}`: {n:,} valor(es) fuera de {mn}–{mx}; revísalos (la plataforma los mostrará tal cual)")
 
     def paginas(self):
         hay = set(self.vars)
@@ -425,7 +417,7 @@ class Validador:
 
 
 def imprimir(r, ruta):
-    print(f"\nValidación de {ruta} (formato {VERSION})\n")
+    print(f"\nValidación de {ruta}\n")
     if r.errores:
         print(f"ERRORES ({len(r.errores)}) — hay que corregirlos antes de cargar la base:")
         for e in r.errores:

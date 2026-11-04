@@ -2,7 +2,7 @@
 Configuración de la plataforma (visor).
 
 Todo lo propio de cada instalación (superficies, módulos, sensores, nombres) viene de la base
-data/visor.db, que genera procesamiento/procesar.py a partir de una base en formato de carga 1.1.
+data/visor.db, que genera procesamiento/procesar.py a partir de una base en el formato de carga.
 Aquí solo quedan rutas y opciones de la aplicación.
 """
 import tempfile
@@ -25,5 +25,5 @@ INSTALACION_CON_RESUMEN = "Prototipo BIPV Sumicol"
 CARPETA_CARGAS = Path(tempfile.gettempdir()) / "visor_cargas"
 HORAS_CONSERVAR_CARGAS = 24
 # Tamaño máximo de archivo que se acepta (MB)
-MAX_MB_BASE_CARGA = 15       # base en formato de carga 1.1: se procesa en el servidor (512 MB de RAM en Render)
+MAX_MB_BASE_CARGA = 15       # base en el formato de carga: se procesa en el servidor (512 MB de RAM en Render)
 MAX_MB_BASE_PROCESADA = 40   # base ya procesada en el computador con procesar.py

@@ -1,4 +1,4 @@
-# Formato de carga 1.1 · Plataforma de monitoreo fotovoltaico
+# Formato de carga · Plataforma de monitoreo fotovoltaico
 
 La plataforma recibe **un archivo SQLite (`.db`) por instalación** con 10 tablas: 7 describen la
 instalación y 3 guardan las mediciones. Sirve para cualquier tecnología fotovoltaica. Los datos se
@@ -10,8 +10,8 @@ Archivos de esta carpeta:
 
 | Archivo | Para qué |
 |---|---|
-| `plantilla_v1.1.db` | Base vacía con las 10 tablas y las variables fijas ya escritas |
-| `esquema.sql` | Las mismas tablas en SQL (`sqlite3 mi_instalacion.db < esquema.sql`) |
+| `plantilla.db` | Plantilla básica: las tablas con solo sus columnas obligatorias y las variables fijas ya escritas (las columnas opcionales se agregan si se necesitan) |
+| `esquema.sql` | Las 10 tablas con todas sus columnas, en SQL (`sqlite3 mi_instalacion.db < esquema.sql`) |
 | `guia_formato.md` | Esta guía |
 
 Los ejemplos corresponden al prototipo BIPV de Sumicol, el primer caso cargado.
@@ -67,7 +67,6 @@ tecnologias ──< modulos >── superficies ──< cronograma_orientaciones
 | Columna | Tipo | | Descripción | Sumicol |
 |---|---|---|---|---|
 | `nombre` | texto | ● | Nombre para el público | Prototipo BIPV Sumicol |
-| `version_formato` | texto | ● | Versión de esta guía | 1.1 |
 | `descripcion` | texto | ○ | Texto corto | 12 vidrios FV semitransparentes en 3 caras |
 | `responsable` | texto | ○ | Grupo o entidad | Proyecto Integra · UdeA |
 | `ciudad`, `pais` | texto | ○ | Ubicación general | —, Colombia |
@@ -112,10 +111,9 @@ tecnologias ──< modulos >── superficies ──< cronograma_orientaciones
 | `nombre` | texto | ● | Nombre para gráficas | Fill factor |
 | `unidad` | texto | ● | Unidad (vacía si no tiene) | — |
 | `tipo` | texto | ● | `electrica` o `ambiental` | electrica |
-| `agregacion` | texto | ● | `promedio`, `suma`, `minimo` o `maximo` (resumen por hora y día) | promedio |
-| `min_valido`, `max_valido` | número | ○ | Rango posible; la validación avisa de los valores fuera de él | 0, 1 |
+| `agregacion` | texto | ○ | `promedio`, `suma`, `minimo` o `maximo` (resumen por hora); vacía = `promedio` | promedio |
 
-Variables fijas (vienen en la plantilla; se borran las que no se entreguen, menos la potencia):
+Variables fijas (la plantilla básica trae la potencia y las ambientales; `voc_v`, `isc_a`, `vmpp_v` e `impp_a` se agregan si se miden):
 
 | variable_id | Tipo | Unidad | | Dónde se usa |
 |---|---|---|---|---|
@@ -189,13 +187,15 @@ está en la cara superior y es el vidrio de 40 %.
 
 ## Cómo crear la base
 
-1. Llena el formulario de la plataforma o copia `plantilla_v1.1.db`.
-2. Llena `instalacion`, `tecnologias`, `superficies`, `modulos` y `sensores`. Borra de
-   `variables` las fijas que no midas (menos la potencia) y agrega tus variables adicionales.
-3. Agrega las columnas que faltan (el formulario ya las crea):
+1. Llena el formulario de la plataforma o copia `plantilla.db`.
+2. Llena `instalacion`, `tecnologias`, `superficies`, `modulos` y `sensores`, y agrega a
+   `variables` tus variables adicionales.
+3. Agrega las columnas que faltan (el formulario ya las crea). Con la plantilla básica, también
+   las columnas opcionales que quieras usar:
    ```sql
    ALTER TABLE mediciones_ambientales ADD COLUMN "IR1" REAL;   -- un sensor
    ALTER TABLE mediciones_electricas  ADD COLUMN ff REAL;      -- una variable adicional
+   ALTER TABLE tecnologias ADD COLUMN transmitancia_pct REAL;  -- una columna opcional
    ```
 4. Copia las mediciones con Python, DB Browser for SQLite u otra herramienta.
 5. Sube el archivo: la plataforma lo revisa y lista los errores antes de aceptarlo.

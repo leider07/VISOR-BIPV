@@ -274,7 +274,7 @@ def generar_plantilla(n, *campos):
 def descargar_formato(_g, _p):
     if not ctx.triggered or not ctx.triggered[0]["value"]:
         return no_update
-    nombre = "guia_formato.pdf" if ctx.triggered_id == "btn-guia" else "plantilla_v1.1.db"
+    nombre = "guia_formato.pdf" if ctx.triggered_id == "btn-guia" else "plantilla.db"
     return dcc.send_file(str(T.C.RAIZ / "formato" / nombre))
 
 

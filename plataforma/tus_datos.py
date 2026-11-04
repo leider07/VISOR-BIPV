@@ -36,7 +36,7 @@ TABLAS = {
     "modulos": [("modulo_id", "Código *", "text"), ("superficie_id", "Superficie *", "lista"),
                 ("tecnologia_id", "Tecnología *", "lista"), ("nombre", "Nombre para mostrar", "text")],
     "adicionales": [("variable_id", "Código *", "text"), ("nombre", "Nombre *", "text"), ("unidad", "Unidad", "text"),
-                    ("tipo", "Tipo *", "lista"), ("agregacion", "Resumen por hora *", "lista")],
+                    ("tipo", "Tipo *", "lista"), ("agregacion", "Resumen por hora", "lista")],
     "sensores": [("sensor_id", "Columna *", "text"), ("variable_id", "Mide *", "lista"),
                  ("superficie_id", "Superficie (irradiancia)", "lista"),
                  ("modulo_id", "Módulo (temperatura de módulo)", "lista"), ("modelo", "Modelo", "text")],
@@ -51,7 +51,7 @@ AYUDAS = {
     "adicionales": "La potencia máxima es obligatoria y ya viene incluida. Agrega aquí las demás variables que vas a "
                    "entregar: eléctricas (voltaje de circuito abierto, corriente de cortocircuito, fill factor…) o "
                    "ambientales que no estén en la lista de sensores (lluvia, dirección del viento…). "
-                   "Se ven en la pestaña Explorar.",
+                   "Se ven en la pestaña Explorar. Si el resumen por hora se deja vacío, se usa el promedio.",
     "sensores": "Cada columna de la tabla de mediciones ambientales. La irradiancia lleva su superficie; "
                 "la temperatura de módulo, su módulo.",
 }
@@ -222,7 +222,7 @@ def pagina(token):
             for n, t, txt in pasos]),
         html.P([html.Button("Descargar la guía (PDF)", id="btn-guia", n_clicks=0, className="enlace-btn"),
                 " · ",
-                html.Button("Descargar la plantilla vacía", id="btn-plantilla-vacia", n_clicks=0, className="enlace-btn")],
+                html.Button("Descargar la plantilla básica", id="btn-plantilla-vacia", n_clicks=0, className="enlace-btn")],
                className="nota"),
 
         html.Section(className="tarjeta tarjeta-grafica", children=[
@@ -240,7 +240,7 @@ def pagina(token):
         html.Section(className="tarjeta tarjeta-grafica", children=[
             html.Div(className="tarjeta-cab", children=[
                 html.H3("3 · Carga tu base"),
-                html.P(f"Base en formato de carga 1.1 (hasta {C.MAX_MB_BASE_CARGA} MB) o, si es más grande, la base "
+                html.P(f"Base con el formato de la plantilla (hasta {C.MAX_MB_BASE_CARGA} MB) o, si es más grande, la base "
                        f"ya procesada en tu computador con procesamiento/procesar.py (hasta "
                        f"{C.MAX_MB_BASE_PROCESADA} MB).")]),
             dcc.Upload(id="carga-archivo", className="zona-carga", multiple=False,

@@ -9,8 +9,8 @@ El primer caso es el **prototipo BIPV de Sumicol**: 12 vidrios fotovoltaicos sem
 ## Cómo funciona
 
 ```
-mi_instalacion.db  (formato de carga 1.1, ver formato/)
-   │  python procesamiento/procesar.py mi_instalacion.db     ← valida, filtra y resume
+mi_instalacion.db  (formato de carga, ver formato/)
+   │  python procesamiento/procesar.py mi_instalacion.db     ← valida y resume
    ▼
 data/visor.db      (base liviana de la plataforma)
    │  python app.py
@@ -32,7 +32,7 @@ contra otra variable, y permite descargar los datos en CSV.
 La pestaña **Tus datos** tiene dos partes:
 
 1. **Crea tu plantilla:** un formulario con tablas editables (instalación, tecnologías, superficies,
-   módulos, variables y sensores). Genera un `.db` en formato 1.1 con las tablas de información ya
+   módulos, variables y sensores). Genera un `.db` con las tablas de información ya
    llenas y las de mediciones vacías, con exactamente las columnas declaradas.
 2. **Carga tu base:** se acepta
    - la base en formato de carga (hasta 15 MB): se valida y se procesa en el servidor;
@@ -66,8 +66,8 @@ En `formato/` está todo lo necesario:
 | `guia_formato.pdf` | Guía visual y práctica para quien carga datos (la descarga la pestaña Tus datos) |
 | `guia_formato.md` | La misma guía en texto, de referencia técnica |
 | `guia/` | Fuente de la guía en PDF (`guia.html`) y el script que la genera (`generar_pdf.py`) |
-| `plantilla_v1.1.db` | Base vacía con las tablas creadas y las variables fijas escritas |
-| `esquema.sql` | Las mismas tablas en SQL |
+| `plantilla.db` | Plantilla básica: solo columnas obligatorias y variables fijas escritas (`python procesamiento/plantilla.py`) |
+| `esquema.sql` | Las 10 tablas con todas sus columnas, en SQL |
 
 `procesamiento/validar_bd.py` revisa una base y lista los errores en lenguaje claro antes de
 procesarla.

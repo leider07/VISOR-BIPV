@@ -1,5 +1,5 @@
 """
-Genera la base liviana de la plataforma (data/visor.db) a partir de una base en formato de carga 1.1.
+Genera la base liviana de la plataforma (data/visor.db) a partir de una base en el formato de carga.
 
 Uso (desde la carpeta del repositorio):
     python procesamiento/procesar.py ruta/a/mi_instalacion.db
@@ -16,6 +16,7 @@ para que las páginas carguen rápido:
 La base de carga solo se lee; nunca se modifica.
 """
 import argparse
+import shutil
 import sqlite3
 import sys
 import time
@@ -28,7 +29,7 @@ import pandas as pd
 AQUI = Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI))
 import parametros as M  # noqa: E402
-from validar_bd import Validador, imprimir  # noqa: E402
+from validar_bd import TABLAS, Validador, imprimir  # noqa: E402
 
 DESTINO = AQUI.parent / "data" / "visor.db"
 FMT = "%Y-%m-%d %H:%M:%S"
@@ -57,13 +58,24 @@ class Base:
         self.con = sqlite3.connect(f"{Path(ruta).resolve().as_uri()}?mode=ro", uri=True)
         leer = lambda t: pd.read_sql(f"SELECT * FROM {q(t)}", self.con)
         tablas = {r[0] for r in self.con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-        self.info = {t: leer(t) for t in INFORMACION if t in tablas}
+        self.info = {t: self.completar(t, leer(t)) for t in INFORMACION if t in tablas}
         self.tiene_energia = "energia_diaria" in tablas and \
             self.con.execute("SELECT COUNT(*) FROM energia_diaria").fetchone()[0] > 0
         mod = self.info["modulos"].merge(self.info["tecnologias"], on="tecnologia_id", suffixes=("", "_tec"))
         self.modulos = mod.set_index("modulo_id")
-        self.variables = self.info["variables"].set_index("variable_id")
+        v = self.info["variables"]
+        v["agregacion"] = v.agregacion.where(v.agregacion.fillna("").astype(str).str.strip() != "", "promedio")
+        self.variables = v.set_index("variable_id")
         self.sensores = self.info["sensores"].set_index("sensor_id")
+
+    @staticmethod
+    def completar(tabla, df):
+        """Deja solo las columnas del formato, en su orden; las opcionales que falten quedan vacías."""
+        cols = list(TABLAS[tabla][1])
+        for c in cols:
+            if c not in df.columns:
+                df[c] = None
+        return df[cols]
 
     def sensores_de(self, variable):
         return self.sensores[self.sensores.variable_id == variable]
@@ -269,12 +281,16 @@ def escribir(tablas, destino):
     con.commit()
     con.execute("VACUUM")
     con.close()
-    tmp.replace(destino)
+    try:
+        tmp.replace(destino)
+    except PermissionError:          # algunas carpetas sincronizadas no dejan reemplazar al renombrar
+        shutil.copyfile(tmp, destino)
+        tmp.unlink()
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("origen", type=Path, help="base en formato de carga 1.1")
+    ap.add_argument("origen", type=Path, help="base en el formato de carga")
     ap.add_argument("--destino", type=Path, default=DESTINO)
     a = ap.parse_args()
     t0 = time.time()

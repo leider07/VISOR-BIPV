@@ -1,9 +1,11 @@
 """
-Genera una plantilla de carga (formato 1.1) a partir de la descripción de una instalación.
+Plantillas del formato de carga.
 
-La usa el formulario de la pestaña «Tus datos»: con lo que se llena allí se crea un .db con las
-tablas de información ya escritas y las tablas de mediciones vacías, con exactamente las columnas
-declaradas (una por variable eléctrica y una por sensor).
+- crear(): la usa el formulario de la pestaña «Tus datos». Con lo que se llena allí se crea un .db con
+  las tablas de información ya escritas y las tablas de mediciones vacías, con exactamente las
+  columnas declaradas (una por variable eléctrica y una por sensor).
+- basica(): la plantilla básica (formato/plantilla.db), con solo las columnas obligatorias:
+      python procesamiento/plantilla.py formato/plantilla.db
 """
 import re
 import sqlite3
@@ -146,7 +148,7 @@ def revisar(d):
             e.append(f"Otras variables, fila {i}: elige si es eléctrica o ambiental.")
         elif c in ELECTRICAS_OPCIONALES and _txt(f.get("tipo")) != "electrica":
             e.append(f"Otras variables, fila {i}: «{c}» es una variable eléctrica.")
-        if _txt(f.get("agregacion")) not in AGREGACIONES:
+        if _txt(f.get("agregacion")) and _txt(f.get("agregacion")) not in AGREGACIONES:
             e.append(f"Otras variables, fila {i}: elige cómo se resume (promedio, suma, mínimo o máximo).")
     amb_adic = {_txt(f.get("variable_id")) for f in adic if _txt(f.get("tipo")) == "ambiental"}
 
@@ -191,8 +193,8 @@ def crear(d, destino):
         con.executescript(ESQUEMA.read_text(encoding="utf-8"))
         con.execute("PRAGMA foreign_keys = ON")
         inst = d.get("instalacion", {})
-        con.execute("INSERT INTO instalacion (nombre, version_formato, descripcion, responsable, ciudad, pais) "
-                    "VALUES (?, '1.1', ?, ?, ?, ?)",
+        con.execute("INSERT INTO instalacion (nombre, descripcion, responsable, ciudad, pais) "
+                    "VALUES (?, ?, ?, ?, ?)",
                     [_txt(inst.get(k)) or None for k in ["nombre", "descripcion", "responsable", "ciudad", "pais"]])
         for f in _filas(d.get("tecnologias")):
             con.execute("INSERT INTO tecnologias (tecnologia_id, nombre, tipo, potencia_stc_w, area_m2, "
@@ -231,10 +233,11 @@ def crear(d, destino):
                 if _txt(f["tipo"]) != "electrica":
                     raise sqlite3.IntegrityError(f"«{vid}» debe ser una variable eléctrica")
                 con.execute("UPDATE variables SET nombre = ?, unidad = ?, agregacion = ? WHERE variable_id = ?",
-                            [_txt(f["nombre"]), _txt(f.get("unidad")) or None, _txt(f["agregacion"]), vid])
+                            [_txt(f["nombre"]), _txt(f.get("unidad")) or None, _txt(f.get("agregacion")) or "promedio", vid])
                 continue
             con.execute("INSERT INTO variables (variable_id, nombre, unidad, tipo, agregacion) VALUES (?, ?, ?, ?, ?)",
-                        [vid, _txt(f["nombre"]), _txt(f.get("unidad")) or None, _txt(f["tipo"]), _txt(f["agregacion"])])
+                        [vid, _txt(f["nombre"]), _txt(f.get("unidad")) or None, _txt(f["tipo"]),
+                         _txt(f.get("agregacion")) or "promedio"])
             if _txt(f["tipo"]) == "electrica":
                 con.execute(f'ALTER TABLE mediciones_electricas ADD COLUMN "{vid}" REAL')
         for f in sen:
@@ -252,3 +255,86 @@ def crear(d, destino):
         return [f"No se pudo crear la plantilla: {ex}"]
     con.close()
     return []
+
+
+# --------------------------------------------------------------------------------------------
+# Plantilla básica: solo columnas obligatorias (y las de sensores que definen irradiancia y
+# temperatura de módulo). Las columnas opcionales del esquema completo se pueden agregar.
+# --------------------------------------------------------------------------------------------
+_FH = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]"
+_F = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
+ESQUEMA_BASICO = f"""
+PRAGMA foreign_keys = ON;
+CREATE TABLE instalacion (
+    nombre  TEXT NOT NULL
+);
+CREATE TABLE tecnologias (
+    tecnologia_id   TEXT PRIMARY KEY,
+    nombre          TEXT NOT NULL,
+    tipo            TEXT NOT NULL CHECK (tipo IN ({", ".join(repr(t) for t in TIPOS_TECNOLOGIA)})),
+    potencia_stc_w  REAL NOT NULL CHECK (potencia_stc_w > 0),
+    area_m2         REAL NOT NULL CHECK (area_m2 > 0)
+);
+CREATE TABLE superficies (
+    superficie_id    TEXT PRIMARY KEY,
+    nombre           TEXT NOT NULL,
+    inclinacion_deg  REAL NOT NULL CHECK (inclinacion_deg BETWEEN 0 AND 90)
+);
+CREATE TABLE modulos (
+    modulo_id      TEXT PRIMARY KEY,
+    superficie_id  TEXT NOT NULL REFERENCES superficies (superficie_id),
+    tecnologia_id  TEXT NOT NULL REFERENCES tecnologias (tecnologia_id)
+);
+CREATE TABLE variables (
+    variable_id  TEXT PRIMARY KEY,
+    nombre       TEXT NOT NULL,
+    unidad       TEXT,
+    tipo         TEXT NOT NULL CHECK (tipo IN ('electrica', 'ambiental')),
+    agregacion   TEXT CHECK (agregacion IN ({", ".join(repr(a) for a in AGREGACIONES)}))
+);
+CREATE TABLE sensores (
+    sensor_id      TEXT PRIMARY KEY,
+    variable_id    TEXT NOT NULL REFERENCES variables (variable_id),
+    superficie_id  TEXT REFERENCES superficies (superficie_id),
+    modulo_id      TEXT REFERENCES modulos (modulo_id)
+);
+CREATE TABLE mediciones_electricas (
+    fecha_hora      TEXT NOT NULL CHECK (fecha_hora GLOB '{_FH}'),
+    modulo_id       TEXT NOT NULL REFERENCES modulos (modulo_id),
+    potencia_max_w  REAL,
+    PRIMARY KEY (modulo_id, fecha_hora)
+) WITHOUT ROWID;
+CREATE TABLE energia_diaria (
+    fecha       TEXT NOT NULL CHECK (fecha GLOB '{_F}'),
+    modulo_id   TEXT NOT NULL REFERENCES modulos (modulo_id),
+    energia_wh  REAL CHECK (energia_wh >= 0),
+    PRIMARY KEY (modulo_id, fecha)
+) WITHOUT ROWID;
+CREATE TABLE mediciones_ambientales (
+    fecha_hora  TEXT PRIMARY KEY CHECK (fecha_hora GLOB '{_FH}')
+) WITHOUT ROWID;
+INSERT INTO variables (variable_id, nombre, unidad, tipo, agregacion) VALUES
+    ('potencia_max_w',       'Potencia máxima',        'W',    'electrica', 'promedio'),
+    ('irradiancia',          'Irradiancia',            'W/m²', 'ambiental', 'promedio'),
+    ('temperatura_ambiente', 'Temperatura ambiente',   '°C',   'ambiental', 'promedio'),
+    ('temperatura_modulo',   'Temperatura del módulo', '°C',   'ambiental', 'promedio'),
+    ('humedad_relativa',     'Humedad relativa',       '%',    'ambiental', 'promedio'),
+    ('velocidad_viento',     'Velocidad del viento',   'm/s',  'ambiental', 'promedio');
+"""
+
+
+def basica(destino):
+    """Crea la plantilla básica en `destino`."""
+    destino = Path(destino)
+    destino.unlink(missing_ok=True)
+    con = sqlite3.connect(destino)
+    con.executescript(ESQUEMA_BASICO)
+    con.commit()
+    con.execute("VACUUM")
+    con.close()
+
+
+if __name__ == "__main__":
+    import sys
+    basica(sys.argv[1] if len(sys.argv) > 1 else AQUI.parent / "formato" / "plantilla.db")
+    print("Listo")
