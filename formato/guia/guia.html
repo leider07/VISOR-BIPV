@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</title>
+<style>
+@font-face { font-family: 'Montserrat'; font-weight: 600; src: url('../../assets/fonts/montserrat-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-weight: 700; src: url('../../assets/fonts/montserrat-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-weight: 800; src: url('../../assets/fonts/montserrat-latin-800-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-weight: 400; src: url('../../assets/fonts/source-sans-3-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-weight: 600; src: url('../../assets/fonts/source-sans-3-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-weight: 700; src: url('../../assets/fonts/source-sans-3-latin-700-normal.woff2') format('woff2'); }
+@page { size: Letter; margin: 0; }
+:root { --verde: #1b554f; --verde-osc: #123c37; --turq: #2f978d; --sol: #edcf3e; --sol-bg: #fdf6d8; --tinta: #16302d;
+  --tinta-2: #35504c; --tinta-3: #5a716d; --fondo: #f5f9f8; --menta: #eef6f3; --borde: #d6e4e1; --rojo: #b5483f; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: 'Source Sans 3', sans-serif; font-size: 10.5pt; line-height: 1.45; color: var(--tinta);
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.pagina { width: 8.5in; height: 11in; padding: 0.6in 0.7in 0.55in; position: relative; overflow: hidden;
+  page-break-after: always; display: flex; flex-direction: column; gap: 12px; }
+.pagina:last-child { page-break-after: auto; }
+.pagina > * { flex-shrink: 0; }
+.compacta th { font-size: 6.4pt; padding: 5px 5px; letter-spacing: 0; }
+.compacta td { padding: 4px 5px; }
+.compacta td.d { font-size: 7.4pt; }
+.check-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 22px; }
+.pie { position: absolute; left: 0.7in; right: 0.7in; bottom: 0.28in; display: flex; justify-content: space-between;
+  font-size: 8pt; color: var(--tinta-3); border-top: 1px solid var(--borde); padding-top: 6px; }
+h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; margin: 0; color: var(--tinta); }
+h2 { font-size: 19pt; font-weight: 800; color: var(--verde); letter-spacing: -0.2px; }
+h3 { font-size: 11.5pt; font-weight: 700; }
+h4 { font-size: 9.5pt; font-weight: 700; color: var(--verde); }
+p { margin: 0; }
+.solo-ceja { margin-bottom: 4px; }
+.figura-diagrama { border: 1px solid #d5e4e0; border-radius: 10px; padding: 14px; background: #fff; text-align: center; margin: 4px 0 12px; }
+.figura-diagrama img { width: 74%; height: auto; image-rendering: auto; }
+.ceja { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 8pt; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--turq); }
+.lead { font-size: 11.5pt; color: var(--tinta-2); max-width: 6.4in; }
+code, .mono { font-family: 'DejaVu Sans Mono', Consolas, monospace; font-size: 8.6pt; }
+code { background: var(--menta); border-radius: 3px; padding: 0 3px; color: var(--verde-osc); }
+.caja { border: 1px solid var(--borde); border-radius: 10px; padding: 12px 14px; background: #fff; }
+.nota { background: var(--sol-bg); border-radius: 8px; padding: 9px 12px; font-size: 9.8pt; }
+.nota b { color: var(--tinta); }
+.rejilla-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.rejilla-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 8.8pt; }
+th { text-align: left; font-family: 'Montserrat', sans-serif; font-size: 7.4pt; font-weight: 700; letter-spacing: 0.3px;
+  text-transform: uppercase; color: var(--tinta-2); background: var(--menta); padding: 5px 7px; border-bottom: 1px solid var(--borde); }
+td { padding: 4.5px 7px; border-bottom: 1px solid #e8f0ee; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+.tabla { border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; }
+.tabla-nombre { font-family: 'DejaVu Sans Mono', monospace; font-size: 8.6pt; font-weight: 700; color: #fff;
+  background: var(--verde); padding: 4px 8px; display: flex; justify-content: space-between; align-items: center; }
+.tabla-nombre span { font-family: 'Source Sans 3', sans-serif; font-weight: 400; font-size: 8pt; opacity: 0.85; }
+td.k { font-family: 'DejaVu Sans Mono', monospace; font-size: 8.2pt; color: var(--verde-osc); font-weight: 700; white-space: nowrap; }
+td.d { font-family: 'DejaVu Sans Mono', monospace; font-size: 8.2pt; white-space: nowrap; }
+.si { color: var(--verde); font-weight: 700; } .no { color: #9aaea9; }
+.badge { font-family: 'Montserrat', sans-serif; font-size: 6.8pt; font-weight: 700; letter-spacing: 0.5px;
+  text-transform: uppercase; padding: 2px 7px; border-radius: 99px; background: #e2f2ef; color: var(--verde); }
+.badge.op { background: #eef1f0; color: #6b7f7b; }
+/* portada */
+.portada { padding: 0; }
+.portada-top { background: var(--verde); color: #fff; padding: 0.75in 0.7in 0.55in; display: flex; flex-direction: column; gap: 14px; }
+.portada-top h1 { color: #fff; font-size: 28pt; font-weight: 800; line-height: 1.12; max-width: 6.3in; }
+.portada-top .ceja { color: var(--sol); }
+.portada-top p { color: #d9ebe7; font-size: 12pt; max-width: 6in; }
+.portada-cuerpo { padding: 0.35in 0.7in; display: flex; flex-direction: column; gap: 12px; }
+.indice td { padding: 3px 6px; }
+.paso { border: 1px solid var(--borde); border-radius: 12px; padding: 14px; background: #fff; display: flex; flex-direction: column; gap: 6px; }
+.paso-num { width: 28px; height: 28px; border-radius: 50%; background: var(--sol); font-family: 'Montserrat', sans-serif;
+  font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 11pt; }
+.paso h3 { font-size: 11pt; }
+.paso p { font-size: 9.8pt; color: var(--tinta-2); }
+.lista { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 3px; }
+.check { list-style: none; padding-left: 0; }
+.check li { padding-left: 22px; position: relative; }
+.check li::before { content: ""; position: absolute; left: 0; top: 2px; width: 12px; height: 12px; border: 1.6px solid var(--verde); border-radius: 3px; }
+.codigo { background: #0f2a27; color: #dcefe9; border-radius: 8px; padding: 10px 12px; font-family: 'DejaVu Sans Mono', monospace;
+  font-size: 8.1pt; line-height: 1.5; white-space: pre; }
+.codigo .c { color: #8fb8b0; }
+.pasos-dbb { counter-reset: n; list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; }
+.pasos-dbb li { counter-increment: n; padding-left: 26px; position: relative; font-size: 9.8pt; }
+.pasos-dbb li::before { content: counter(n); position: absolute; left: 0; top: 0; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--verde); color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 8pt;
+  display: flex; align-items: center; justify-content: center; }
+.err td:first-child { color: var(--rojo); }
+.tit-sec { display: flex; flex-direction: column; gap: 4px; }
+svg .tx, svg text.tx { font-family: 'Source Sans 3', sans-serif; }
+svg .mono-svg text { font-family: 'DejaVu Sans Mono', monospace; }
+svg .mono-svg text.tx { font-family: 'Source Sans 3', sans-serif; }
+svg text.mt { font-family: 'Montserrat', sans-serif; }
+/* texto justificado */
+body { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+.paso p, .portada-cuerpo .rejilla-2 li { text-align: left; }
+th, td.k, td.d, .codigo, code, .tabla-nombre, .paso-num, h1, h2, h3, h4, .ceja { text-align: left; hyphens: manual; }
+.t-cab { display: flex; align-items: baseline; gap: 10px; margin-top: 2px; }
+.t-cab h3 { font-family: 'DejaVu Sans Mono', monospace; font-size: 11pt; color: var(--verde-osc); }
+.t-desc { font-size: 9.8pt; color: var(--tinta-2); margin: 2px 0 5px; }
+.bloque-tabla { display: flex; flex-direction: column; }
+.parrafo { font-size: 10pt; color: var(--tinta-2); }
+td.o { text-align: center; width: 22px; }
+</style>
+</head>
+<body>
+<section class="pagina portada">
+  <div class="portada-top">
+    <div class="ceja">Plataforma de monitoreo fotovoltaico · Proyecto Integra</div>
+    <h1>Cómo preparar y cargar los datos de tu instalación</h1>
+    <p>Guía para preparar la base de datos de una instalación fotovoltaica: estructura, contenido de cada tabla, procedimiento de llenado y un ejemplo completo.</p>
+  </div>
+  <div class="portada-cuerpo">
+    <div class="rejilla-3">
+      <div class="paso"><div class="paso-num">1</div><h3>Crea tu plantilla</h3>
+        <p>En la pestaña <b>Tus datos</b>, describe tu instalación en el formulario. Se descarga un archivo <code>.db</code> con todas las tablas listas.</p></div>
+      <div class="paso"><div class="paso-num">2</div><h3>Llena tus mediciones</h3>
+        <p>Copia tus datos en las tablas de mediciones con Python o con DB Browser for SQLite (páginas 7 y 8).</p></div>
+      <div class="paso"><div class="paso-num">3</div><h3>Carga tu base</h3>
+        <p>Súbela en <b>Tus datos</b>. Se revisa, se procesa y se visualiza en las pestañas Clima, Energía, Desempeño y Explorar.</p></div>
+    </div>
+    <div class="rejilla-2">
+      <div class="caja">
+        <h4>Lo que necesitas</h4>
+        <ul class="lista" style="margin-top:6px">
+          <li>La <b>potencia máxima</b> de cada módulo, con su fecha y hora (obligatoria).</li>
+          <li>Si se dispone de ellas: voltajes, corrientes u otras variables eléctricas.</li>
+          <li>Mediciones ambientales: irradiancia, temperatura, humedad, viento u otras.</li>
+          <li>La descripción de la instalación: tipos de módulo, ubicación de cada módulo y sensores.</li>
+        </ul>
+      </div>
+      <div class="caja">
+        <h4>Lo que debes saber</h4>
+        <ul class="lista" style="margin-top:6px">
+          <li>La plataforma es un <b>visor</b>: presenta los datos tal como se cargan, sin filtrarlos.</li>
+          <li>La base cargada <b>solo es visible para quien la sube</b> y se elimina del servidor a las 24 horas.</li>
+          <li>Se admiten bases de hasta <b>15 MB</b>. Las más grandes se procesan antes en el computador y se cargan ya procesadas (hasta 40 MB).</li>
+        </ul>
+      </div>
+    </div>
+    <div class="caja">
+      <h4>Contenido</h4>
+      <table class="indice" style="margin-top:6px; font-size:9.6pt">
+        <tr><td style="width:40px">2</td><td>Estructura de la base de datos</td></tr>
+        <tr><td>3–6</td><td>Descripción de las tablas</td></tr>
+        <tr><td>7</td><td>Llenado de la plantilla con Python</td></tr>
+        <tr><td>8</td><td>Llenado de la plantilla con DB Browser for SQLite</td></tr>
+        <tr><td>9–10</td><td>Ejemplo de una base completa</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>1</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Estructura</div><h2>Estructura de la base de datos</h2><p class="lead">La base de datos es un archivo SQLite con diez tablas. Siete describen la instalación y se llenan una sola vez; las tres restantes contienen las mediciones. Las tablas se relacionan mediante códigos definidos por el usuario, como <code>techo</code> o <code>M1</code>.</p></div>
+<div class="figura-diagrama"><img src="diagrama.png" alt="Diagrama de las tablas de la base de datos"></div>
+<p class="parrafo">Cada línea une una columna con la tabla donde se define su código: el punto se ubica en la tabla que usa el código. La tabla <code>mediciones_ambientales</code> no presenta líneas porque se relaciona con <code>sensores</code> mediante el nombre de sus columnas: cada columna corresponde a un <code>sensor_id</code>. Del mismo modo, las columnas de <code>mediciones_electricas</code> corresponden a variables de tipo eléctrico de la tabla <code>variables</code>. La plataforma verifica ambas relaciones al cargar la base.</p>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>2</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><h2>Descripción de las tablas</h2><p class="lead">Para cada tabla se indica su propósito y el contenido de sus columnas. <span class="si">●</span> obligatoria · <span class="no">○</span> opcional.</p></div>
+<div class="caja"><h4>Reglas generales</h4>
+<ul class="lista" style="margin-top:6px; font-size:9.6pt">
+<li>Los nombres de tablas y columnas deben coincidir exactamente con los de esta guía.</li>
+<li>Los códigos (<code>_id</code>) se escriben con letras sin tilde, números y guion bajo (<code>fachada_sur</code>), y de forma idéntica en todas las tablas, incluidas mayúsculas y minúsculas.</li>
+<li>Las fechas y horas se escriben <code>AAAA-MM-DD HH:MM:SS</code>, en hora local; las fechas solas, <code>AAAA-MM-DD</code>.</li>
+<li>Los decimales se escriben con punto, sin separador de miles. Un dato faltante es una celda vacía, nunca 0, −999 ni texto.</li>
+<li>Unidades: W, V, A, Wh, W/m², °C, % y m/s; las variables adicionales usan la unidad que se declare en <code>variables</code>.</li>
+<li>La plataforma presenta los datos tal como se cargan: no aplica filtros ni descarta lecturas.</li>
+<li>La plantilla generada con el formulario incluye las columnas que corresponden a lo declarado. La plantilla básica solo incluye las columnas obligatorias, la potencia máxima y las variables ambientales fijas; las columnas opcionales y las variables <code>voc_v</code>, <code>isc_a</code>, <code>vmpp_v</code> e <code>impp_a</code> se agregan cuando se necesiten.</li>
+</ul></div><div class="bloque-tabla"><div class="t-cab"><h3>instalacion</h3><span class="badge">obligatoria</span></div><p class="t-desc">Datos generales del proyecto. Contiene una sola fila.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">nombre</td><td class="tipo">texto</td><td class="o si">●</td><td>Nombre de la instalación que se muestra en la plataforma.</td></tr><tr><td class="k">descripcion</td><td class="tipo">texto</td><td class="o no">○</td><td>Descripción breve del proyecto.</td></tr><tr><td class="k">responsable</td><td class="tipo">texto</td><td class="o no">○</td><td>Grupo o entidad a cargo.</td></tr><tr><td class="k">ciudad, pais</td><td class="tipo">texto</td><td class="o no">○</td><td>Ubicación general.</td></tr></table></div></div><div class="bloque-tabla"><div class="t-cab"><h3>tecnologias</h3><span class="badge">obligatoria</span></div><p class="t-desc">Una fila por cada tipo de módulo. La potencia STC y el área se usan para calcular la eficiencia.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">tecnologia_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código único de la tecnología.</td></tr><tr><td class="k">nombre</td><td class="tipo">texto</td><td class="o si">●</td><td>Nombre que aparece en las gráficas y los filtros.</td></tr><tr><td class="k">tipo</td><td class="tipo">texto</td><td class="o si">●</td><td>Uno de: <code>c-Si mono</code>, <code>c-Si poli</code>, <code>CdTe</code>, <code>CIGS</code>, <code>a-Si</code>, <code>perovskita</code>, <code>vidrio semitransparente</code>, <code>otro</code>.</td></tr><tr><td class="k">potencia_stc_w</td><td class="tipo">número</td><td class="o si">●</td><td>Potencia nominal en condiciones estándar de medida (W).</td></tr><tr><td class="k">area_m2</td><td class="tipo">número</td><td class="o si">●</td><td>Área del módulo (m²).</td></tr><tr><td class="k">transmitancia_pct</td><td class="tipo">número</td><td class="o no">○</td><td>Transmitancia visible (%), para módulos semitransparentes.</td></tr><tr><td class="k">coef_temp_pmax</td><td class="tipo">número</td><td class="o no">○</td><td>Coeficiente de temperatura de la potencia (%/°C).</td></tr><tr><td class="k">fabricante, modelo</td><td class="tipo">texto</td><td class="o no">○</td><td>Referencia comercial.</td></tr></table></div></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>3</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec solo-ceja"><div class="ceja">Descripción de las tablas</div></div>
+<div class="bloque-tabla"><div class="t-cab"><h3>superficies</h3><span class="badge">obligatoria</span></div><p class="t-desc">Una fila por cada superficie con módulos: cubierta, fachada o cara de un prototipo.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">superficie_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código único de la superficie.</td></tr><tr><td class="k">nombre</td><td class="tipo">texto</td><td class="o si">●</td><td>Nombre que se muestra en la plataforma.</td></tr><tr><td class="k">inclinacion_deg</td><td class="tipo">número</td><td class="o si">●</td><td>Inclinación entre 0° (horizontal) y 90° (vertical).</td></tr><tr><td class="k">orientacion</td><td class="tipo">texto</td><td class="o no">○</td><td>Orientación fija: Norte, Noreste, Este, Sureste, Sur, Suroeste, Oeste o Noroeste. Se deja vacía si la superficie es horizontal o si cambió de orientación (en ese caso se usa el cronograma).</td></tr><tr><td class="k">descripcion</td><td class="tipo">texto</td><td class="o no">○</td><td>Descripción breve.</td></tr></table></div></div><div class="bloque-tabla"><div class="t-cab"><h3>cronograma_orientaciones</h3><span class="badge op">opcional</span></div><p class="t-desc">Se usa solo si alguna superficie cambió de orientación o de inclinación. Una fila por superficie y periodo; los periodos de una misma superficie no pueden cruzarse.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">superficie_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código de la superficie (debe existir en <code>superficies</code>).</td></tr><tr><td class="k">desde</td><td class="tipo">fecha y hora</td><td class="o si">●</td><td>Inicio del periodo.</td></tr><tr><td class="k">hasta</td><td class="tipo">fecha y hora</td><td class="o no">○</td><td>Fin del periodo. Vacío si la superficie se mantuvo así hasta el final de los datos.</td></tr><tr><td class="k">orientacion</td><td class="tipo">texto</td><td class="o si">●</td><td>Orientación durante el periodo.</td></tr><tr><td class="k">inclinacion_deg</td><td class="tipo">número</td><td class="o no">○</td><td>Inclinación durante el periodo, solo si también cambió.</td></tr></table></div></div><div class="bloque-tabla"><div class="t-cab"><h3>modulos</h3><span class="badge">obligatoria</span></div><p class="t-desc">Una fila por cada módulo con medición eléctrica.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">modulo_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código único del módulo.</td></tr><tr><td class="k">superficie_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Superficie donde está instalado (debe existir en <code>superficies</code>).</td></tr><tr><td class="k">tecnologia_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Tecnología del módulo (debe existir en <code>tecnologias</code>). El área del módulo se toma de ella.</td></tr><tr><td class="k">nombre</td><td class="tipo">texto</td><td class="o no">○</td><td>Nombre que se muestra; si se deja vacío, se usa el de la tecnología.</td></tr></table></div></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>4</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec solo-ceja"><div class="ceja">Descripción de las tablas</div></div>
+<div class="bloque-tabla"><div class="t-cab"><h3>variables</h3><span class="badge">obligatoria</span></div><p class="t-desc">Lista de las variables medidas. Las variables fijas tienen un código reservado; las demás son variables adicionales que define el usuario y se presentan en la pestaña Explorar.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">variable_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código de la variable. En las variables eléctricas corresponde al nombre de la columna en <code>mediciones_electricas</code>.</td></tr><tr><td class="k">nombre</td><td class="tipo">texto</td><td class="o si">●</td><td>Nombre que se muestra en las gráficas.</td></tr><tr><td class="k">unidad</td><td class="tipo">texto</td><td class="o si">●</td><td>Unidad de medida; vacía si la variable no tiene unidad.</td></tr><tr><td class="k">tipo</td><td class="tipo">texto</td><td class="o si">●</td><td><code>electrica</code> si se mide en cada módulo; <code>ambiental</code> si la registra un sensor.</td></tr><tr><td class="k">agregacion</td><td class="tipo">texto</td><td class="o no">○</td><td>Forma de resumir las lecturas de una hora en un solo valor, ya que la plataforma presenta valores horarios: <code>promedio</code>, <code>suma</code>, <code>minimo</code> o <code>maximo</code>. Si se deja vacía, se usa <code>promedio</code>.</td></tr></table></div></div><div style="display:grid; grid-template-columns: 1fr; gap:10px">
+<div class="tabla"><div class="tabla-nombre">Selección de la agregación</div><table>
+<tr><th>Agregación</th><th>Uso recomendado</th></tr>
+<tr><td class="d">promedio</td><td>Potencia, voltaje, corriente, temperatura, irradiancia, humedad y viento.</td></tr>
+<tr><td class="d">suma</td><td>Magnitudes acumulativas: precipitación (mm) o energía por intervalo (Wh).</td></tr>
+<tr><td class="d">maximo</td><td>Valores pico, como ráfagas de viento.</td></tr>
+<tr><td class="d">minimo</td><td>Valores mínimos, como la corriente mínima.</td></tr></table></div>
+<div class="tabla"><div class="tabla-nombre">Variables fijas</div><table>
+<tr><th>variable_id</th><th>Unidad</th><th>Tipo</th></tr>
+<tr><td class="d">potencia_max_w <span class="badge">oblig.</span></td><td>W</td><td>eléctrica</td></tr>
+<tr><td class="d">voc_v · isc_a · vmpp_v · impp_a</td><td>V · A</td><td>eléctrica</td></tr>
+<tr><td class="d">irradiancia</td><td>W/m²</td><td>ambiental</td></tr>
+<tr><td class="d">temperatura_ambiente · temperatura_modulo</td><td>°C</td><td>ambiental</td></tr>
+<tr><td class="d">humedad_relativa · velocidad_viento</td><td>% · m/s</td><td>ambiental</td></tr></table></div></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>5</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec solo-ceja"><div class="ceja">Descripción de las tablas</div></div>
+<div class="bloque-tabla"><div class="t-cab"><h3>sensores</h3><span class="badge">obligatoria</span></div><p class="t-desc">Una fila por cada columna de <code>mediciones_ambientales</code>: indica qué mide cada sensor y dónde está ubicado. Cada superficie admite un solo sensor de irradiancia; los sensores del sitio (temperatura ambiente, humedad, viento) no llevan superficie ni módulo.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">sensor_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Nombre exacto de la columna en <code>mediciones_ambientales</code>.</td></tr><tr><td class="k">variable_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Variable que mide (de tipo ambiental, en <code>variables</code>).</td></tr><tr><td class="k">superficie_id</td><td class="tipo">texto</td><td class="o no">○</td><td>Obligatoria si el sensor mide irradiancia: superficie a la que sirve de referencia.</td></tr><tr><td class="k">modulo_id</td><td class="tipo">texto</td><td class="o no">○</td><td>Obligatoria si el sensor mide temperatura de módulo: módulo al que está adherido.</td></tr><tr><td class="k">modelo, fabricante, descripcion</td><td class="tipo">texto</td><td class="o no">○</td><td>Referencia del equipo y notas.</td></tr></table></div></div><div class="bloque-tabla"><div class="t-cab"><h3>mediciones_electricas</h3><span class="badge">obligatoria</span></div><p class="t-desc">Una fila por módulo y por lectura. No puede haber dos filas con el mismo módulo y la misma fecha y hora.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">fecha_hora</td><td class="tipo">fecha y hora</td><td class="o si">●</td><td>Momento de la lectura.</td></tr><tr><td class="k">modulo_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código del módulo (debe existir en <code>modulos</code>).</td></tr><tr><td class="k">potencia_max_w</td><td class="tipo">número</td><td class="o si">●</td><td>Potencia máxima (W).</td></tr><tr><td class="k">‹variable eléctrica›</td><td class="tipo">número</td><td class="o no">○</td><td>Una columna por cada variable eléctrica declarada en <code>variables</code>, por ejemplo <code>voc_v</code>, <code>isc_a</code>, <code>vmpp_v</code> o <code>impp_a</code>.</td></tr></table></div></div><div class="bloque-tabla"><div class="t-cab"><h3>energia_diaria</h3><span class="badge op">opcional</span></div><p class="t-desc">Energía diaria calculada por el equipo de medición. Si no se incluye, la plataforma la calcula a partir de la potencia.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">fecha</td><td class="tipo">fecha</td><td class="o si">●</td><td>Día.</td></tr><tr><td class="k">modulo_id</td><td class="tipo">texto</td><td class="o si">●</td><td>Código del módulo.</td></tr><tr><td class="k">energia_wh</td><td class="tipo">número</td><td class="o si">●</td><td>Energía del día (Wh).</td></tr><tr><td class="k">data_points</td><td class="tipo">entero</td><td class="o no">○</td><td>Número de lecturas usadas en el cálculo (informativo).</td></tr></table></div></div><div class="bloque-tabla"><div class="t-cab"><h3>mediciones_ambientales</h3><span class="badge">obligatoria</span></div><p class="t-desc">Una fila por lectura y una columna por sensor. Cada nombre de columna debe estar declarado en <code>sensores</code>.</p>
+<div class="tabla"><table><tr><th style="width:24%">Columna</th><th style="width:13%">Tipo</th><th></th><th>Descripción</th></tr><tr><td class="k">fecha_hora</td><td class="tipo">fecha y hora</td><td class="o si">●</td><td>Momento de la lectura; no puede repetirse.</td></tr><tr><td class="k">‹sensor_id›</td><td class="tipo">número</td><td class="o si">●</td><td>Una columna por sensor, en la unidad de la variable que mide.</td></tr></table></div></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>6</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Llenado de la plantilla · opción A</div><h2>Con Python</h2><p class="lead">Procedimiento recomendado cuando los datos están en archivos CSV o Excel, o cuando el volumen es grande. Requiere Python 3 y la librería pandas (<code>pip install pandas</code>).</p></div>
+<p class="parrafo">El siguiente programa lee las mediciones desde archivos CSV o Excel, convierte las fechas al formato requerido, elimina lecturas duplicadas y agrega los datos a las tablas de la plantilla. Los nombres de las columnas de los archivos deben coincidir con los de la plantilla. El parámetro <code>dayfirst=True</code> corresponde a fechas escritas como 01/05/2026; si las fechas ya están en formato 2026-05-01, puede omitirse.</p><div class="codigo"><span class="c"># llenar_plantilla.py · copia las mediciones en la plantilla generada por el formulario</span>
+import sqlite3
+import pandas as pd
+
+base = sqlite3.connect("plantilla_mi_instalacion.db")
+FORMATO = "%Y-%m-%d %H:%M:%S"
+
+<span class="c"># 1. Mediciones eléctricas: fecha_hora, modulo_id, potencia_max_w y las demás variables declaradas</span>
+el = pd.read_csv("mediciones_electricas.csv")      <span class="c"># o pd.read_excel("archivo.xlsx")</span>
+el["fecha_hora"] = pd.to_datetime(el["fecha_hora"], dayfirst=True).dt.strftime(FORMATO)
+el = el.drop_duplicates(["modulo_id", "fecha_hora"])
+el.to_sql("mediciones_electricas", base, if_exists="append", index=False)
+
+<span class="c"># 2. Mediciones ambientales: fecha_hora y una columna por sensor</span>
+amb = pd.read_csv("mediciones_ambientales.csv")
+amb["fecha_hora"] = pd.to_datetime(amb["fecha_hora"], dayfirst=True).dt.strftime(FORMATO)
+amb = amb.drop_duplicates("fecha_hora")
+amb.to_sql("mediciones_ambientales", base, if_exists="append", index=False)
+
+<span class="c"># 3. Opcional · energía diaria: fecha, modulo_id, energia_wh</span>
+<span class="c"># en = pd.read_csv("energia_diaria.csv")</span>
+<span class="c"># en.to_sql("energia_diaria", base, if_exists="append", index=False)</span>
+
+base.commit()
+base.close()</div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>7</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><div class="ceja">Llenado de la plantilla · opción B</div><h2>Con DB Browser for SQLite</h2><p class="lead">Programa gratuito con interfaz gráfica (sqlitebrowser.org), adecuado para bases pequeñas o medianas y para quienes no programan.</p></div>
+<div class="rejilla-2">
+    <div class="caja"><h4>Preparación de los archivos</h4>
+      <ul class="lista" style="margin-top:6px; font-size:9.8pt">
+        <li>Guardar cada tabla de mediciones como archivo <b>CSV</b> (en Excel: <i>Guardar como › CSV UTF-8</i>).</li>
+        <li>La primera fila debe contener los <b>nombres exactos de las columnas</b> de la plantilla.</li>
+        <li>Verificar que las fechas tengan el formato <code>2026-05-01 12:00:00</code>. Excel suele convertirlas a 01/05/2026; para evitarlo, aplicar el formato personalizado <code>aaaa-mm-dd hh:mm:ss</code> antes de guardar.</li>
+        <li>Verificar que los decimales usen punto.</li>
+        <li>Si se parte de la plantilla básica, agregar antes las columnas opcionales que se usarán: <i>Modificar tabla › Agregar campo</i>, con el nombre exacto de la columna.</li>
+      </ul></div>
+    <div class="caja"><h4>Importación de cada archivo</h4>
+      <ol class="pasos-dbb" style="margin-top:8px">
+        <li>Abrir la plantilla con <i>Abrir base de datos</i>.</li>
+        <li>Seleccionar <i>Archivo › Importar › Tabla desde archivo CSV</i> y elegir el archivo.</li>
+        <li>En <i>Nombre de la tabla</i>, escribir la tabla de la plantilla, por ejemplo <code>mediciones_electricas</code>.</li>
+        <li>Marcar <i>Nombres de columna en la primera línea</i> y elegir el separador (coma o punto y coma).</li>
+        <li>Aceptar y confirmar que los datos se agregan a la tabla existente.</li>
+        <li>Repetir con <code>mediciones_ambientales</code> y, si aplica, con <code>energia_diaria</code>.</li>
+        <li>Guardar con <i>Escribir cambios</i> (Ctrl + S).</li>
+      </ol></div>
+  </div>
+  <div class="caja"><h4>Verificación</h4>
+    <p style="margin-top:6px; font-size:9.8pt">En la pestaña <i>Hojear datos</i>, revisar las primeras filas de cada tabla de mediciones: las fechas deben aparecer como <code>2026-05-01 12:00:00</code> y los números alineados a la derecha; si aparecen a la izquierda, se guardaron como texto. En la pestaña <i>Ejecutar SQL</i> puede consultarse el número de lecturas por módulo:</p>
+    <div class="codigo" style="margin-top:8px">SELECT modulo_id, COUNT(*) AS lecturas, MIN(fecha_hora) AS desde, MAX(fecha_hora) AS hasta
+FROM mediciones_electricas GROUP BY modulo_id;</div></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>8</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec"><h2>Ejemplo de una base completa</h2><p class="lead">Instalación con un techo y una fachada, dos tecnologías, tres módulos y tres sensores. Se muestran todas las tablas con algunas filas de mediciones.</p></div>
+<div style="display:flex; flex-direction:column; gap:8px"><div class="tabla compacta"><div class="tabla-nombre">instalacion <span>una sola fila</span></div><table><tr><th>nombre</th><th>descripcion</th><th>ciudad</th><th>pais</th></tr><tr><td>Techo solar de ejemplo</td><td>Dos tecnologías en un techo y una fachada</td><td>Medellín</td><td>Colombia</td></tr></table></div><div style="display:flex; flex-direction:column; gap:8px"><div class="tabla compacta"><div class="tabla-nombre">tecnologias</div><table><tr><th>tecnologia_id</th><th>nombre</th><th>tipo</th><th>potencia_stc_w</th><th>area_m2</th></tr><tr><td class="d">MONO</td><td>Monocristalino 450 W</td><td>c-Si mono</td><td>450</td><td>2.0</td></tr><tr><td class="d">CIGS</td><td>CIGS 150 W</td><td>CIGS</td><td>150</td><td>1.1</td></tr></table></div><div class="tabla compacta"><div class="tabla-nombre">superficies</div><table><tr><th>superficie_id</th><th>nombre</th><th>inclinacion_deg</th><th>orientacion</th></tr><tr><td class="d">techo</td><td>Techo</td><td>10</td><td>Sur</td></tr><tr><td class="d">fachada</td><td>Fachada oeste</td><td>90</td><td>Oeste</td></tr></table></div></div><div style="display:grid; grid-template-columns: 0.9fr 1.35fr; gap:12px"><div class="tabla compacta"><div class="tabla-nombre">modulos</div><table><tr><th>modulo_id</th><th>superficie_id</th><th>tecnologia_id</th></tr><tr><td class="d">M1</td><td>techo</td><td>MONO</td></tr><tr><td class="d">C1</td><td>techo</td><td>CIGS</td></tr><tr><td class="d">F1</td><td>fachada</td><td>MONO</td></tr></table></div><div class="tabla compacta"><div class="tabla-nombre">sensores</div><table><tr><th>sensor_id</th><th>variable_id</th><th>superficie_id</th><th>modulo_id</th></tr><tr><td class="d">G_techo</td><td>irradiancia</td><td>techo</td><td>—</td></tr><tr><td class="d">T_amb</td><td>temperatura_ambiente</td><td>—</td><td>—</td></tr><tr><td class="d">T_M1</td><td>temperatura_modulo</td><td>—</td><td class="d">M1</td></tr></table></div></div><div class="tabla compacta"><div class="tabla-nombre">variables <span>filas agregadas a las de la plantilla</span></div><table><tr><th>variable_id</th><th>nombre</th><th>unidad</th><th>tipo</th><th>agregacion</th></tr><tr><td class="d">ff</td><td>Fill factor</td><td>—</td><td>electrica</td><td>promedio</td></tr></table></div></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>9</span></div>
+</section>
+<section class="pagina">
+<div class="tit-sec solo-ceja"><div class="ceja">Ejemplo</div><p class="lead">Algunas filas de las tablas de mediciones de la misma instalación.</p></div>
+<div style="display:flex; flex-direction:column; gap:10px"><div class="tabla compacta"><div class="tabla-nombre">mediciones_electricas</div><table><tr><th>fecha_hora</th><th>modulo_id</th><th>potencia_max_w</th><th>voc_v</th><th>isc_a</th><th>ff</th></tr><tr><td class="d">2026-05-01 12:00:00</td><td class="d">M1</td><td>385.2</td><td>44.1</td><td>11.2</td><td>0.77</td></tr><tr><td class="d">2026-05-01 12:00:00</td><td class="d">C1</td><td>121.7</td><td>51.3</td><td>3.4</td><td>0.69</td></tr><tr><td class="d">2026-05-01 12:05:00</td><td class="d">M1</td><td>379.8</td><td>44.0</td><td>11.0</td><td class="no">(vacío)</td></tr></table></div><div style="display:grid; grid-template-columns: 1.3fr 1fr; gap:12px"><div class="tabla compacta"><div class="tabla-nombre">mediciones_ambientales</div><table><tr><th>fecha_hora</th><th>G_techo</th><th>T_amb</th><th>T_M1</th></tr><tr><td class="d">2026-05-01 12:00:00</td><td>865.0</td><td>24.6</td><td>47.9</td></tr><tr><td class="d">2026-05-01 12:05:00</td><td>851.3</td><td>24.8</td><td>48.2</td></tr></table></div><div class="tabla compacta"><div class="tabla-nombre">energia_diaria</div><table><tr><th>fecha</th><th>modulo_id</th><th>energia_wh</th></tr><tr><td class="d">2026-05-01</td><td class="d">M1</td><td>2410.5</td></tr></table></div></div></div>
+<div class="caja"><h4>Lectura del ejemplo</h4>
+<ul class="lista" style="margin-top:6px; font-size:9.6pt">
+<li>Los módulos <code>M1</code> y <code>C1</code> están instalados en el techo y <code>F1</code> en la fachada; <code>M1</code> y <code>F1</code> son de la misma tecnología.</li>
+<li><code>G_techo</code> es la referencia de irradiancia del techo: con ella se calcula la eficiencia de <code>M1</code> y <code>C1</code>. La fachada no tiene sensor de irradiancia, por lo que de <code>F1</code> se presenta la potencia y la energía, pero no la eficiencia.</li>
+<li><code>T_M1</code> registra la temperatura del módulo <code>M1</code> y <code>T_amb</code> la temperatura ambiente del sitio.</li>
+<li>El fill factor (<code>ff</code>) es una variable adicional: se declara en <code>variables</code> y tiene su propia columna en <code>mediciones_electricas</code>. Una celda vacía indica que esa lectura no está disponible.</li>
+</ul></div>
+<div class="pie"><span>Guía para cargar datos · Plataforma de monitoreo fotovoltaico</span><span>10</span></div>
+</section>
+</body>
+</html>

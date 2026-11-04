@@ -1,0 +1,15 @@
+/* Fuentes alojadas en la propia app (licencia SIL OFL), sin depender de Google Fonts */
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 500; font-display: swap; src: url('../fonts/montserrat-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 600; font-display: swap; src: url('../fonts/montserrat-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 700; font-display: swap; src: url('../fonts/montserrat-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 800; font-display: swap; src: url('../fonts/montserrat-latin-800-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 400; font-display: swap; src: url('../fonts/source-sans-3-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 500; font-display: swap; src: url('../fonts/source-sans-3-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 600; font-display: swap; src: url('../fonts/source-sans-3-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 700; font-display: swap; src: url('../fonts/source-sans-3-latin-700-normal.woff2') format('woff2'); }
+/* Mismo tipo con un nombre sin espacios ni comillas: lo usan las gráficas, porque algunas versiones de
+   Plotly no pueden exportar a PNG una fuente escrita entre comillas. */
+@font-face { font-family: SourceSans3; font-style: normal; font-weight: 400; font-display: swap; src: url('../fonts/source-sans-3-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: SourceSans3; font-style: normal; font-weight: 500; font-display: swap; src: url('../fonts/source-sans-3-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: SourceSans3; font-style: normal; font-weight: 600; font-display: swap; src: url('../fonts/source-sans-3-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: SourceSans3; font-style: normal; font-weight: 700; font-display: swap; src: url('../fonts/source-sans-3-latin-700-normal.woff2') format('woff2'); }

@@ -1,11 +1,12 @@
 -- =====================================================================
---  Formato de carga 1.1 · Plataforma de monitoreo fotovoltaico
---  Un archivo SQLite (.db) por instalación, con estas 10 tablas.
+--  Formato de carga · Plataforma de monitoreo fotovoltaico
+--  Un archivo SQLite (.db) por instalación, con estas 10 tablas (todas las columnas).
+--  La plantilla básica (plantilla.db) trae solo las columnas obligatorias.
 --  Guía completa: formato/guia_formato.md
 --
 --  Crear una base vacía desde la terminal:
 --      sqlite3 mi_instalacion.db < esquema.sql
---  (o copiar plantilla_v1.1.db, que ya tiene estas tablas creadas)
+--  (o partir de plantilla.db y agregar las columnas opcionales que se necesiten)
 -- =====================================================================
 PRAGMA foreign_keys = ON;
 
@@ -16,7 +17,6 @@ PRAGMA foreign_keys = ON;
 -- Una sola fila con los datos generales del proyecto.
 CREATE TABLE instalacion (
     nombre           TEXT NOT NULL,
-    version_formato  TEXT NOT NULL DEFAULT '1.1',
     descripcion      TEXT,
     responsable      TEXT,
     ciudad           TEXT,
@@ -63,10 +63,7 @@ CREATE TABLE variables (
     nombre       TEXT NOT NULL,
     unidad       TEXT,
     tipo         TEXT NOT NULL CHECK (tipo IN ('electrica', 'ambiental')),
-    agregacion   TEXT NOT NULL CHECK (agregacion IN ('promedio', 'suma', 'minimo', 'maximo')),
-    min_valido   REAL,
-    max_valido   REAL,
-    CHECK (min_valido IS NULL OR max_valido IS NULL OR min_valido < max_valido)
+    agregacion   TEXT CHECK (agregacion IN ('promedio', 'suma', 'minimo', 'maximo'))   -- vacía = promedio
 );
 
 -- Una fila por cada columna de mediciones_ambientales: qué mide y dónde está conectado.
@@ -132,14 +129,14 @@ CREATE TABLE mediciones_ambientales (
 --  VARIABLES FIJAS (borrar las filas de las que no se entreguen,
 --  excepto potencia_max_w, que es obligatoria)
 -- ---------------------------------------------------------------------
-INSERT INTO variables (variable_id, nombre, unidad, tipo, agregacion, min_valido, max_valido) VALUES
-    ('potencia_max_w',       'Potencia máxima',                     'W',    'electrica', 'promedio', 0,    NULL),
-    ('voc_v',                'Voltaje de circuito abierto',         'V',    'electrica', 'promedio', 0,    NULL),
-    ('isc_a',                'Corriente de cortocircuito',          'A',    'electrica', 'promedio', 0,    NULL),
-    ('vmpp_v',               'Voltaje en el punto de máxima potencia',   'V', 'electrica', 'promedio', 0, NULL),
-    ('impp_a',               'Corriente en el punto de máxima potencia', 'A', 'electrica', 'promedio', 0, NULL),
-    ('irradiancia',          'Irradiancia',                         'W/m²', 'ambiental', 'promedio', 0,    1500),
-    ('temperatura_ambiente', 'Temperatura ambiente',                '°C',   'ambiental', 'promedio', -40,  60),
-    ('temperatura_modulo',   'Temperatura del módulo',              '°C',   'ambiental', 'promedio', -40,  100),
-    ('humedad_relativa',     'Humedad relativa',                    '%',    'ambiental', 'promedio', 0,    100),
-    ('velocidad_viento',     'Velocidad del viento',                'm/s',  'ambiental', 'promedio', 0,    60);
+INSERT INTO variables (variable_id, nombre, unidad, tipo, agregacion) VALUES
+    ('potencia_max_w',       'Potencia máxima',                     'W',    'electrica', 'promedio'),
+    ('voc_v',                'Voltaje de circuito abierto',         'V',    'electrica', 'promedio'),
+    ('isc_a',                'Corriente de cortocircuito',          'A',    'electrica', 'promedio'),
+    ('vmpp_v',               'Voltaje en el punto de máxima potencia',   'V', 'electrica', 'promedio'),
+    ('impp_a',               'Corriente en el punto de máxima potencia', 'A', 'electrica', 'promedio'),
+    ('irradiancia',          'Irradiancia',                         'W/m²', 'ambiental', 'promedio'),
+    ('temperatura_ambiente', 'Temperatura ambiente',                '°C',   'ambiental', 'promedio'),
+    ('temperatura_modulo',   'Temperatura del módulo',              '°C',   'ambiental', 'promedio'),
+    ('humedad_relativa',     'Humedad relativa',                    '%',    'ambiental', 'promedio'),
+    ('velocidad_viento',     'Velocidad del viento',                'm/s',  'ambiental', 'promedio');

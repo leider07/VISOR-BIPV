@@ -4,14 +4,32 @@ from datetime import date, timedelta
 import pandas as pd
 from dash import dcc, html
 
-import config as C
-from graficas import COLOR_VIDRIO
+from . import datos as D
+from .graficas import color_modulo, etiqueta_superficie
 
 MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
 MESES_LARGO = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto",
                "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
-PAGINAS = [("/", "Resumen"), ("/clima", "Clima"), ("/energia", "Energía"), ("/desempeno", "Desempeño")]
+AMBIENTALES = {"irradiancia", "temperatura_ambiente", "temperatura_modulo", "humedad_relativa", "velocidad_viento"}
+
+
+def paginas():
+    """Pestañas disponibles según la instalación: (ruta, nombre)."""
+    p = []
+    if D.es_resumen_fijo():
+        p.append(("/", "Resumen"))
+    if D.variables() & AMBIENTALES:
+        p.append(("/clima", "Clima"))
+    p += [("/energia", "Energía"), ("/desempeno", "Desempeño"), ("/explorar", "Explorar"), ("/datos", "Tus datos")]
+    return p
+
+
+def palabras():
+    """Sustantivos de la interfaz según la base: módulo/vidrio y superficie/cara."""
+    m = D.metadatos()
+    n, s = m.get("modulo_palabra", "módulo"), m.get("superficie_palabra", "superficie")
+    return {"n": n, "np": n + "s", "s": s, "sp": s + "s"}
 
 
 # ---------------------------------------------------------------- fechas
@@ -55,7 +73,7 @@ def meses_disponibles(meta):
 
 
 def icono_calendario(tam=18):
-    return html.Img(src="/assets/img/calendario.svg", alt="", width=tam, height=tam, className="icono")
+    return html.Img(src="/assets/img/iconos/calendario.svg", alt="", width=tam, height=tam, className="icono")
 
 
 def selector_fechas(meta):
@@ -68,7 +86,7 @@ def selector_fechas(meta):
             html.Span(className="btn-fechas-texto", children=[
                 html.Span(id="fechas-rango", className="btn-fechas-rango"),
                 html.Span(id="fechas-texto")]),
-            html.Img(src="/assets/img/flecha.svg", alt="", width=14, height=14, className="icono"),
+            html.Img(src="/assets/img/iconos/flecha.svg", alt="", width=14, height=14, className="icono"),
         ]),
         html.Div(id="pop-fechas", className="pop-fechas", style={"display": "none"},
                  role="dialog", **{"aria-label": "Elegir rango de fechas"}, children=[
@@ -108,66 +126,105 @@ def selector_fechas(meta):
 
 
 # ---------------------------------------------------------------- filtros
+def opciones_modulos(superficie):
+    return [{"label": html.Span([html.Span(className="punto", style={"background": color_modulo(r.color)}),
+                                 r.etiqueta]), "value": r.modulo_id}
+            for r in D.modulos_de(superficie).itertuples()]
+
+
+def filtro_modulos(superficie, valor=None):
+    valor = list(D.modulos_de(superficie).modulo_id) if valor is None else valor
+    return dcc.Checklist(id="filtro-vidrios", options=opciones_modulos(superficie), value=valor, inline=True,
+                         className="chips", inputClassName="chip-input", labelClassName="chip chip-claro")
+
+
+def titulo_modulos():
+    pal = palabras()
+    m = D.modulos()
+    if pal["n"] == "vidrio" and m.transmitancia_pct.notna().all():
+        return "Vidrio (% de transmitancia)"
+    return pal["np"].capitalize()
+
+
 def barra_filtros(meta):
-    opciones_cara = [{"label": C.CARAS[k]["etiqueta"], "value": k} for k in C.ORDEN_CARAS]
-    opciones_vid = [{"label": html.Span([html.Span(className="punto", style={"background": COLOR_VIDRIO[v]}),
-                                         f"Vidrio {v} %"]), "value": v} for v in C.VIDRIOS]
-    return html.Div(className="barra-filtros", children=[
+    sup = D.superficies()
+    primera = sup.superficie_id.iloc[0]
+    opciones_sup = [{"label": etiqueta_superficie(r, corta=True), "value": r.superficie_id} for r in sup.itertuples()]
+    return html.Div(id="barra-filtros", className="barra-filtros", children=[
         selector_fechas(meta),
         html.Div(id="grupo-cara", className="grupo-filtro", children=[
-            html.Span("Cara (elige una)", className="filtro-titulo"),
-            dcc.RadioItems(id="filtro-cara", options=opciones_cara, value="superior", inline=True,
+            html.Span(f"{palabras()['s'].capitalize()} (elige una)", className="filtro-titulo"),
+            dcc.RadioItems(id="filtro-cara", options=opciones_sup, value=primera, inline=True,
                            className="chips", inputClassName="chip-input", labelClassName="chip"),
         ]),
-        html.Div(className="grupo-filtro", children=[
-            html.Span("Vidrio (% de transmitancia)", className="filtro-titulo"),
-            dcc.Checklist(id="filtro-vidrios", options=opciones_vid, value=list(C.VIDRIOS), inline=True,
-                          className="chips", inputClassName="chip-input", labelClassName="chip chip-claro"),
+        html.Div(id="grupo-modulos", className="grupo-filtro", children=[
+            html.Span(titulo_modulos(), className="filtro-titulo"),
+            html.Div(id="caja-modulos", children=filtro_modulos(primera)),
         ]),
         html.Div(id="nota-filtros", className="nota-filtros"),
     ])
 
 
 # ---------------------------------------------------------------- marco
+def textos_marca(meta):
+    """(franja superior, título de la marca, subtítulo de la marca)."""
+    if D.es_resumen_fijo():
+        return "Plataforma de monitoreo BIPV · Prototipo Sumicol", "Visor BIPV", "Sumicol · Medellín"
+    lugar = " · ".join(x for x in [meta.get("ciudad"), meta.get("pais")] if x)
+    return (f"Plataforma de monitoreo fotovoltaico · {meta['instalacion']}", "Visor fotovoltaico",
+            " · ".join(x for x in [meta["instalacion"], meta.get("ciudad")] if x) or lugar)
+
+
 def encabezado(meta):
+    franja, marca, sub = textos_marca(meta)
     return html.Header(className="encabezado", children=[
         html.Div(className="franja", children=html.Div(className="contenedor franja-int", children=[
-            html.Span("Plataforma de monitoreo BIPV · Prototipo Sumicol"),
+            html.Span(franja),
             html.Span(f"Datos históricos · {rango_texto(meta['fecha_inicio'], meta['fecha_fin'])}"),
         ])),
         html.Div(className="contenedor barra-nav", children=[
             dcc.Link(href="/", className="marca", children=[
-                html.Img(src="/assets/img/integra-logo.png",
+                html.Img(src="/assets/img/logos/integra-logo.png",
                          alt="Integra – Plataforma de Integración Fotovoltaica en Edificaciones", className="logo"),
                 html.Span(className="separador"),
-                html.Span(className="marca-texto", children=["Visor BIPV", html.Br(),
-                                                              html.Small("Sumicol · Medellín")]),
+                html.Span(className="marca-texto", children=[marca, html.Br(), html.Small(sub)]),
             ]),
             html.Nav(**{"aria-label": "Secciones"}, className="nav", children=[
-                dcc.Link(nombre, href=ruta, id=f"nav-{i}", className="nav-link")
-                for i, (ruta, nombre) in enumerate(PAGINAS)]),
+                dcc.Link(nombre, href=ruta, id={"type": "nav", "index": ruta}, className="nav-link")
+                for ruta, nombre in paginas()]),
         ]),
     ])
+
+
+def aviso_base_propia(meta):
+    """Franja que recuerda que se está viendo una base cargada por el visitante."""
+    return html.Div(className="franja-base", children=html.Div(className="contenedor franja-base-int", children=[
+        html.Span(["Estás viendo tu base ", html.B(f"«{meta['instalacion']}»"),
+                   ". Solo tú la ves en esta pestaña del navegador."]),
+        html.Button("Volver a la plataforma de Sumicol", id={"type": "volver", "index": "franja"}, n_clicks=0,
+                    className="enlace-btn")]))
 
 
 def pie():
     return html.Footer(className="pie", children=[
         html.Div(className="pie-logos", children=html.Div(className="contenedor", children=html.Img(
-            src="/assets/img/logos-aliados.png",
+            src="/assets/img/logos/logos-aliados.png",
             alt="Entidades aliadas: SGR, Universidad de Antioquia, Corantioquia, Sumicol, SAI, Andercol, "
                 "Gobernaciones de Antioquia, Caldas, Quindío y Risaralda", className="logos-aliados"))),
         html.Div(className="pie-franja", children=html.Div(className="contenedor pie-int", children=[
             html.Span(className="pie-marca", children=[
-                html.Img(src="/assets/img/favicon.png", alt="", className="pie-icono"),
+                html.Img(src="/assets/img/logos/favicon.png", alt="", className="pie-icono"),
                 "Proyecto Integra · Plataforma de Integración Fotovoltaica en Edificaciones"]),
-            html.A("proyecto-integra.site", href="https://proyecto-integra.site/", target="_blank", rel="noopener"),
+            html.Span(className="pie-enlaces", children=[
+                html.A("Manual de uso (PDF)", href="/assets/docs/manual_uso.pdf", download="manual_uso.pdf"),
+                html.A("proyecto-integra.site", href="https://proyecto-integra.site/", target="_blank", rel="noopener")]),
         ])),
     ])
 
 
 # ---------------------------------------------------------------- tarjetas
 def tarjeta_grafica(titulo, subtitulo, figura, extra=None):
-    from graficas import CONFIG
+    from .graficas import CONFIG
     hijos = [html.Div(className="tarjeta-cab", children=[html.H3(titulo), html.P(subtitulo)])]
     hijos.append(dcc.Graph(figure=figura, config=CONFIG, className="grafica"))
     if extra is not None:

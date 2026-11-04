@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
-import config as C
+from . import config as C
+from . import datos as D
 
 # Paleta
 VERDE = "#1b554f"
@@ -11,9 +12,11 @@ TEXTO = "#16302d"
 TEXTO_2 = "#35504c"
 REJILLA = "#e3ecea"
 AMBIENTE = "#b9770e"
-COLOR_CARA = {"superior": "#1b554f", "inclinada": "#2f978d", "vertical": "#d9a20b"}
-COLOR_VIDRIO = {10: "#123c37", 30: "#2f978d", 40: "#d9a20b", 80: "#73879a"}
-FUENTE = "'Source Sans 3', 'Segoe UI', sans-serif"
+# Colores por posición: superficies en su orden; módulos según su posición dentro de la superficie
+PALETA_SUPERFICIE = ["#1b554f", "#2f978d", "#d9a20b", "#73879a", "#8e5b9f", "#c0504d", "#4a7fb5", "#7a9a3a"]
+PALETA_MODULO = ["#123c37", "#2f978d", "#d9a20b", "#73879a", "#8e5b9f", "#c0504d", "#4a7fb5", "#7a9a3a",
+                 "#5c3d2e", "#e07a5f", "#3d405b", "#81b29a"]
+FUENTE = "SourceSans3, Segoe UI, sans-serif"   # sin comillas: con comillas, algunas versiones de Plotly no exportan PNG
 
 LOCALE_ES = {
     "dictionary": {
@@ -39,11 +42,41 @@ CONFIG = {
     "toImageButtonOptions": {"format": "png", "scale": 2, "filename": "visor_bipv"},
 }
 
-HORAS = list(range(C.HORA_INICIO, C.HORA_FIN))
 
 
-def nombre_vidrio(v):
-    return f"Vidrio {v} %"
+def color_modulo(posicion):
+    return PALETA_MODULO[int(posicion) % len(PALETA_MODULO)]
+
+
+def color_superficie(orden):
+    return PALETA_SUPERFICIE[int(orden) % len(PALETA_SUPERFICIE)]
+
+
+def etiqueta_superficie(r, corta=False):
+    """Cara superior (0°)  ·  corta: Superior (0°)."""
+    nombre = r.nombre
+    if corta and nombre.lower().startswith("cara "):
+        nombre = nombre[5:].capitalize()
+    return f"{nombre} ({r.inclinacion_deg:g}°)"
+
+
+def series_modulos(df, ids=None):
+    """Módulos de df (o los ids dados, aunque no tengan datos), en el orden de la plataforma:
+    (id, etiqueta, color, área, datos del módulo)."""
+    m = D.modulos()
+    ids = df.modulo_id.unique() if ids is None else ids
+    for r in m[m.modulo_id.isin(ids)].itertuples():
+        yield r.modulo_id, r.etiqueta, color_modulo(r.color), r.area_m2, df[df.modulo_id == r.modulo_id]
+
+
+def series_superficies(df, solo_irradiancia=False):
+    s = D.superficies()
+    if solo_irradiancia:
+        s = s[s.tiene_irradiancia == 1]
+    for r in s.itertuples():
+        d = df[df.superficie_id == r.superficie_id]
+        if not d.empty:
+            yield r.superficie_id, etiqueta_superficie(r), color_superficie(r.orden), d
 
 
 def rgba(hex_color, a):
@@ -73,9 +106,12 @@ def _base(fig, y_titulo, x_titulo, alto=380, leyenda=True):
 
 
 def _eje_horas(fig):
-    fig.update_xaxes(tickmode="array", tickvals=list(range(6, 19, 2)),
-                     ticktext=[f"{h}:00" for h in range(6, 19, 2)],
-                     range=[C.HORA_INICIO - 0.5, C.HORA_FIN - 0.5])
+    """Eje de horas del día según las horas que tienen datos en la base."""
+    m = D.metadatos()
+    h0, h1 = int(m.get("hora_min", 0)), int(m.get("hora_max", 23))
+    marcas = [h for h in range(h0, h1 + 1) if h % 2 == 0]
+    fig.update_xaxes(tickmode="array", tickvals=marcas, ticktext=[f"{h}:00" for h in marcas],
+                     range=[h0 - 0.5, h1 + 0.5])
     return fig
 
 
@@ -117,16 +153,12 @@ def perfil_irradiancia(df):
     if df.empty:
         return vacia()
     fig = go.Figure()
-    for cara in C.ORDEN_CARAS:
-        d = df[df.cara == cara]
-        if d.empty:
-            continue
+    for sid, nom, col, d in series_superficies(df):
         g = d.groupby("hora").g_media
         st = pd.DataFrame({"m": g.mean(), "q1": g.quantile(0.25), "q3": g.quantile(0.75)}).reset_index()
-        col, nom = COLOR_CARA[cara], C.CARAS[cara]["etiqueta"]
-        _banda(fig, st.hora, st.q1, st.q3, col, nom, cara)
+        _banda(fig, st.hora, st.q1, st.q3, col, nom, sid)
         fig.add_trace(go.Scatter(
-            x=st.hora, y=st.m, mode="lines+markers", name=f"Cara {nom.lower()}", legendgroup=cara,
+            x=st.hora, y=st.m, mode="lines+markers", name=nom, legendgroup=sid,
             line=dict(color=col, width=3), marker=dict(size=5),
             customdata=np.stack([st.q1, st.q3], axis=-1),
             hovertemplate="%{y:.0f} W/m² <span style='color:#4a635f'>(mitad de los días entre "
@@ -140,11 +172,8 @@ def hsp_diaria(df):
         return vacia()
     fig = go.Figure()
     barras = df.fecha.nunique() <= DIAS_MAX_BARRAS
-    for cara in C.ORDEN_CARAS:
-        d = df[df.cara == cara]
-        if d.empty:
-            continue
-        _serie_diaria(fig, d.fecha, d.hsp, f"Cara {C.CARAS[cara]['etiqueta'].lower()}", COLOR_CARA[cara],
+    for _, nom, col, d in series_superficies(df):
+        _serie_diaria(fig, d.fecha, d.hsp, nom, col,
                       "%{y:.1f} h<extra>%{fullData.name}</extra>", barras)
     _base(fig, "HSP (horas)", "Fecha", 440)
     fig.update_layout(barmode="group", bargap=0.18, bargroupgap=0.05)
@@ -153,17 +182,14 @@ def hsp_diaria(df):
     return fig
 
 
-def temperatura_vidrios(tv, met):
+def temperatura_modulos(tv, met):
     if tv.empty and met.empty:
         return vacia()
     fig = go.Figure()
-    for v in C.VIDRIOS:
-        d = tv[tv.vidrio == v]
-        if d.empty:
-            continue
+    for _, nom, col, _a, d in series_modulos(tv):
         m = d.groupby("hora").t_media.mean()
-        fig.add_trace(go.Scatter(x=m.index, y=m.values, mode="lines+markers", name=nombre_vidrio(v),
-                                 line=dict(color=COLOR_VIDRIO[v], width=3), marker=dict(size=5),
+        fig.add_trace(go.Scatter(x=m.index, y=m.values, mode="lines+markers", name=nom,
+                                 line=dict(color=col, width=3), marker=dict(size=5),
                                  hovertemplate="%{y:.1f} °C<extra>%{fullData.name}</extra>"))
     a = met.dropna(subset=["ta_media"]).groupby("hora").ta_media.mean()
     if not a.empty:
@@ -206,13 +232,10 @@ def temperaturas_tiempo(tv, met):
     if tv.empty and met.dropna(subset=["ta_media"]).empty:
         return vacia()
     fig = go.Figure()
-    for v in C.VIDRIOS:
-        d = tv[tv.vidrio == v]
-        if d.empty:
-            continue
+    for _, nom, col, _a, d in series_modulos(tv):
         s = _horaria(d.fecha, d.hora, d.t_media)
-        fig.add_trace(go.Scatter(x=s.index, y=s.values, mode="lines", name=nombre_vidrio(v),
-                                 line=dict(color=COLOR_VIDRIO[v], width=1.6), connectgaps=False,
+        fig.add_trace(go.Scatter(x=s.index, y=s.values, mode="lines", name=nom,
+                                 line=dict(color=col, width=1.6), connectgaps=False,
                                  hovertemplate="%{y:.1f} °C<extra>%{fullData.name}</extra>"))
     a = met.dropna(subset=["ta_media"])
     if not a.empty:
@@ -250,17 +273,40 @@ def viento(met):
     return _eje_horas(fig)
 
 
+def humedad_tiempo(met):
+    d = met.dropna(subset=["hr_media"])
+    if d.empty:
+        return vacia()
+    s = _horaria(d.fecha, d.hora, d.hr_media)
+    fig = go.Figure(go.Scatter(x=s.index, y=s.values, mode="lines", name="Humedad relativa",
+                               line=dict(color="#4a7fb5", width=1.6), connectgaps=False,
+                               hovertemplate="%{y:.0f} %<extra></extra>"))
+    _base(fig, "Humedad relativa (%)", "Fecha", 420, leyenda=False)
+    fig.update_yaxes(range=[0, 100])
+    return _eje_tiempo(fig)
+
+
+def humedad(met):
+    d = met.dropna(subset=["hr_media"])
+    if d.empty:
+        return vacia()
+    m = d.groupby("hora").hr_media.mean()
+    fig = go.Figure(go.Scatter(x=m.index, y=m.values, mode="lines+markers", name="Humedad relativa",
+                               line=dict(color="#4a7fb5", width=3), marker=dict(size=5),
+                               hovertemplate="%{y:.0f} %<extra></extra>"))
+    _base(fig, "Humedad relativa (%)", "Hora del día", 340, leyenda=False)
+    fig.update_yaxes(range=[0, 100])
+    return _eje_horas(fig)
+
+
 # ============================== ENERGÍA ==============================
 def energia_diaria(df):
     if df.empty:
         return vacia()
     fig = go.Figure()
     barras = df.fecha.nunique() <= DIAS_MAX_BARRAS
-    for v in C.VIDRIOS:
-        d = df[df.vidrio == v]
-        if d.empty:
-            continue
-        _serie_diaria(fig, d.fecha, d.energia_wh, nombre_vidrio(v), COLOR_VIDRIO[v],
+    for _, nom, col, _a, d in series_modulos(df):
+        _serie_diaria(fig, d.fecha, d.energia_wh, nom, col,
                       "%{y:.0f} Wh<extra>%{fullData.name}</extra>", barras)
     _base(fig, "Energía (Wh/día)", "Fecha", 460)
     fig.update_layout(barmode="group", bargap=0.18, bargroupgap=0.04)
@@ -273,12 +319,10 @@ def energia_acumulada(df):
     if df.empty:
         return vacia()
     fig = go.Figure()
-    for v in C.VIDRIOS:
-        d = df[df.vidrio == v].sort_values("fecha")
-        if d.empty:
-            continue
+    for _, nom, col, _a, d in series_modulos(df):
+        d = d.sort_values("fecha")
         fig.add_trace(go.Scatter(x=pd.to_datetime(d.fecha), y=d.energia_wh.cumsum() / 1000, mode="lines",
-                                 name=nombre_vidrio(v), line=dict(color=COLOR_VIDRIO[v], width=3),
+                                 name=nom, line=dict(color=col, width=3),
                                  hovertemplate="%{y:.2f} kWh<extra>%{fullData.name}</extra>"))
     _base(fig, "Energía acumulada (kWh)", "Fecha", 420)
     fig.update_xaxes(tickformat="%d %b\n%Y")
@@ -291,13 +335,10 @@ def perfil_potencia(df):
     if df.empty:
         return vacia()
     fig = go.Figure()
-    for v in C.VIDRIOS:
-        d = df[df.vidrio == v]
-        if d.empty:
-            continue
-        m = d.groupby("hora").p_media.mean() / C.AREA_PANEL_M2
-        fig.add_trace(go.Scatter(x=m.index, y=m.values, mode="lines+markers", name=nombre_vidrio(v),
-                                 line=dict(color=COLOR_VIDRIO[v], width=3), marker=dict(size=5),
+    for _, nom, col, area, d in series_modulos(df):
+        m = d.groupby("hora").p_media.mean() / area
+        fig.add_trace(go.Scatter(x=m.index, y=m.values, mode="lines+markers", name=nom,
+                                 line=dict(color=col, width=3), marker=dict(size=5),
                                  hovertemplate="%{y:.1f} W/m²<extra>%{fullData.name}</extra>"))
     _base(fig, "Potencia (W/m²)", "Hora del día", 360)
     return _eje_horas(fig)
@@ -307,12 +348,9 @@ def potencia_vs_irradiancia(df):
     if df.empty:
         return vacia()
     fig = go.Figure()
-    for v in C.VIDRIOS:
-        d = df[df.vidrio == v]
-        if d.empty:
-            continue
-        fig.add_trace(go.Scattergl(x=d.g, y=d.p / C.AREA_PANEL_M2, mode="markers", name=nombre_vidrio(v),
-                                   marker=dict(color=COLOR_VIDRIO[v], size=5, opacity=0.55),
+    for _, nom, col, area, d in series_modulos(df):
+        fig.add_trace(go.Scattergl(x=d.g, y=d.p / area, mode="markers", name=nom,
+                                   marker=dict(color=col, size=5, opacity=0.55),
                                    hovertemplate="%{x:.0f} W/m² → %{y:.1f} W/m²<extra>%{fullData.name}</extra>"))
     _base(fig, "Potencia (W/m²)", "Irradiancia (W/m²)", 360)
     fig.update_layout(hovermode="closest", legend=dict(itemsizing="constant"))
@@ -325,14 +363,77 @@ def perfil_eficiencia(df):
     if d.empty:
         return vacia()
     fig = go.Figure()
-    for v in C.VIDRIOS:
-        x = d[d.vidrio == v]
-        if x.empty:
-            continue
+    for _, nom, col, _a, x in series_modulos(d):
         s = x.groupby("hora")[["p_ef", "ga_ef"]].sum()
         e = 100 * s.p_ef / s.ga_ef
-        fig.add_trace(go.Scatter(x=e.index, y=e.values, mode="lines+markers", name=nombre_vidrio(v),
-                                 line=dict(color=COLOR_VIDRIO[v], width=3), marker=dict(size=5),
+        fig.add_trace(go.Scatter(x=e.index, y=e.values, mode="lines+markers", name=nom,
+                                 line=dict(color=col, width=3), marker=dict(size=5),
                                  hovertemplate="%{y:.1f} %<extra>%{fullData.name}</extra>"))
     _base(fig, "Eficiencia (%)", "Hora del día", 360)
     return _eje_horas(fig)
+
+
+# ============================== EXPLORAR ==============================
+PALETA_EXPLORAR = PALETA_MODULO
+
+
+def _color_i(i):
+    return PALETA_EXPLORAR[i % len(PALETA_EXPLORAR)]
+
+
+def _eje_y(nombre, unidad):
+    return f"{nombre} ({unidad})" if unidad else nombre
+
+
+def explorar_tiempo(series, nombre, unidad, dec=2):
+    """series: [(etiqueta, df fecha/hora/valor, color)]."""
+    if not any(len(d) for _, d, _c in series):
+        return vacia()
+    fig = go.Figure()
+    u = f" {unidad}" if unidad else ""
+    for et, d, col in series:
+        if d.empty:
+            continue
+        s = _horaria(d.fecha, d.hora, d.valor, dec)
+        fig.add_trace(go.Scatter(x=s.index, y=s.values, mode="lines", name=et, connectgaps=False,
+                                 line=dict(color=col, width=1.6),
+                                 hovertemplate=f"%{{y:.{dec}f}}{u}<extra>%{{fullData.name}}</extra>"))
+    _base(fig, _eje_y(nombre, unidad), "Fecha", 480)
+    fig.update_yaxes(rangemode="normal")
+    return _eje_tiempo(fig)
+
+
+def explorar_perfil(series, nombre, unidad, dec=2):
+    if not any(len(d) for _, d, _c in series):
+        return vacia()
+    fig = go.Figure()
+    u = f" {unidad}" if unidad else ""
+    for et, d, col in series:
+        if d.empty:
+            continue
+        st = d.groupby("hora").valor.mean().rename("m").reset_index()
+        fig.add_trace(go.Scatter(x=st.hora, y=st.m, mode="lines+markers", name=et,
+                                 line=dict(color=col, width=3), marker=dict(size=5),
+                                 hovertemplate=f"%{{y:.{dec}f}}{u}<extra>%{{fullData.name}}</extra>"))
+    _base(fig, _eje_y(nombre, unidad), "Hora del día", 440)
+    fig.update_yaxes(rangemode="normal")
+    return _eje_horas(fig)
+
+
+def explorar_dispersion(pares, xnombre, xunidad, ynombre, yunidad, dec=2):
+    """pares: [(etiqueta, df con x, y, color)]."""
+    if not any(len(d) for _, d, _c in pares):
+        return vacia("No hay datos de las dos variables en las mismas horas.")
+    fig = go.Figure()
+    xu, yu = (f" {xunidad}" if xunidad else ""), (f" {yunidad}" if yunidad else "")
+    for et, d, col in pares:
+        if d.empty:
+            continue
+        fig.add_trace(go.Scattergl(x=d.x, y=d.y, mode="markers", name=et,
+                                   marker=dict(color=col, size=5, opacity=0.55),
+                                   hovertemplate=f"%{{x:.{dec}f}}{xu} → %{{y:.{dec}f}}{yu}<extra>%{{fullData.name}}</extra>"))
+    _base(fig, _eje_y(ynombre, yunidad), _eje_y(xnombre, xunidad), 480)
+    fig.update_layout(hovermode="closest", legend=dict(itemsizing="constant"))
+    fig.update_xaxes(showgrid=True, gridcolor=REJILLA)
+    fig.update_yaxes(rangemode="normal")
+    return fig

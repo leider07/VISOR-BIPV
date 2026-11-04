@@ -1,16 +1,17 @@
-# Formato de carga 1.1 · Plataforma de monitoreo fotovoltaico
+# Formato de carga · Plataforma de monitoreo fotovoltaico
 
 La plataforma recibe **un archivo SQLite (`.db`) por instalación** con 10 tablas: 7 describen la
 instalación y 3 guardan las mediciones. Sirve para cualquier tecnología fotovoltaica. Los datos se
-suben **ya organizados y corregidos** (calibraciones aplicadas, cambios de sensor resueltos); la
-plataforma aplica la ventana horaria, los filtros y la validación de días.
+suben **ya organizados, corregidos y depurados** como cada usuario considere conveniente
+(calibraciones aplicadas, cambios de sensor resueltos, datos erróneos retirados): la plataforma es un
+**visor** y muestra los datos tal como se cargan, sin filtrarlos.
 
 Archivos de esta carpeta:
 
 | Archivo | Para qué |
 |---|---|
-| `plantilla_v1.1.db` | Base vacía con las 10 tablas y las variables fijas ya escritas |
-| `esquema.sql` | Las mismas tablas en SQL (`sqlite3 mi_instalacion.db < esquema.sql`) |
+| `plantilla.db` | Plantilla básica: las tablas con solo sus columnas obligatorias y las variables fijas ya escritas (las columnas opcionales se agregan si se necesitan) |
+| `esquema.sql` | Las 10 tablas con todas sus columnas, en SQL (`sqlite3 mi_instalacion.db < esquema.sql`) |
 | `guia_formato.md` | Esta guía |
 
 Los ejemplos corresponden al prototipo BIPV de Sumicol, el primer caso cargado.
@@ -50,6 +51,8 @@ tecnologias ──< modulos >── superficies ──< cronograma_orientaciones
   El rango del proyecto se calcula de los datos.
 - **Intervalo**: recomendado 1 minuto, aceptado hasta 15. Las tablas se cruzan por minuto.
 - **Datos faltantes**: celda vacía (NULL). Nunca 0, -999 o texto.
+- **Datos depurados**: la plataforma no filtra. Lo que se cargue es lo que se ve: si hay lecturas
+  erróneas, horas que no interesan o días incompletos, se retiran antes de cargar.
 - **Códigos** (`_id`): texto corto y único que tú eliges; igual en todas las tablas.
 - **Unidades**: las fijas usan W, V, A, Wh, W/m², °C, %, m/s. Las adicionales declaran la suya.
 - **Inclinación**: 0° horizontal, 90° vertical. **Orientación**: Norte, Noreste, Este, Sureste,
@@ -64,7 +67,6 @@ tecnologias ──< modulos >── superficies ──< cronograma_orientaciones
 | Columna | Tipo | | Descripción | Sumicol |
 |---|---|---|---|---|
 | `nombre` | texto | ● | Nombre para el público | Prototipo BIPV Sumicol |
-| `version_formato` | texto | ● | Versión de esta guía | 1.1 |
 | `descripcion` | texto | ○ | Texto corto | 12 vidrios FV semitransparentes en 3 caras |
 | `responsable` | texto | ○ | Grupo o entidad | Proyecto Integra · UdeA |
 | `ciudad`, `pais` | texto | ○ | Ubicación general | —, Colombia |
@@ -109,10 +111,9 @@ tecnologias ──< modulos >── superficies ──< cronograma_orientaciones
 | `nombre` | texto | ● | Nombre para gráficas | Fill factor |
 | `unidad` | texto | ● | Unidad (vacía si no tiene) | — |
 | `tipo` | texto | ● | `electrica` o `ambiental` | electrica |
-| `agregacion` | texto | ● | `promedio`, `suma`, `minimo` o `maximo` (resumen por hora y día) | promedio |
-| `min_valido`, `max_valido` | número | ○ | Rango posible; fuera se descarta | 0, 1 |
+| `agregacion` | texto | ○ | `promedio`, `suma`, `minimo` o `maximo` (resumen por hora); vacía = `promedio` | promedio |
 
-Variables fijas (vienen en la plantilla; se borran las que no se entreguen, menos la potencia):
+Variables fijas (la plantilla básica trae la potencia y las ambientales; `voc_v`, `isc_a`, `vmpp_v` e `impp_a` se agregan si se miden):
 
 | variable_id | Tipo | Unidad | | Dónde se usa |
 |---|---|---|---|---|
@@ -169,7 +170,7 @@ Una fila por módulo y lectura; no se repite módulo + fecha_hora.
 | `fecha` | fecha | ● | Día |
 | `modulo_id` | texto | ● | Existe en `modulos` |
 | `energia_wh` | número | ● | Energía del día (Wh) |
-| `data_points` | entero | ○ | Número de lecturas usadas en el cálculo |
+| `data_points` | entero | ○ | Número de lecturas usadas en el cálculo (informativo) |
 
 Si no está, la plataforma calcula la energía a partir de `potencia_max_w`.
 
@@ -186,13 +187,15 @@ está en la cara superior y es el vidrio de 40 %.
 
 ## Cómo crear la base
 
-1. Llena el formulario de la plataforma o copia `plantilla_v1.1.db`.
-2. Llena `instalacion`, `tecnologias`, `superficies`, `modulos` y `sensores`. Borra de
-   `variables` las fijas que no midas (menos la potencia) y agrega tus variables adicionales.
-3. Agrega las columnas que faltan (el formulario ya las crea):
+1. Llena el formulario de la plataforma o copia `plantilla.db`.
+2. Llena `instalacion`, `tecnologias`, `superficies`, `modulos` y `sensores`, y agrega a
+   `variables` tus variables adicionales.
+3. Agrega las columnas que faltan (el formulario ya las crea). Con la plantilla básica, también
+   las columnas opcionales que quieras usar:
    ```sql
    ALTER TABLE mediciones_ambientales ADD COLUMN "IR1" REAL;   -- un sensor
    ALTER TABLE mediciones_electricas  ADD COLUMN ff REAL;      -- una variable adicional
+   ALTER TABLE tecnologias ADD COLUMN transmitancia_pct REAL;  -- una columna opcional
    ```
 4. Copia las mediciones con Python, DB Browser for SQLite u otra herramienta.
 5. Sube el archivo: la plataforma lo revisa y lista los errores antes de aceptarlo.
@@ -215,5 +218,4 @@ por defecto; la plataforma los revisa igual al cargar).
 | Explorar | Cualquier variable, incluidas las adicionales |
 
 VOC, ISC, VMPP, IMPP y las variables adicionales se ven en **Explorar** (variable, módulos o
-sensores, eje horizontal: tiempo / hora del día / otra variable, y fechas). A las adicionales solo
-se les aplica el rango `min_valido`–`max_valido`.
+sensores, eje horizontal: tiempo / hora del día / otra variable, y fechas).
