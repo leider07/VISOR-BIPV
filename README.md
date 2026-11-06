@@ -213,7 +213,7 @@ la aplicación no los usa.
 
 ## Autoría, licencia y cita
 
-**Autores:** Leider Fabián Castro García · Santiago Restrepo Muñoz
+**Autores:** Leider Fabián Castro García, Santiago Restrepo Muñoz, Edwin Alexander Ramírez Pérez, Franklin Jaramillo Isaza
 
 Grupo de Investigación en Manejo Eficiente de la Energía (**GIMEL**) y Centro de Investigación,
 Innovación y Desarrollo de Materiales (**CIDEMAT**), Universidad de Antioquia.
