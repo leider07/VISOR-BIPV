@@ -1,15 +1,21 @@
 cff-version: 1.2.0
 message: "Si usas esta plataforma, por favor cítala así."
-title: "VISOR-BIPV: plataforma de monitoreo fotovoltaico"
+title: "Plataforma de monitoreo BIPV (VISOR-BIPV): visualización de datos históricos de instalaciones fotovoltaicas"
 type: software
 authors:
   - family-names: "Castro García"
     given-names: "Leider Fabián"
     email: fabianleider0707@gmail.com
     affiliation: "Universidad de Antioquia (GIMEL y CIDEMAT)"
+  - family-names: "Restrepo Muñoz"
+    given-names: "Santiago"
+  - family-names: "Ramírez Pérez"
+    given-names: "Edwin Alexander"
+  - family-names: "Jaramillo Isaza"
+    given-names: "Franklin"
 repository-code: "https://github.com/leider07/VISOR-BIPV"
 license: MIT
-date-released: 2026-11-04
+date-released: 2026-11-09
 abstract: >-
   Plataforma web (Dash y Plotly) para visualizar datos históricos de instalaciones
   fotovoltaicas: recurso solar, energía y desempeño de cada módulo. El primer caso es el
