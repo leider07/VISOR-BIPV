@@ -225,6 +225,8 @@ Antioquia, Risaralda, Caldas y Quindío».
 **Aliados:** Universidad de Antioquia, Sumicol, Andercol, Sociedad Antioqueña de Ingenieros y
 Arquitectos (SAI), Gobernación de Antioquia y Corantioquia.
 
+**Agradecimientos:** Este trabajo contó con el apoyo de los proyectos «Desarrollo de capacidades para la generación de energía eléctrica para atender los retos de diversificación, descentralización y demanda en entornos urbanos y rurales de Antioquia, Risaralda, Caldas y Quindío» (código BPIN 2023000100025) y «Desarrollo de una plataforma de agricultura inteligente energéticamente autónoma para el monitoreo continuo de variables relevantes, orientada a mejorar la productividad y mitigar el impacto ambiental en cultivos hortícolas de Antioquia y Quindío» (código BPIN 2022000100012), financiados por el Sistema General de Regalías, y del proyecto «Plataforma de Hardware in the Loop para la Gestión Energética» (código 2024-76942), financiado por la convocatoria 2023-2024 de la Universidad de Antioquia. Se agradece también a Sumicol (Organización Corona) por facilitar sus instalaciones para la implementación, operación y validación del montaje experimental.
+
 **Titularidad:** los derechos patrimoniales del software pertenecen a la Universidad de Antioquia. Los
 datos del prototipo de Sumicol, las fotografías del montaje y los logotipos pertenecen a sus titulares.
 Las tipografías se incluyen con la licencia SIL Open Font License (ver `assets/fonts/`).
