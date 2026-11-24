@@ -39,7 +39,7 @@ CONFIG = {
     "locale": "es",
     "locales": {"es": LOCALE_ES},
     "modeBarButtonsToRemove": ["select2d", "lasso2d", "autoScale2d", "toggleSpikelines"],
-    "toImageButtonOptions": {"format": "png", "scale": 2, "filename": "visor_bipv"},
+    "toImageButtonOptions": {"format": "png", "scale": 2, "filename": "monitoreo_fotovoltaico"},
 }
 
 

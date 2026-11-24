@@ -1,19 +1,29 @@
 cff-version: 1.2.0
-message: "Si usas esta plataforma, por favor cítala así."
-title: "VISOR-BIPV: plataforma de monitoreo fotovoltaico"
+message: "Si usas este software, por favor cítalo así."
+title: "Plataforma de monitoreo fotovoltaico"
 type: software
 authors:
   - family-names: "Castro García"
     given-names: "Leider Fabián"
-    email: fabianleider0707@gmail.com
-    affiliation: "Universidad de Antioquia (GIMEL y CIDEMAT)"
+    affiliation: "Universidad de Antioquia (CIDEMAT, GIMEL)"
+  - family-names: "Ramírez Pérez"
+    given-names: "Edwin Alexander"
+    affiliation: "Universidad de Antioquia (CIDEMAT)"
+  - family-names: "Restrepo Muñoz"
+    given-names: "Santiago"
+    affiliation: "Universidad de Antioquia (CIDEMAT, GIMEL)"
+  - family-names: "Jaramillo Isaza"
+    given-names: "Franklin"
+    affiliation: "Universidad de Antioquia (CIDEMAT)"
+contact:
+  - name: "Proyecto Integra"
+    email: proyectointegra.siu@udea.edu.co
 repository-code: "https://github.com/leider07/VISOR-BIPV"
-license: MIT
-date-released: 2026-11-04
+date-released: 2026-11-22
 abstract: >-
-  Plataforma web (Dash y Plotly) para visualizar datos históricos de instalaciones
-  fotovoltaicas: recurso solar, energía y desempeño de cada módulo. El primer caso es el
-  prototipo BIPV de Sumicol, desarrollado en el Proyecto Integra.
+  Software para visualizar datos históricos de instalaciones fotovoltaicas: recurso solar,
+  energía y desempeño de cada módulo. Desarrollado en el Proyecto del Sistema General de
+  Regalías código BPIN 2023000100025. El primer caso es el prototipo BIPV de Sumicol.
 keywords:
   - fotovoltaica
   - BIPV

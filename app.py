@@ -25,7 +25,7 @@ from plataforma.componentes import (aviso_base_propia, barra_filtros, encabezado
 _META = D.metadatos()
 app = dash.Dash(
     __name__,
-    title="Visor BIPV · Proyecto Integra" if D.es_resumen_fijo() else f"{_META['instalacion']} · Proyecto Integra",
+    title="Plataforma de monitoreo fotovoltaico" if D.es_resumen_fijo() else f"{_META['instalacion']} · Plataforma de monitoreo fotovoltaico",
     update_title=None,
     suppress_callback_exceptions=True,
     compress=True,   # comprime las respuestas (flask-compress): la página carga más rápido

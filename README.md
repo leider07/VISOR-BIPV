@@ -1,4 +1,4 @@
-# VISOR-BIPV · Plataforma de monitoreo fotovoltaico
+# Plataforma de monitoreo fotovoltaico
 
 Plataforma web para visualizar los datos históricos de instalaciones fotovoltaicas: el recurso
 solar y las condiciones del sitio, la energía generada por cada módulo y su desempeño (potencia y
@@ -26,7 +26,7 @@ puede visualizarse con las mismas pestañas y gráficas.
 - [Tus datos: bases propias](#tus-datos-bases-propias)
 - [Estructura del código](#estructura-del-código)
 - [Mantenimiento](#mantenimiento)
-- [Autoría, licencia y cita](#autoría-licencia-y-cita)
+- [Autoría y titularidad](#autoría-y-titularidad)
 
 ## Funcionalidades
 
@@ -130,7 +130,6 @@ Solo `potencia_max_w` es obligatoria entre las variables. Los archivos de `forma
 | `guia_formato.md` | La misma información como referencia técnica |
 | `plantilla.db` | Plantilla básica: solo columnas obligatorias y variables fijas escritas |
 | `esquema.sql` | Las diez tablas con todas sus columnas |
-| `guia/` | Fuente de la guía en PDF (`guia.html`, `diagrama.png`) y el script que la genera |
 
 ## Procesamiento de los datos
 
@@ -183,7 +182,6 @@ Los límites están en `plataforma/config.py`.
 │   ├── plantilla.py         # plantilla desde el formulario y plantilla básica
 │   └── parametros.py        # parámetros de cálculo
 ├── formato/                 # formato de carga: guía, plantilla y esquema
-├── manual/                  # fuente del manual de uso (manual.html, capturas y generador)
 ├── data/visor.db            # base de la plataforma (Sumicol)
 └── assets/                  # css/, fonts/ (licencias OFL), img/, docs/manual_uso.pdf
 ```
@@ -205,30 +203,33 @@ Detalles de diseño:
 | Actualizar los datos de Sumicol | Generar la base de carga y ejecutar `python procesamiento/procesar.py <base>.db`; luego commit de `data/visor.db`. |
 | Ajustar cálculos | `procesamiento/parametros.py` y volver a procesar. |
 | Regenerar la plantilla básica | `python procesamiento/plantilla.py` |
-| Regenerar la guía de carga | Editar `formato/guia/guia.html` y ejecutar `python formato/guia/generar_pdf.py` |
-| Regenerar el manual | Editar `manual/manual.html` (capturas en `manual/img/`) y ejecutar `python manual/generar_pdf.py` |
+| Actualizar el manual o la guía | Reemplazar `assets/docs/manual_uso.pdf` o `formato/guia_formato.pdf` por la nueva versión en PDF (los botones de descarga los toman de ahí). |
 
-Los generadores de PDF necesitan Playwright con Chromium (`pip install playwright && playwright install chromium`);
-la aplicación no los usa.
+## Autoría y titularidad
 
-## Autoría, licencia y cita
+**Autores:**
 
-**Autor:** Leider Fabián Castro García · fabianleider0707@gmail.com
+- Leider Fabián Castro García¹ ²
+- Edwin Alexander Ramírez Pérez¹
+- Santiago Restrepo Muñoz¹ ²
+- Franklin Jaramillo Isaza¹
 
-Grupo de Investigación en Manejo Eficiente de la Energía (**GIMEL**) y Centro de Investigación,
-Innovación y Desarrollo de Materiales (**CIDEMAT**), Universidad de Antioquia.
+¹ Centro de Investigación, Innovación y Desarrollo de Materiales (CIDEMAT), Universidad de Antioquia, Medellín, Colombia.
+² Grupo de Investigación en Manejo Eficiente de la Energía (GIMEL), Universidad de Antioquia, Medellín, Colombia.
 
-**Agradecimientos:** al Proyecto Integra, en el que se desarrolló el prototipo BIPV de Sumicol y esta
-plataforma.
+**Proyecto:** desarrollado en el Proyecto del Sistema General de Regalías código BPIN 2023000100025,
+«Desarrollo de capacidades para la generación de energía eléctrica, para enfrentar los retos de
+diversificación, descentralización y demanda en entornos urbanos y rurales de los departamentos de
+Antioquia, Risaralda, Caldas y Quindío».
 
-**Licencia:**
+**Aliados:** Universidad de Antioquia, Sumicol, Andercol, Sociedad Antioqueña de Ingenieros y
+Arquitectos (SAI), Gobernación de Antioquia y Corantioquia.
 
-- El código se distribuye con la licencia [MIT](LICENSE).
-- La documentación (manual de uso, guía de carga y capturas de pantalla) se distribuye con la
-  licencia [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.es).
-- Los datos del prototipo de Sumicol, las fotografías del montaje y los logotipos de las entidades
-  pertenecen a sus titulares, se usan con su autorización y no están cubiertos por estas licencias.
-- Las tipografías se incluyen con la licencia SIL Open Font License (ver `assets/fonts/`).
+**Titularidad:** los derechos patrimoniales del software pertenecen a la Universidad de Antioquia. Los
+datos del prototipo de Sumicol, las fotografías del montaje y los logotipos pertenecen a sus titulares.
+Las tipografías se incluyen con la licencia SIL Open Font License (ver `assets/fonts/`).
+
+**Contacto:** proyectointegra.siu@udea.edu.co
 
 **Cómo citar:** el repositorio incluye un archivo [`CITATION.cff`](CITATION.cff); GitHub muestra la cita
 en el botón *Cite this repository*.

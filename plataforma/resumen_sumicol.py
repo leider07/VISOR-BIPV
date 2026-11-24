@@ -167,6 +167,47 @@ def resumen():
                                 for r in crono.itertuples()]),
                 ])),
             ]),
+            creditos(),
+        ]),
+    ])
+
+
+# ---------------------------------------------------------------- créditos
+PROYECTO = ("Desarrollo de capacidades para la generación de energía eléctrica, para enfrentar los retos de "
+            "diversificación, descentralización y demanda en entornos urbanos y rurales de los departamentos de "
+            "Antioquia, Risaralda, Caldas y Quindío")
+AUTORES = [("Leider Fabián Castro García", "1, 2"), ("Edwin Alexander Ramírez Pérez", "1"),
+           ("Santiago Restrepo Muñoz", "1, 2"), ("Franklin Jaramillo Isaza", "1")]
+AFILIACIONES = ["Centro de Investigación, Innovación y Desarrollo de Materiales (CIDEMAT), Universidad de Antioquia, "
+                "Medellín, Colombia",
+                "Grupo de Investigación en Manejo Eficiente de la Energía (GIMEL), Universidad de Antioquia, "
+                "Medellín, Colombia"]
+ALIADOS = ("Universidad de Antioquia, Sumicol, Andercol, Sociedad Antioqueña de Ingenieros y Arquitectos (SAI), "
+           "Gobernación de Antioquia y Corantioquia.")
+CONTACTO = "proyectointegra.siu@udea.edu.co"
+
+
+def creditos():
+    """Proyecto, autores, aliados y contacto, al final del Resumen."""
+    return html.Section(id="creditos", className="bloque-grande creditos", children=[
+        html.Div("Proyecto del Sistema General de Regalías · Código BPIN 2023000100025", className="ceja"),
+        html.H2(PROYECTO, className="creditos-proyecto"),
+        html.Div(className="rejilla-3 creditos-rejilla", children=[
+            html.Div(className="tarjeta creditos-tarjeta", children=[
+                html.H3("Autores"),
+                html.Ul(className="creditos-lista", children=[
+                    html.Li([nombre, html.Sup(sup)]) for nombre, sup in AUTORES]),
+                html.Div(className="creditos-afil", children=[
+                    html.P([html.Sup(str(i + 1)), f" {a}"]) for i, a in enumerate(AFILIACIONES)]),
+            ]),
+            html.Div(className="tarjeta creditos-tarjeta", children=[
+                html.H3("Aliados"),
+                html.P(ALIADOS, className="parrafo"),
+            ]),
+            html.Div(className="tarjeta creditos-tarjeta", children=[
+                html.H3("Contacto"),
+                html.A(CONTACTO, href=f"mailto:{CONTACTO}", className="creditos-correo"),
+            ]),
         ]),
     ])
 

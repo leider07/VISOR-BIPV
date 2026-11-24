@@ -169,9 +169,9 @@ def barra_filtros(meta):
 def textos_marca(meta):
     """(franja superior, título de la marca, subtítulo de la marca)."""
     if D.es_resumen_fijo():
-        return "Plataforma de monitoreo BIPV · Prototipo Sumicol", "Visor BIPV", "Sumicol · Medellín"
+        return "Proyecto Integra · Prototipo BIPV Sumicol", "Plataforma de monitoreo fotovoltaico", "Sumicol · Medellín"
     lugar = " · ".join(x for x in [meta.get("ciudad"), meta.get("pais")] if x)
-    return (f"Plataforma de monitoreo fotovoltaico · {meta['instalacion']}", "Visor fotovoltaico",
+    return (f"Proyecto Integra · {meta['instalacion']}", "Plataforma de monitoreo fotovoltaico",
             " · ".join(x for x in [meta["instalacion"], meta.get("ciudad")] if x) or lugar)
 
 
