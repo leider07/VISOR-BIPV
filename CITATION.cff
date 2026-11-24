@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "Si usas este software, por favor cítalo así."
-title: "Plataforma de monitoreo fotovoltaico"
+title: "Monitor BIPV 360: plataforma de análisis del desempeño fotovoltaico en edificaciones"
 type: software
 authors:
   - family-names: "Castro García"

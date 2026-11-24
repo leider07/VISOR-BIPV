@@ -100,11 +100,11 @@ def _tabla(tabla, filas=None):
     return dash_table.DataTable(
         id=f"form-{tabla}", columns=cols, data=filas or [_fila_vacia(tabla)], editable=True, row_deletable=True,
         dropdown=desplegables_fijos(tabla), css=[{"selector": ".Select-menu-outer", "rule": "display: block !important"}],
-        style_table={"overflowX": "auto"}, style_cell={"fontFamily": "'Source Sans 3', sans-serif", "fontSize": 15,
+        style_table={"overflowX": "auto"}, style_cell={"fontFamily": "'Fira Sans', sans-serif", "fontSize": 15,
                                                         "padding": "8px 10px", "textAlign": "left", "minWidth": 110},
-        style_header={"fontFamily": "Montserrat, sans-serif", "fontSize": 12, "fontWeight": 700,
-                      "background": "#eef6f3", "color": "#1b554f"},
-        style_data={"background": "#fff"}, page_action="none")
+        style_header={"fontFamily": "'Fira Sans', sans-serif", "fontSize": 12, "fontWeight": 600,
+                      "background": "#EEF0E1", "color": "#304936"},
+        style_data={"background": "#FFFCF6"}, page_action="none")
 
 
 def _opciones(valores, etiquetas=None):
@@ -199,7 +199,7 @@ def tarjeta_base_activa(token):
                          className="parrafo")]),
         html.Div(className="hero-botones", children=[
             dcc.Link("Ver mis datos", href="/energia", className="btn btn-pri"),
-            html.Button("Volver a la plataforma de Sumicol", id={"type": "volver", "index": "datos"}, n_clicks=0,
+            html.Button("Volver al prototipo BIPV", id={"type": "volver", "index": "datos"}, n_clicks=0,
                         className="btn btn-sec")]),
     ])
 
@@ -224,7 +224,7 @@ def pagina(token):
                 " · ",
                 html.Button("Descargar la plantilla básica", id="btn-plantilla-vacia", n_clicks=0, className="enlace-btn"),
                 " · ",
-                html.A("Descargar el manual de uso (PDF)", href="/assets/docs/manual_uso.pdf", download="manual_uso.pdf",
+                html.A("Descargar el manual de uso (PDF)", href="/assets/docs/manual_uso.pdf", download="Monitor_BIPV_360_Manual_de_uso.pdf",
                        className="enlace-btn")],
                className="nota"),
 
@@ -251,7 +251,7 @@ def pagina(token):
                        children=html.Div([html.Strong("Arrastra tu archivo .db aquí"), html.Br(),
                                           html.Span(f"o haz clic para elegirlo · máximo {C.MAX_MB_BASE_PROCESADA} MB "
                                                     "(los archivos más grandes no se envían)")])),
-            dcc.Loading(type="dot", color="#1b554f", children=html.Div(id="carga-resultado")),
+            dcc.Loading(type="dot", color="#304936", children=html.Div(id="carga-resultado")),
         ]),
     ])
 

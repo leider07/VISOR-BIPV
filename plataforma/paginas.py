@@ -119,7 +119,7 @@ ESCALA_MATRIZ = [(0, (255, 253, 245)), (250, (251, 239, 196)), (500, (246, 216, 
 
 def color_irradiancia(v):
     if v != v:  # NaN
-        return "#ffffff"
+        return "#FFFCF6"
     v = max(0.0, min(float(v), ESCALA_MATRIZ[-1][0]))
     for (a, ca), (b, cb) in zip(ESCALA_MATRIZ, ESCALA_MATRIZ[1:]):
         if v <= b:
@@ -150,7 +150,7 @@ def tarjeta_matriz():
         html.Div(className="matriz-info", children=[
             html.Span(id="matriz-texto"),
             html.Button("Ver todo el rango", id="btn-matriz-todo", n_clicks=0, className="enlace-btn")]),
-        dcc.Loading(type="dot", color="#1b554f", children=html.Div(id="matriz-tabla", className="matriz-caja")),
+        dcc.Loading(type="dot", color="#304936", children=html.Div(id="matriz-tabla", className="matriz-caja")),
         html.Div(className="matriz-leyenda", children=[
             html.Span("0 W/m²"), html.Span(className="matriz-gradiente"), html.Span("1000 W/m² o más")]),
     ])
@@ -384,7 +384,7 @@ def explorar(f):
             html.Div(className="tarjeta-cab explorar-cab", children=[
                 html.Div([html.H3(id="exp-titulo"), html.P(id="exp-subtitulo")]),
                 html.Button("Descargar datos", id="btn-descargar-exp", n_clicks=0, className="btn btn-sec btn-peq")]),
-            dcc.Loading(type="dot", color="#1b554f", children=dcc.Graph(id="exp-grafica", config=G.CONFIG,
+            dcc.Loading(type="dot", color="#304936", children=dcc.Graph(id="exp-grafica", config=G.CONFIG,
                                                                          className="grafica")),
         ]),
     ])

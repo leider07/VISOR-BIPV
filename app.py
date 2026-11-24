@@ -1,5 +1,5 @@
 """
-Plataforma de monitoreo fotovoltaico · Proyecto Integra
+Monitor BIPV 360 · Plataforma de análisis del desempeño fotovoltaico en edificaciones
 
 Muestra la base data/visor.db (generada con procesamiento/procesar.py). En la pestaña «Tus datos»
 cada visitante puede cargar su propia base y verla él solo (se guarda temporalmente en el servidor).
@@ -25,7 +25,7 @@ from plataforma.componentes import (aviso_base_propia, barra_filtros, encabezado
 _META = D.metadatos()
 app = dash.Dash(
     __name__,
-    title="Plataforma de monitoreo fotovoltaico" if D.es_resumen_fijo() else f"{_META['instalacion']} · Plataforma de monitoreo fotovoltaico",
+    title="Monitor BIPV 360" if D.es_resumen_fijo() else f"{_META['instalacion']} · Monitor BIPV 360",
     update_title=None,
     suppress_callback_exceptions=True,
     compress=True,   # comprime las respuestas (flask-compress): la página carga más rápido
@@ -48,7 +48,7 @@ def marco(propia=False):
             html.Div([html.H1(id="titulo"), html.P(id="subtitulo")]),
             barra_filtros(meta),
         ])),
-        dcc.Loading(type="circle", color="#1b554f", delay_show=250,
+        dcc.Loading(type="circle", color="#304936", delay_show=250,
                     children=html.Main(id="contenido", className="contenido")),
         pie(),
     ]
@@ -101,7 +101,11 @@ def navegacion(ruta, _fechas, base):
     ruta = _ruta(ruta)
     # Las clases se calculan para los enlaces que hay en pantalla (al cambiar de base puede quedar un instante
     # el menú de la base anterior)
-    clases = ["nav-link activo" if o["id"]["index"] == ruta else "nav-link" for o in ctx.outputs_list[0]]
+    # Pestañas como ruta de energía: las anteriores a la activa quedan «recorridas» (línea amarilla)
+    ids = [o["id"]["index"] for o in ctx.outputs_list[0]]
+    pos = ids.index(ruta) if ruta in ids else -1
+    clases = ["nav-link activo" if i == pos else "nav-link recorrido" if i < pos else "nav-link"
+              for i in range(len(ids))]
     if ruta == "/":
         return clases, {"display": "none"}, "", "", "", "grupo-filtro", "grupo-filtro", {}
     if ruta == "/datos":
@@ -274,8 +278,10 @@ def generar_plantilla(n, *campos):
 def descargar_formato(_g, _p):
     if not ctx.triggered or not ctx.triggered[0]["value"]:
         return no_update
-    nombre = "guia_formato.pdf" if ctx.triggered_id == "btn-guia" else "plantilla.db"
-    return dcc.send_file(str(T.C.RAIZ / "formato" / nombre))
+    if ctx.triggered_id == "btn-guia":
+        return dcc.send_file(str(T.C.RAIZ / "formato" / "guia_formato.pdf"),
+                             filename="Monitor_BIPV_360_Guia_para_cargar_datos.pdf")
+    return dcc.send_file(str(T.C.RAIZ / "formato" / "plantilla.db"))
 
 
 @app.callback(Output("base", "data"), Output("carga-resultado", "children"),

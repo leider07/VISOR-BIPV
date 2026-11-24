@@ -1,4 +1,4 @@
-# Plataforma de monitoreo fotovoltaico
+# Monitor BIPV 360 · Plataforma de análisis del desempeño fotovoltaico en edificaciones
 
 Plataforma web para visualizar los datos históricos de instalaciones fotovoltaicas: el recurso
 solar y las condiciones del sitio, la energía generada por cada módulo y su desempeño (potencia y
@@ -193,7 +193,7 @@ Detalles de diseño:
   base.
 - **Interfaz generada desde los datos.** Pestañas, filtros, colores y términos se construyen a partir
   del catálogo y los metadatos de `visor.db`.
-- **Estilo propio.** Tipografías Montserrat y Source Sans 3 servidas localmente; paleta y componentes
+- **Estilo propio.** Identidad visual de Integra: tipografías Figtree y Fira Sans servidas localmente; paleta (crema, verde bosque, musgo, salvia y amarillo) y componentes
   en `assets/css/estilo.css`.
 
 ## Mantenimiento

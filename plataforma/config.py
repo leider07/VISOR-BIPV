@@ -18,7 +18,7 @@ DISPERSION_MINUTOS = M.DISPERSION_MINUTOS
 
 # Instalación que tiene la pestaña Resumen propia (textos y fotos fijos, plataforma/resumen_sumicol.py).
 # Para cualquier otra instalación la plataforma abre directo en las gráficas.
-INSTALACION_CON_RESUMEN = "Prototipo BIPV Sumicol"
+INSTALACION_CON_RESUMEN = "Prototipo BIPV"
 
 # Bases que cargan los visitantes en «Tus datos»: carpeta temporal, se borran a las 24 h
 # (en el hosting gratuito además se pierden al reiniciar el servidor)

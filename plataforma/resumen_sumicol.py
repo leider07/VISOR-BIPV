@@ -1,4 +1,4 @@
-"""Pestaña Resumen del prototipo BIPV Sumicol (contenido fijo: textos, fotos y equipos)."""
+"""Pestaña Resumen del prototipo BIPV (contenido fijo: textos, fotos y equipos)."""
 from datetime import date
 
 from dash import html
@@ -43,36 +43,42 @@ def resumen():
         ("6", "Visualiza tus datos", "Describe tu instalación, descarga la plantilla, llénala con tus mediciones "
                                      "y cárgala. Solo tú la ves y se borra a las 24 horas.", "captura-datos.png"),
     ]
-    return html.Div([
+    return html.Div(className="resumen", children=[
         html.Section(className="hero", children=html.Div(className="contenedor hero-int", children=[
             html.Div(className="hero-texto", children=[
-                html.Div("Prototipo BIPV · Sumicol, Medellín", className="ceja"),
-                html.H1("Vidrios fotovoltaicos que generan energía en la fachada"),
-                html.P("Esta plataforma muestra los datos históricos del prototipo de integración fotovoltaica en "
-                       "edificaciones (BIPV) instalado en Sumicol: 12 módulos de vidrio semitransparente con cuatro "
-                       "niveles de transmitancia, montados en tres caras con inclinaciones de 0°, 60° y 90°.",
-                       className="parrafo"),
+                html.H1(["Desempeño de tecnologías fotovoltaicas ", html.Span("integradas", className="resaltado"),
+                         " en edificaciones"]),
+                html.P(className="parrafo hero-lede", children=[
+                    html.Strong("Monitor BIPV 360 es una plataforma para el sector de la construcción que monitorea la "
+                                "generación eléctrica de sistemas fotovoltaicos integrados en edificaciones y las "
+                                "condiciones ambientales en las que operan."),
+                    " Relaciona las mediciones eléctricas de cada módulo PV con la irradiancia y la temperatura, y "
+                    "compara potencia, energía y eficiencia entre módulos de distintas tecnologías fotovoltaicas, "
+                    "incluidos vidrios con diferentes porcentajes de transmisión de luz, instalados con distintas "
+                    "orientaciones e inclinaciones, de 0° a 90°, en cubiertas, fachadas, pérgolas, barandas y otros "
+                    "elementos arquitectónicos."]),
                 html.Div(className="hero-botones", children=[
                     html.A("Explorar los datos", href="/clima", className="btn btn-pri"),
                     html.A("¿Cómo funciona?", href="#como", className="btn btn-sec"),
                 ]),
             ]),
-            html.Div(className="hero-foto", children=[
-                html.Img(src=f"{IMG}/montaje-1.jpg", alt="Prototipo BIPV en la terraza de Sumicol"),
-                html.Div(className="hero-sello", children=[f"{f_corta(meta['fecha_inicio'])} – {f_corta(meta['fecha_fin'])}",
-                                                         html.Br(), html.Span("datos históricos")]),
+            html.Div(className="hero-visual", children=[
+                html.Img(src="/assets/img/portada/edificio-integra.webp",
+                         alt="Ilustración de un edificio con módulos fotovoltaicos integrados que reciben la luz del sol"),
             ]),
         ])),
-        html.Div(className="contenedor", children=[
-            html.Div(className="rejilla-4 bloque", children=[
-                html.Div(className="tarjeta cifra", children=[html.Div(v, className="cifra-v"), html.Div(t)])
+        html.Section(className="franja-res franja-bosque nodo-ruta", children=html.Div(className="contenedor", children=[
+            html.Div(className="rejilla-4 cifras revelar", children=[
+                html.Div(className="cifra", children=[html.Div(v, className="cifra-v"), html.Div(t)])
                 for v, t in [("12", "módulos BIPV de 0,72 m²"), ("3", "caras: 0°, 60° y 90°"),
                              ("4", "vidrios: 10, 30, 40 y 80 % de transmitancia"),
                              (str(meses), "meses de medición, minuto a minuto")]]),
-            html.Section(className="bloque-grande dos-col", children=[
+        ])),
+        franja("", [
+            html.Div(className="bloque-grande dos-col revelar", children=[
                 html.Div(className="col-texto", children=[
                     html.Div("El montaje", className="ceja"),
-                    html.H2("Tres caras, cuatro vidrios"),
+                    titulo("Tres caras, cuatro ", "vidrios"),
                     html.P("En cada cara se midió, minuto a minuto, la electricidad que produce cada vidrio y la "
                            "radiación solar que recibe. La cara superior mira siempre al cielo; la inclinada y la "
                            "vertical se fueron girando para mirar al Norte, Sur, Este y Oeste.", className="parrafo"),
@@ -85,14 +91,16 @@ def resumen():
                 html.Img(src=f"{IMG}/montaje-2.jpg", alt="Vista del prototipo con las caras inclinada y vertical",
                          className="foto-grande"),
             ]),
-            html.Div(className="rejilla-3 galeria", children=[
+            html.Div(className="rejilla-3 galeria revelar", children=[
                 html.Img(src=f"{IMG}/montaje-3.jpg", alt="Detalle de los vidrios semitransparentes"),
                 html.Img(src=f"{IMG}/montaje-4.jpg", alt="Otra vista del prototipo"),
                 html.Img(src=f"{IMG}/montaje-1.jpg", alt="Prototipo con la ciudad de fondo"),
             ]),
-            html.Section(className="bloque-grande", children=[
+        ]),
+        franja("franja-salvia", [
+            html.Div(className="bloque-grande revelar", children=[
                 html.Div("Instrumentación", className="ceja"),
-                html.H2("Equipos de medición"),
+                titulo("Equipos de ", "medición"),
                 html.Div(className="tarjeta equipo-principal", children=[
                     html.Img(src=f"{IMG}/trazador-iv.jpg", alt="Trazador de curvas I-V instalado en su caja",
                              className="equipo-foto-grande"),
@@ -106,26 +114,28 @@ def resumen():
                                className="parrafo"),
                     ]),
                 ]),
-                html.Div(className="rejilla-4", children=[
-                    html.Div(className="tarjeta equipo", children=[
-                        html.Img(src=f"{IMG}/{img}", alt=nombre, className="equipo-foto"),
-                        html.Div(qué, className="equipo-mide"),
-                        html.Div(nombre, className="equipo-nombre"),
-                        html.P(desc)])
-                    for img, qué, nombre, desc in [
-                        ("sensor-radiacion.png", "Radiación solar", "Piranómetro RK200-04",
-                         "Mide la radiación solar que llega a cada cara. Hay uno en el mismo plano de cada cara."),
-                        ("sensor-termistor.png", "Temperatura de los vidrios", "Termistor NTC B3950 10K de película delgada",
-                         "Sensor delgado adherido a los vidrios para medir su temperatura."),
-                        ("sensor-ambiente.png", "Temperatura ambiente", "Sensor SHT31",
-                         "Mide la temperatura y la humedad del aire alrededor del prototipo."),
-                        ("sensor-viento.png", "Viento", "Sensor JXCT-3001-FSFX",
-                         "Estación de viento que mide la velocidad del aire sobre el prototipo."),
-                    ]]),
             ]),
-            html.Section(className="bloque-grande", children=[
+            html.Div(className="rejilla-4 revelar", children=[
+                html.Div(className="tarjeta equipo", children=[
+                    html.Img(src=f"{IMG}/{img}", alt=nombre, className="equipo-foto"),
+                    html.Div(qué, className="equipo-mide"),
+                    html.Div(nombre, className="equipo-nombre"),
+                    html.P(desc)])
+                for img, qué, nombre, desc in [
+                    ("sensor-radiacion.png", "Radiación solar", "Piranómetro RK200-04",
+                     "Mide la radiación solar que llega a cada cara. Hay uno en el mismo plano de cada cara."),
+                    ("sensor-termistor.png", "Temperatura de los vidrios", "Termistor NTC B3950 10K de película delgada",
+                     "Sensor delgado adherido a los vidrios para medir su temperatura."),
+                    ("sensor-ambiente.png", "Temperatura ambiente", "Sensor SHT31",
+                     "Mide la temperatura y la humedad del aire alrededor del prototipo."),
+                    ("sensor-viento.png", "Viento", "Sensor JXCT-3001-FSFX",
+                     "Estación de viento que mide la velocidad del aire sobre el prototipo."),
+                ]]),
+        ]),
+        franja("", [
+            html.Div(className="bloque-grande revelar", children=[
                 html.Div("Metodología", className="ceja"),
-                html.H2("Cómo se procesaron los datos"),
+                titulo("Cómo se ", "procesaron", " los datos"),
                 html.Div(className="rejilla-3", children=[
                     html.Div(className="tarjeta metodo", children=[html.H3(t), html.P(d)]) for t, d in [
                         ("Horario analizado",
@@ -139,11 +149,13 @@ def resumen():
                          "rango elegido, incluyendo días soleados y nublados."),
                     ]]),
             ]),
-            html.Section(id="como", className="bloque-grande", children=[
+        ]),
+        franja("franja-salvia", id="como", hijos=[
+            html.Div(className="bloque-grande revelar", children=[
                 html.Div("Guía rápida", className="ceja"),
                 html.Div(className="titulo-con-accion", children=[
-                    html.H2("Cómo usar la plataforma"),
-                    html.A("Descargar el manual de uso (PDF)", href=MANUAL, download="manual_uso.pdf",
+                    titulo("Cómo usar la ", "plataforma"),
+                    html.A("Descargar el manual de uso (PDF)", href=MANUAL, download="Monitor_BIPV_360_Manual_de_uso.pdf",
                            className="btn btn-sec")]),
                 html.Div(className="rejilla-3", children=[
                     html.Div(className="tarjeta paso", children=[
@@ -151,10 +163,12 @@ def resumen():
                         html.Div(className="paso-tit", children=[html.Span(n, className="paso-num"), t]),
                         html.P(d)]) for n, t, d, img in pasos]),
             ]),
-            html.Section(className="bloque-grande dos-col cronograma", children=[
+        ]),
+        franja("", [
+            html.Div(className="bloque-grande dos-col cronograma revelar", children=[
                 html.Div(className="col-texto", children=[
                     html.Div("Referencia", className="ceja"),
-                    html.H2("Cronograma de orientaciones"),
+                    titulo("Cronograma de ", "orientaciones"),
                     html.P("La cara inclinada y la vertical se giraron periódicamente. Esta tabla indica hacia dónde "
                            "miraba cada una en cada periodo, para interpretar los datos de una fecha concreta.",
                            className="parrafo"),
@@ -167,9 +181,23 @@ def resumen():
                                 for r in crono.itertuples()]),
                 ])),
             ]),
-            creditos(),
         ]),
+        franja("franja-creditos", [creditos()]),
+        # Ruta de energía vertical: se llena de amarillo al bajar y enciende un nodo por sección (assets/animaciones.js)
+        html.Div(className="ruta-vertical", **{"aria-hidden": "true"}, children=html.I()),
     ])
+
+
+def franja(clase, hijos, id=None):
+    """Sección a todo lo ancho (crema, salvia o bosque) con su contenido centrado."""
+    extra = {"id": id} if id else {}
+    return html.Section(className=f"franja-res nodo-ruta {clase}".strip(), **extra,
+                        children=html.Div(className="contenedor", children=hijos))
+
+
+def titulo(antes, palabra, despues=""):
+    """Título de sección con una sola palabra resaltada en amarillo (se pinta al aparecer)."""
+    return html.H2([antes, html.Span(palabra, className="resaltado"), despues])
 
 
 # ---------------------------------------------------------------- créditos
@@ -182,33 +210,29 @@ AFILIACIONES = ["Centro de Investigación, Innovación y Desarrollo de Materiale
                 "Medellín, Colombia",
                 "Grupo de Investigación en Manejo Eficiente de la Energía (GIMEL), Universidad de Antioquia, "
                 "Medellín, Colombia"]
-ALIADOS = ("Universidad de Antioquia, Sumicol, Andercol, Sociedad Antioqueña de Ingenieros y Arquitectos (SAI), "
-           "Gobernación de Antioquia y Corantioquia.")
 CONTACTO = "proyectointegra.siu@udea.edu.co"
 
 
 def creditos():
-    """Proyecto, autores, aliados y contacto, al final del Resumen."""
-    return html.Section(id="creditos", className="bloque-grande creditos", children=[
+    """Proyecto, autores y contacto, al final del Resumen (los aliados están en el pie con sus logos)."""
+    nombres = []
+    for k, (nombre, sup) in enumerate(AUTORES):
+        if k:
+            nombres.append(html.Span("·", className="creditos-sep"))
+        nombres.append(html.Span([nombre, html.Sup(sup)], className="creditos-autor"))
+    return html.Section(id="creditos", className="creditos", children=[
         html.Div("Proyecto del Sistema General de Regalías · Código BPIN 2023000100025", className="ceja"),
         html.H2(PROYECTO, className="creditos-proyecto"),
-        html.Div(className="rejilla-3 creditos-rejilla", children=[
-            html.Div(className="tarjeta creditos-tarjeta", children=[
-                html.H3("Autores"),
-                html.Ul(className="creditos-lista", children=[
-                    html.Li([nombre, html.Sup(sup)]) for nombre, sup in AUTORES]),
+        html.Div(className="creditos-fila", children=[
+            html.Div(className="creditos-col", children=[
+                html.Div("Autores", className="ceja"),
+                html.Div(nombres, className="creditos-nombres"),
                 html.Div(className="creditos-afil", children=[
                     html.P([html.Sup(str(i + 1)), f" {a}"]) for i, a in enumerate(AFILIACIONES)]),
             ]),
-            html.Div(className="tarjeta creditos-tarjeta", children=[
-                html.H3("Aliados"),
-                html.P(ALIADOS, className="parrafo"),
-            ]),
-            html.Div(className="tarjeta creditos-tarjeta", children=[
-                html.H3("Contacto"),
+            html.Div(className="creditos-col creditos-contacto", children=[
+                html.Div("Contacto", className="ceja"),
                 html.A(CONTACTO, href=f"mailto:{CONTACTO}", className="creditos-correo"),
             ]),
         ]),
     ])
-
-

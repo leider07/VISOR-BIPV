@@ -8,15 +8,17 @@ from . import datos as D
 
 # Paleta
 VERDE = "#1b554f"
-TEXTO = "#16302d"
-TEXTO_2 = "#35504c"
-REJILLA = "#e3ecea"
+TEXTO = "#1A4127"
+TEXTO_2 = "#3E4A40"
+REJILLA = "#ECE6D8"
+PAPEL = "#FFFCF6"
+BORDE = "#E3DBC9"
 AMBIENTE = "#b9770e"
 # Colores por posición: superficies en su orden; módulos según su posición dentro de la superficie
 PALETA_SUPERFICIE = ["#1b554f", "#2f978d", "#d9a20b", "#73879a", "#8e5b9f", "#c0504d", "#4a7fb5", "#7a9a3a"]
 PALETA_MODULO = ["#123c37", "#2f978d", "#d9a20b", "#73879a", "#8e5b9f", "#c0504d", "#4a7fb5", "#7a9a3a",
                  "#5c3d2e", "#e07a5f", "#3d405b", "#81b29a"]
-FUENTE = "SourceSans3, Segoe UI, sans-serif"   # sin comillas: con comillas, algunas versiones de Plotly no exportan PNG
+FUENTE = "FiraSans, Segoe UI, sans-serif"   # sin comillas: con comillas, algunas versiones de Plotly no exportan PNG
 
 LOCALE_ES = {
     "dictionary": {
@@ -88,11 +90,11 @@ def _base(fig, y_titulo, x_titulo, alto=380, leyenda=True):
     fig.update_layout(
         height=alto,
         margin=dict(l=64, r=16, t=16, b=56),
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#ffffff",
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor=PAPEL,
         font=dict(family=FUENTE, size=14, color=TEXTO_2),
         separators=",.",
         hovermode="x unified",
-        hoverlabel=dict(font=dict(family=FUENTE, size=13), bgcolor="#ffffff", bordercolor="#dbe7e4"),
+        hoverlabel=dict(font=dict(family=FUENTE, size=13), bgcolor=PAPEL, bordercolor=BORDE),
         showlegend=leyenda,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0,
                     font=dict(size=13, color=TEXTO), bgcolor="rgba(0,0,0,0)"),
@@ -135,7 +137,7 @@ def vacia(mensaje="No hay datos para los filtros elegidos.", alto=320):
     fig = go.Figure()
     fig.add_annotation(text=mensaje, showarrow=False, font=dict(size=15, color=TEXTO_2),
                        xref="paper", yref="paper", x=0.5, y=0.5)
-    fig.update_layout(height=alto, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#ffffff",
+    fig.update_layout(height=alto, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor=PAPEL,
                       xaxis=dict(visible=False), yaxis=dict(visible=False), margin=dict(l=16, r=16, t=16, b=16))
     return fig
 
@@ -217,12 +219,12 @@ def _eje_tiempo(fig, horario=True):
     """Eje de fechas con botones 7 días / 1 mes / Todo y barra inferior para acercarse."""
     fig.update_xaxes(
         tickformat="%d %b\n%Y", hoverformat="%d %b %Y · %H:00" if horario else "%d %b %Y",
-        rangeslider=dict(visible=True, thickness=0.07, bgcolor="#f5f9f8", bordercolor="#dbe7e4", borderwidth=1),
+        rangeslider=dict(visible=True, thickness=0.07, bgcolor="#F5EFE3", bordercolor=BORDE, borderwidth=1),
         rangeselector=dict(
             buttons=[dict(count=7, label="7 días", step="day", stepmode="backward"),
                      dict(count=1, label="1 mes", step="month", stepmode="backward"),
                      dict(step="all", label="Todo")],
-            x=0, y=1.0, yanchor="bottom", bgcolor="#ffffff", activecolor="#eef6f3",
+            x=0, y=1.0, yanchor="bottom", bgcolor=PAPEL, activecolor="#D1DBBA",
             bordercolor="#b9d3ce", borderwidth=1, font=dict(size=12, color=TEXTO)))
     fig.update_layout(legend=dict(x=0, xanchor="left", y=1.1, yanchor="bottom"), margin=dict(t=64))
     return fig

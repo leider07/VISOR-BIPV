@@ -166,28 +166,20 @@ def barra_filtros(meta):
 
 
 # ---------------------------------------------------------------- marco
-def textos_marca(meta):
-    """(franja superior, título de la marca, subtítulo de la marca)."""
-    if D.es_resumen_fijo():
-        return "Proyecto Integra · Prototipo BIPV Sumicol", "Plataforma de monitoreo fotovoltaico", "Sumicol · Medellín"
-    lugar = " · ".join(x for x in [meta.get("ciudad"), meta.get("pais")] if x)
-    return (f"Proyecto Integra · {meta['instalacion']}", "Plataforma de monitoreo fotovoltaico",
-            " · ".join(x for x in [meta["instalacion"], meta.get("ciudad")] if x) or lugar)
+NOMBRE = "Monitor BIPV 360"
+DESCRIPTOR = "Plataforma de análisis del desempeño fotovoltaico en edificaciones"
 
 
 def encabezado(meta):
-    franja, marca, sub = textos_marca(meta)
     return html.Header(className="encabezado", children=[
-        html.Div(className="franja", children=html.Div(className="contenedor franja-int", children=[
-            html.Span(franja),
-            html.Span(f"Datos históricos · {rango_texto(meta['fecha_inicio'], meta['fecha_fin'])}"),
-        ])),
         html.Div(className="contenedor barra-nav", children=[
             dcc.Link(href="/", className="marca", children=[
-                html.Img(src="/assets/img/logos/integra-logo.png",
+                html.Img(src="/assets/img/logos/integra-logo.svg",
                          alt="Integra – Plataforma de Integración Fotovoltaica en Edificaciones", className="logo"),
                 html.Span(className="separador"),
-                html.Span(className="marca-texto", children=[marca, html.Br(), html.Small(sub)]),
+                html.Span(className="marca-texto", children=[
+                    html.Span(NOMBRE, className="marca-nombre"),
+                    html.Span(DESCRIPTOR, className="marca-desc")]),
             ]),
             html.Nav(**{"aria-label": "Secciones"}, className="nav", children=[
                 dcc.Link(nombre, href=ruta, id={"type": "nav", "index": ruta}, className="nav-link")
@@ -201,22 +193,36 @@ def aviso_base_propia(meta):
     return html.Div(className="franja-base", children=html.Div(className="contenedor franja-base-int", children=[
         html.Span(["Estás viendo tu base ", html.B(f"«{meta['instalacion']}»"),
                    ". Solo tú la ves en esta pestaña del navegador."]),
-        html.Button("Volver a la plataforma de Sumicol", id={"type": "volver", "index": "franja"}, n_clicks=0,
+        html.Button("Volver al prototipo BIPV", id={"type": "volver", "index": "franja"}, n_clicks=0,
                     className="enlace-btn")]))
+
+
+# Logos del pie: (archivo, entidad, alto en px para que se vean de un peso visual parecido)
+ALIADOS = [
+    ("SGR.png", "Sistema General de Regalías", 50),
+    ("udea.png", "Universidad de Antioquia", 58),
+    ("corantioquia.png", "Corantioquia", 46),
+    ("SUMICOL.png", "Sumicol", 26),
+    ("sociedad.png", "Sociedad Antioqueña de Ingenieros y Arquitectos", 38),
+    ("andercol.png", "Andercol", 46),
+    ("gobernacion-antioquia.png", "Gobernación de Antioquia", 62),
+    ("caldas.png", "Gobernación de Caldas", 60),
+    ("quindio.png", "Gobernación del Quindío", 62),
+    ("risaralda.png", "Gobernación de Risaralda", 66),
+]
 
 
 def pie():
     return html.Footer(className="pie", children=[
-        html.Div(className="pie-logos", children=html.Div(className="contenedor", children=html.Img(
-            src="/assets/img/logos/logos-aliados.png",
-            alt="Entidades aliadas: SGR, Universidad de Antioquia, Corantioquia, Sumicol, SAI, Andercol, "
-                "Gobernaciones de Antioquia, Caldas, Quindío y Risaralda", className="logos-aliados"))),
+        html.Div(className="pie-logos", children=html.Div(className="contenedor logos-aliados", children=[
+            html.Img(src=f"/assets/img/logos/{archivo}", alt=nombre, title=nombre, style={"height": f"{alto}px"})
+            for archivo, nombre, alto in ALIADOS])),
         html.Div(className="pie-franja", children=html.Div(className="contenedor pie-int", children=[
             html.Span(className="pie-marca", children=[
                 html.Img(src="/assets/img/logos/favicon.png", alt="", className="pie-icono"),
-                "Proyecto Integra · Plataforma de Integración Fotovoltaica en Edificaciones"]),
+                f"{NOMBRE} · {DESCRIPTOR}"]),
             html.Span(className="pie-enlaces", children=[
-                html.A("Manual de uso (PDF)", href="/assets/docs/manual_uso.pdf", download="manual_uso.pdf"),
+                html.A("Manual de uso (PDF)", href="/assets/docs/manual_uso.pdf", download="Monitor_BIPV_360_Manual_de_uso.pdf"),
                 html.A("proyecto-integra.site", href="https://proyecto-integra.site/", target="_blank", rel="noopener")]),
         ])),
     ])
